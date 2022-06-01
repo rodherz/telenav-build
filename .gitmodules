@@ -1,0 +1,60 @@
+[submodule "lexakai-annotations"]
+	path = lexakai-annotations
+	url = https://github.com/Telenav/lexakai-annotations.git
+	branch = feature/new-build-scripts
+[submodule "kivakit"]
+	path = kivakit
+	url = https://github.com/Telenav/kivakit.git
+	branch = feature/new-build-scripts
+[submodule "kivakit-extensions"]
+	path = kivakit-extensions
+	url = https://github.com/Telenav/kivakit-extensions.git
+	branch = feature/new-build-scripts
+[submodule "kivakit-stuff"]
+	path = kivakit-stuff
+	url = https://github.com/Telenav/kivakit-stuff.git
+	branch = feature/new-build-scripts
+[submodule "kivakit-examples"]
+	path = kivakit-examples
+	url = https://github.com/Telenav/kivakit-examples.git
+	branch = feature/new-build-scripts
+[submodule "lexakai"]
+	path = lexakai
+	url = https://github.com/Telenav/lexakai.git
+	branch = feature/new-build-scripts
+[submodule "mesakit"]
+	path = mesakit
+	url = https://github.com/Telenav/mesakit.git
+	branch = feature/new-build-scripts
+[submodule "mesakit-extensions"]
+	path = mesakit-extensions
+	url = https://github.com/Telenav/mesakit-extensions.git
+	branch = feature/new-build-scripts
+[submodule "mesakit-examples"]
+	path = mesakit-examples
+	url = https://github.com/Telenav/mesakit-examples.git
+	branch = feature/new-build-scripts
+[submodule "cactus-build"]
+	path = cactus-build
+	url = https://github.com/Telenav/cactus-build.git
+	branch = feature/new-build-scripts
+[submodule "telenav-superpom"]
+	path = telenav-superpom
+	url = https://github.com/Telenav/telenav-superpom.git
+	branch = feature/new-build-scripts
+[submodule "mesakit-assets"]
+	path = mesakit-assets
+	url = https://github.com/Telenav/mesakit-assets.git
+	branch = publish
+[submodule "lexakai-assets"]
+	path = lexakai-assets
+	url = https://github.com/Telenav/lexakai-assets.git
+	branch = publish
+[submodule "kivakit-assets"]
+	path = kivakit-assets
+	url = https://github.com/Telenav/kivakit-assets.git
+	branch = publish
+[submodule "cactus-build-assets"]
+	path = cactus-build-assets
+	url = https://github.com/Telenav/cactus-build-assets.git
+	branch = publish

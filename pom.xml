@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
+// © 2011-2022 Telenav, Inc.
+// Licensed under Apache License, Version 2.0
+//
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+-->
+
+<project xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+         xmlns = "http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation = "http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <!--
+       This is a bill-of-materials ONLY POM. It builds top-level subprojects which are
+       incorporated as Git submodules. It should not have a parent, list dependencies
+       or contain any configuration, and the child projects should neither assume they
+       live underneath it, nor attempt to reference it as a parent or in any other way.
+
+       This is a list of stuff for Maven to build however it wants to be built, and that
+       it is all it should ever be, because it should remain possible to create a different
+       git repository with a sub- or super-set of what is included here, with no chance of
+       that breaking something.
+    -->
+
+    <groupId>com.telenav</groupId>
+    <artifactId>kivakit-build</artifactId>
+    <version>1.5.1-SNAPSHOT</version>
+
+    <packaging>pom</packaging>
+
+    <name>kivakit-build</name>
+    <description>
+        A bill-of-materials-only project that builds all KivaKit, MesaKit and Lexakai
+        projects.
+    </description>
+    <modules>
+
+        <module>telenav-superpom</module>
+        <module>kivakit</module>
+        <module>cactus-build</module>
+        <module>lexakai-annotations</module>
+        <module>kivakit-extensions</module>
+        <module>kivakit-examples</module>
+        <module>kivakit-stuff</module>
+        <module>lexakai</module>
+        <module>mesakit</module>
+        <module>mesakit-extensions</module>
+        <module>mesakit-examples</module>
+
+    </modules>
+
+</project>

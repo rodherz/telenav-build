@@ -1,0 +1,41 @@
+#!/bin/sh
+
+# Determine the branch to set up
+branch_name=$1
+
+# shellcheck disable=SC2039
+if [[ -z "$branch_name" ]]; then
+
+    branch_name=develop
+
+fi
+
+echo "Setting up to build branch $branch_name"
+git submodule init || exit 1
+
+echo "Cloning git repositories"
+git submodule update || exit 1
+
+echo "Configuring git repositories"
+git config pull.ff only || exit 1
+# shellcheck disable=SC2016
+git submodule foreach 'git config pull.ff only && echo "Configuring $name"' || exit 1
+
+echo "Initializing git flow"
+# shellcheck disable=SC2016
+git submodule foreach '[[ "$path" == *-assets* ]] || git flow init -f -d --feature feature/ --bugfix bugfix/ --release release/ --hotfix hotfix/ --support support/ -t ''' || exit 1
+
+echo "Configuring environment"
+# shellcheck disable=SC2039
+source ./source-me || exit 1
+
+echo "Switching to branch $branch_name"
+kivakit-git-switch-branch.sh "$branch_name" || exit 1
+
+echo "Running master build"
+cd telenav-superpom
+mvn clean install
+cd ..
+mvn clean install
+
+echo "Done."

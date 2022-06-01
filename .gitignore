@@ -1,0 +1,20 @@
+*.orig
+*.class
+*.jar
+*.war
+*.ear
+*~
+target/
+/parent/target/
+
+# IDE metadata
+nbproject/
+nb-configuration.xml
+nbactions.xml
+*.iml
+.idea/*
+.classpath
+*.orig
+.DS_Store
+*~
+
