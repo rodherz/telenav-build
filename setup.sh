@@ -25,7 +25,12 @@ git submodule init || exit 1
 echo "Cloning git repositories"
 git submodule update || exit 1
 
-if [[ ! "$build" == "ci-build" ]]; then
+if [[ "$build" == "ci-build" ]]; then
+
+    export TMPDIR=temporary
+    mkdir $TMPDIR
+
+else
 
     echo "Configuring git repositories"
     git config pull.ff only || exit 1
