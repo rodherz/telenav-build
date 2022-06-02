@@ -48,10 +48,8 @@ echo "Configuring environment"
 source ./source-me || exit 1
 
 echo "Switching to branch $branch_name"
-# shellcheck disable=SC2140
-git submodule foreach "[[ ! "\$path" == *-assets* ]] || git checkout $branch_name" || exit 1
-# shellcheck disable=SC2140
-git submodule foreach "[[ "\$path" == *-assets* ]] || git checkout publish" || exit 1
+git submodule foreach "[[ ! \"\$path\" == *-assets* ]] || git checkout $branch_name" || exit 1
+git submodule foreach "[[ \"\$path\" == *-assets* ]] || git checkout publish" || exit 1
 
 echo "Installing super pom"
 mvn -f telenav-superpom/pom.xml clean install
@@ -60,3 +58,5 @@ echo "Running master build"
 mvn clean install
 
 echo "Done."
+
+git submodule foreach "[[ ! \"$path\" == *-assets* ]] || echo $branch_name" || exit 1
