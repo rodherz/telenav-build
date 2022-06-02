@@ -32,10 +32,10 @@ source ./source-me || exit 1
 echo "Switching to branch $branch_name"
 kivakit-git-switch-branch.sh "$branch_name" || exit 1
 
+echo "Installing super pom"
+mvn -f telenav-superpom/pom.xml clean install
+
 echo "Running master build"
-cd telenav-superpom
-mvn clean install
-cd ..
 mvn clean install
 
 echo "Done."

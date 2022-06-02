@@ -17,4 +17,5 @@ nbactions.xml
 *.orig
 .DS_Store
 *~
-
+telenav-assets/
+safety-service/
