@@ -27,7 +27,7 @@ git submodule update || exit 1
 
 if [[ "$build" == "ci-build" ]]; then
 
-    export TMPDIR=temporary
+    export TMPDIR=./temporary/
     mkdir $TMPDIR
 
 else
