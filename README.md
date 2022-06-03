@@ -36,15 +36,20 @@ Where [branch-name] is one of:
 
  - master (latest release)
  - develop (development code)
- - feature/* (feature branch)
- - hotfix/* (fix branch)
 
 Next, execute:
 
 ```
 cd telenav-build
-./setup.sh
+./setup.sh [branch-name]
 ```
+
+Where [branch-name] is one of:
+
+ - master (latest release)
+ - develop (development code)
+ - feature/* (feature branch)
+ - hotfix/* (fix branch)
 
 This will cause all projects for the branch to be checked out and built.
 
