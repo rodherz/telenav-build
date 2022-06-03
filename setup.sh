@@ -83,6 +83,7 @@ source ./source-me || exit 1
 #
 
 echo "Switching to branch $branch_name"
+git checkout --quiet $branch_name || echo "Ignoring: No branch of telenav-build called $branch_name"
 export branch_name
 # shellcheck disable=SC2016
 git submodule --quiet foreach 'echo $path' | grep assets | xargs -I FOLDER echo "cd FOLDER && git checkout publish"
