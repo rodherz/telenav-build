@@ -94,6 +94,8 @@ git submodule --quiet foreach 'echo $path' | grep -v assets | xargs -I FOLDER ec
 #
 
 echo "Building"
+HOME=$(pwd)
+export HOME
 mvn --batch-mode -f telenav-superpom/pom.xml clean install
 mvn --batch-mode clean install
 
