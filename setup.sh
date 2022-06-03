@@ -50,8 +50,8 @@ source ./source-me || exit 1
 echo "Switching to branch $branch_name"
 export branch_name
 
-git submodule foreach "if [[ \"\$path\" == *\"-assets\" ]] ; then git checkout publish ; fi" || exit 1
-git submodule foreach "if [[ ! \"\$path\" == *\"-assets\" ]] ; then git checkout $branch_name ; fi" || exit 1
+git submodule foreach "eval if [[ \"\$path\" == *\"-assets\" ]] ; then git checkout publish ; fi" || exit 1
+git submodule foreach "eval if [[ ! \"\$path\" == *\"-assets\" ]] ; then git checkout $branch_name ; fi" || exit 1
 
 echo "Installing super pom"
 mvn -f telenav-superpom/pom.xml clean install
@@ -68,6 +68,3 @@ else
 fi
 
 echo "Done."
-
-
-git submodule foreach "[[ ! \"\$path\" == *\"-assets\" ]] || echo git checkout $branch_name" || exit 1
