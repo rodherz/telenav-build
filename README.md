@@ -34,8 +34,10 @@ git clone --branch [branch-name] https://github.com/Telenav/telenav-build.git
 
 Where [branch-name] is one of:
 
- - master (latest stable code)
+ - master (latest release)
  - develop (development code)
+ - feature/* (feature branch)
+ - hotfix/* (fix branch)
 
 Next, execute:
 
