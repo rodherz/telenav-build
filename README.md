@@ -21,8 +21,10 @@ The following products are required to build Telenav Open Source projects:
 
  - Java 17.0.2+
  - Maven 3.8.5+
- - Git
- - Git Flow (brew install git-flow)
+ - Git 2.30.1+
+ - Git Flow 1.12.3 (AVH Edition): brew install git-flow-avh
+
+> NOTE: The git flow AVH build is **required**.
 
 ## Setup
 
