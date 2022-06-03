@@ -49,9 +49,10 @@ source ./source-me || exit 1
 
 echo "Switching to branch $branch_name"
 export branch_name
-
-git submodule foreach "eval if [[ \"\$path\" == *\"-assets\" ]] ; then git checkout publish ; fi" || exit 1
-git submodule foreach "eval if [[ ! \"\$path\" == *\"-assets\" ]] ; then git checkout $branch_name ; fi" || exit 1
+# shellcheck disable=SC2016
+git submodule --quiet foreach 'echo $path' | grep assets | xargs -I FOLDER echo "cd FOLDER && git checkout publish"
+# shellcheck disable=SC2016
+git submodule --quiet foreach 'echo $path' | grep -v assets | xargs -I FOLDER echo "cd FOLDER && git checkout $branch_name"
 
 echo "Installing super pom"
 mvn -f telenav-superpom/pom.xml clean install
