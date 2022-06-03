@@ -54,18 +54,8 @@ git submodule --quiet foreach 'echo $path' | grep assets | xargs -I FOLDER echo 
 # shellcheck disable=SC2016
 git submodule --quiet foreach 'echo $path' | grep -v assets | xargs -I FOLDER echo "cd FOLDER && git checkout $branch_name"
 
-echo "Installing super pom"
-mvn -f telenav-superpom/pom.xml clean install
-
-echo "Running master build"
-if [[ "$build" == "ci-build" ]]; then
-
-    mvn --batch-mode clean install
-
-else
-
-    mvn clean install
-
-fi
+echo "Building"
+mvn -f --batch-mode telenav-superpom/pom.xml clean install
+mvn --batch-mode clean install
 
 echo "Done."
