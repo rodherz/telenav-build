@@ -48,15 +48,26 @@ echo "Configuring environment"
 source ./source-me || exit 1
 
 echo "Switching to branch $branch_name"
-git submodule foreach "if [[ ! \"\$path\" == *\"-assets\"* ]]; then git checkout $branch_name; fi" || exit 1
-git submodule foreach "if [[ \"\$path\" == *\"-assets\"* ]]; then git checkout publish; fi" || exit 1
+export branch_name
+
+git submodule foreach "[[ \"\$path\" == *\"-assets\" ]] || git checkout publish" || exit 1
+git submodule foreach "[[ \"\$path\" == *\"-assets\" ]] || git checkout $branch_name" || exit 1
 
 echo "Installing super pom"
 mvn -f telenav-superpom/pom.xml clean install
 
 echo "Running master build"
-mvn clean install
+if [[ "$build" == "ci-build" ]]; then
+
+    mvn --batch-mode clean install
+
+else
+
+    mvn clean install
+
+fi
 
 echo "Done."
 
-git submodule foreach "[[ ! \"$path\" == *-assets* ]] || echo $branch_name" || exit 1
+
+git submodule foreach "[[ ! \"\$path\" == *\"-assets\" ]] || echo git checkout $branch_name" || exit 1
