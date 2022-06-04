@@ -4,6 +4,56 @@ branch_name=$1
 caller=$2
 
 #
+# Check tools
+#
+
+# 1) Parse Java version from output like: openjdk version "17.0.3" 2022-04-19 LTS
+java_version=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}')
+
+# 2) Parse Maven version from output like: Apache Maven 3.8.5 (3599d3414f046de2324203b78ddcf9b5e4388aa0)
+maven_version=$(mvn -version 2>&1 | awk -F ' ' '/Apache Maven/ {print $3}')
+
+# 3) Parse Git version from output like: git version 2.36.1
+git_version=$(git --version 2>&1 | awk -F' ' '{print $3}')
+
+# 4) Parse Git flow version from output like: 1.12.3 (AVH Edition)
+git_flow_version=$(git flow version)
+
+# Check Java version
+if [[ ! "$java_version" == "17."* ]]; then
+    echo "Telenav Open Source projects require Java 17"
+    echo "To install: https://jdk.java.net/archive/"
+    exit 1
+else
+    echo "Using Java $java_version"
+fi
+
+# Check Maven version
+if [[ ! $maven_version =~ 3\.8\.[5-9][0-9]* ]]; then
+    echo "Telenav Open Source projects require Maven 3.8.5 or higher"
+    echo "To install: https://maven.apache.org/download.cgi"
+    exit 1
+else
+    echo "Using Maven $maven_version"
+fi
+
+# Check Git version
+if [[ ! $git_version =~ 2\.3[0-9]\. ]]; then
+    echo "Telenav Open Source projects require Git version 2.30 or higher"
+    exit 1
+else
+    echo "Using Git $git_version"
+fi
+
+if [[ ! $git_flow_version =~ 1.1[2-9]\..*\(AVH\ Edition\) ]]; then
+    echo "Telenav Open Source projects require Git Flow (AVH Edition) version 1.12 or higher"
+    echo "To install on macOS: brew install git-flow-avh"
+    exit 1
+else
+    echo "Using Git Flow $git_flow_version"
+fi
+
+#
 # Determine branch to set up
 #
 
@@ -66,7 +116,7 @@ else
 
     echo "Initializing git flow"
     # shellcheck disable=SC2016
-    git submodule foreach '[[ "$path" == *-assets* ]] || git flow init -f -d --feature feature/ --bugfix bugfix/ --release release/ --hotfix hotfix/ --support support/ -t ''' || exit 1
+    git submodule foreach '[[ "$path" == *-assets* ]] || git flow init -f -d --feature feature/ --bugfix bugfix/ --release release/ --hotfix hotfix/ --support support/ -t \"\"' || exit 1
 
 fi
 
