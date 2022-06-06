@@ -27,7 +27,7 @@ if [[ ! "$java_version" == "17."* ]]; then
     echo "To install: https://jdk.java.net/archive/"
     exit 1
 else
-    echo "Using Java $java_version"
+    echo "Java $java_version"
 fi
 
 # Check Maven version
@@ -36,7 +36,7 @@ if [[ ! $maven_version =~ 3\.8\.[5-9][0-9]* ]]; then
     echo "To install: https://maven.apache.org/download.cgi"
     exit 1
 else
-    echo "Using Maven $maven_version"
+    echo "Maven $maven_version"
 fi
 
 # Check Git version
@@ -44,7 +44,7 @@ if [[ ! $git_version =~ 2\.3[0-9]\. ]]; then
     echo "Telenav Open Source projects require Git version 2.30 or higher"
     exit 1
 else
-    echo "Using Git $git_version"
+    echo "Git $git_version"
 fi
 
 # Check Git Flow version
@@ -55,7 +55,7 @@ if [[ ! "$caller" == "ci-build" ]]; then
         echo "To install on macOS: brew install git-flow-avh"
         exit 1
     else
-        echo "Using Git Flow $git_flow_version"
+        echo "Git Flow $git_flow_version"
     fi
 fi
 
@@ -110,7 +110,7 @@ if [[ "$caller" == "ci-build" ]]; then
 
     echo "Creating temporary folder"
     export TMPDIR=./temporary/
-    mkdir $TMPDIR
+    mkdir -p $TMPDIR
 
 else
 
@@ -139,12 +139,12 @@ source ./source-me || exit 1
 #
 
 echo "Switching to branch $branch_name"
-git checkout --quiet $branch_name || echo "Ignoring: No branch of telenav-build called $branch_name"
+git checkout --quiet $branch_name || echo "Ignoring: No branch of telenav-build called $branch_name" || exit 1
 export branch_name
 # shellcheck disable=SC2016
-git submodule --quiet foreach 'echo $path' | grep assets | xargs -I FOLDER echo "cd FOLDER && git checkout publish"
+git submodule --quiet foreach 'echo $path' | grep assets | xargs -I FOLDER echo "cd FOLDER && git checkout publish" || exit 1
 # shellcheck disable=SC2016
-git submodule --quiet foreach 'echo $path' | grep -v assets | xargs -I FOLDER echo "cd FOLDER && git checkout $branch_name"
+git submodule --quiet foreach 'echo $path' | grep -v assets | xargs -I FOLDER echo "cd FOLDER && git checkout $branch_name" || exit 1
 
 #
 # Build
@@ -154,17 +154,17 @@ HOME=$(pwd)
 export HOME
 
 echo "Installing superpom"
-mvn --batch-mode -f telenav-superpom/pom.xml clean install
+mvn --batch-mode -f telenav-superpom/pom.xml clean install || exit 1
 
 if [[ -d cactus-build ]]; then
 
     echo "Building maven plugin"
-    mvn --batch-mode -f cactus-build clean install
+    mvn --batch-mode -f cactus-build clean install || exit 1
 
 fi
 
 echo "Building"
-mvn --batch-mode clean install
+mvn --batch-mode clean install || exit 1
 
 #
 # Setup complete
