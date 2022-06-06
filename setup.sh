@@ -148,6 +148,9 @@ echo "Building"
 HOME=$(pwd)
 export HOME
 mvn --batch-mode -f telenav-superpom/pom.xml clean install
+if [[ -d cactus-build ]]; then
+    mvn --batch-mode -f cactus-build/maven-plugin clean install
+fi
 mvn --batch-mode clean install
 
 #
