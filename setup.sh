@@ -17,7 +17,9 @@ maven_version=$(mvn -version 2>&1 | awk -F ' ' '/Apache Maven/ {print $3}')
 git_version=$(git --version 2>&1 | awk -F' ' '{print $3}')
 
 # 4) Parse Git flow version from output like: 1.12.3 (AVH Edition)
-git_flow_version=$(git flow version)
+if [[ ! "$caller" == "ci-build" ]]; then
+    git_flow_version=$(git flow version)
+fi
 
 # Check Java version
 if [[ ! "$java_version" == "17."* ]]; then
@@ -45,12 +47,16 @@ else
     echo "Using Git $git_version"
 fi
 
-if [[ ! $git_flow_version =~ 1.1[2-9]\..*\(AVH\ Edition\) ]]; then
-    echo "Telenav Open Source projects require Git Flow (AVH Edition) version 1.12 or higher"
-    echo "To install on macOS: brew install git-flow-avh"
-    exit 1
-else
-    echo "Using Git Flow $git_flow_version"
+# Check Git Flow version
+
+if [[ ! "$caller" == "ci-build" ]]; then
+    if [[ ! $git_flow_version =~ 1.1[2-9]\..*\(AVH\ Edition\) ]]; then
+        echo "Telenav Open Source projects require Git Flow (AVH Edition) version 1.12 or higher"
+        echo "To install on macOS: brew install git-flow-avh"
+        exit 1
+    else
+        echo "Using Git Flow $git_flow_version"
+    fi
 fi
 
 #
