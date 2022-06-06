@@ -159,7 +159,7 @@ mvn --batch-mode -f telenav-superpom/pom.xml clean install
 if [[ -d cactus-build ]]; then
 
     echo "Building maven plugin"
-    mvn --batch-mode -f cactus-build/maven-plugin clean install
+    mvn --batch-mode -f cactus-build clean install
 
 fi
 
