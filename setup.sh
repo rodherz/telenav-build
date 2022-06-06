@@ -144,13 +144,20 @@ git submodule --quiet foreach 'echo $path' | grep -v assets | xargs -I FOLDER ec
 # Build
 #
 
-echo "Building"
 HOME=$(pwd)
 export HOME
+
+echo "Installing superpom"
 mvn --batch-mode -f telenav-superpom/pom.xml clean install
+
 if [[ -d cactus-build ]]; then
+
+    echo "Building maven plugin"
     mvn --batch-mode -f cactus-build/maven-plugin clean install
+
 fi
+
+echo "Building"
 mvn --batch-mode clean install
 
 #
