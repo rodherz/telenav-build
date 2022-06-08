@@ -147,6 +147,27 @@ git submodule --quiet foreach 'echo $path' | grep assets | xargs -I FOLDER echo 
 git submodule --quiet foreach 'echo $path' | grep -v assets | xargs -I FOLDER echo "cd FOLDER && git checkout $branch_name" || exit 1
 
 #
+# Clear caches
+#
+
+project_version()
+{
+    project_home=$1
+
+    pushd "$project_home" 1>/dev/null || exit 1
+    mvn -q -DforceStdout org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version || exit 1
+    popd 1>/dev/null || exit 1
+}
+
+KIVAKIT_VERSION=$(project_version kivakit)
+MESAKIT_VERSION=$(project_version mesakit)
+
+echo rm -rf "~/.kivakit/$KIVAKIT_VERSION"
+echo rm -rf "~/.mesakit/$MESAKIT_VERSION"
+
+exit 1
+
+#
 # Build
 #
 
