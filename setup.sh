@@ -122,7 +122,7 @@ else
 
     echo "Initializing git flow"
     # shellcheck disable=SC2016
-    git submodule foreach '[[ "$path" == *-assets* ]] || git flow init -f -d --feature feature/ --bugfix bugfix/ --release release/ --hotfix hotfix/ --support support/ -t \"\"' || exit 1
+    git submodule foreach '[[ "$path" == *-assets ]] || git flow init -f -d --feature feature/ --bugfix bugfix/ --release release/ --hotfix hotfix/ --support support/ -t \"\"' || exit 1
 
 fi
 
@@ -138,13 +138,10 @@ source ./source-me || exit 1
 # Check out branch
 #
 
-echo "Switching to branch $branch_name"
+echo "Checking out branch $branch_name"
 git checkout --quiet $branch_name || echo "Ignoring: No branch of telenav-build called $branch_name" || exit 1
-export branch_name
-# shellcheck disable=SC2016
-git submodule --quiet foreach 'echo $path' | grep assets | xargs -I FOLDER echo "cd FOLDER && git checkout publish" || exit 1
-# shellcheck disable=SC2016
-git submodule --quiet foreach 'echo $path' | grep -v assets | xargs -I FOLDER echo "cd FOLDER && git checkout $branch_name" || exit 1
+git submodule --quiet foreach '[[ ! "$path" == *-assets ]] || git checkout publish' || exit 1
+git submodule --quiet foreach "[[ "\$path" == *-assets ]] || git checkout $branch_name" || exit 1
 
 #
 # Clear cache folders
