@@ -144,6 +144,13 @@ git submodule --quiet foreach '[[ ! "$path" == *-assets ]] || git checkout publi
 git submodule --quiet foreach "[[ "\$path" == *-assets ]] || git checkout $branch_name" || exit 1
 
 #
+# Install superpoms
+#
+
+echo "Installing superpom"
+mvn --batch-mode -f telenav-superpom/pom.xml clean install || exit 1
+
+#
 # Clear cache folders
 #
 
@@ -170,9 +177,6 @@ rm -rf "~/.mesakit/$MESAKIT_VERSION"
 
 HOME=$(pwd)
 export HOME
-
-echo "Installing superpom"
-mvn --batch-mode -f telenav-superpom/pom.xml clean install || exit 1
 
 if [[ -d cactus-build ]]; then
 
