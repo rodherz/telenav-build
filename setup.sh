@@ -147,7 +147,7 @@ git submodule --quiet foreach 'echo $path' | grep assets | xargs -I FOLDER echo 
 git submodule --quiet foreach 'echo $path' | grep -v assets | xargs -I FOLDER echo "cd FOLDER && git checkout $branch_name" || exit 1
 
 #
-# Clear caches
+# Clear cache folders
 #
 
 project_version()
@@ -160,12 +160,12 @@ project_version()
 }
 
 KIVAKIT_VERSION=$(project_version kivakit)
+echo "Removing ~/.kivakit/$KIVAKIT_VERSION"
+rm -rf "~/.kivakit/$KIVAKIT_VERSION"
+
 MESAKIT_VERSION=$(project_version mesakit)
-
-echo rm -rf "~/.kivakit/$KIVAKIT_VERSION"
-echo rm -rf "~/.mesakit/$MESAKIT_VERSION"
-
-exit 1
+echo "Removing ~/.mesakit/$MESAKIT_VERSION"
+rm -rf "~/.mesakit/$MESAKIT_VERSION"
 
 #
 # Build
