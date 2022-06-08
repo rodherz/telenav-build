@@ -138,6 +138,13 @@ else
 fi
 
 #
+# Install super-poms
+#
+
+echo "Installing super-pom"
+mvn --batch-mode -f telenav-superpom/pom.xml clean install || exit 1
+
+#
 # Configure environment
 #
 
@@ -154,13 +161,6 @@ git checkout --quiet $branch_name || echo "Ignoring: No branch of telenav-build 
 # shellcheck disable=SC2016
 git submodule --quiet foreach '[[ ! "$path" == *-assets ]] || git checkout publish' || exit 1
 git submodule --quiet foreach "[[ \"\$path\" == *-assets ]] || git checkout $branch_name" || exit 1
-
-#
-# Install super-poms
-#
-
-echo "Installing super-pom"
-mvn --batch-mode -f telenav-superpom/pom.xml clean install || exit 1
 
 #
 # Clear cache folders
