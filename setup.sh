@@ -4,6 +4,17 @@ branch_name=$1
 caller=$2
 
 #
+# Set HOME for continuous integration build
+#
+
+if [[ "$caller" == "ci-build" ]]; then
+
+    HOME=$(pwd)
+    export HOME
+
+fi
+
+#
 # Check tools
 #
 
@@ -140,14 +151,15 @@ source ./source-me || exit 1
 
 echo "Checking out branch $branch_name"
 git checkout --quiet $branch_name || echo "Ignoring: No branch of telenav-build called $branch_name" || exit 1
+# shellcheck disable=SC2016
 git submodule --quiet foreach '[[ ! "$path" == *-assets ]] || git checkout publish' || exit 1
-git submodule --quiet foreach "[[ "\$path" == *-assets ]] || git checkout $branch_name" || exit 1
+git submodule --quiet foreach "[[ \"\$path\" == *-assets ]] || git checkout $branch_name" || exit 1
 
 #
-# Install superpoms
+# Install super-poms
 #
 
-echo "Installing superpom"
+echo "Installing super-pom"
 mvn --batch-mode -f telenav-superpom/pom.xml clean install || exit 1
 
 #
@@ -165,31 +177,32 @@ project_version()
 
 KIVAKIT_VERSION=$(project_version kivakit)
 echo "Removing ~/.kivakit/$KIVAKIT_VERSION"
-rm -rf "~/.kivakit/$KIVAKIT_VERSION"
+rm -rf "$HOME/.kivakit/$KIVAKIT_VERSION"
 
 MESAKIT_VERSION=$(project_version mesakit)
-echo "Removing ~/.mesakit/$MESAKIT_VERSION"
-rm -rf "~/.mesakit/$MESAKIT_VERSION"
+echo "Removing $HOME/.mesakit/$MESAKIT_VERSION"
+rm -rf "$HOME/.mesakit/$MESAKIT_VERSION"
+
+#
+# Build cactus
+#
+
+if [[ -d cactus-build ]]; then
+
+    echo "Building cactus"
+    mvn --batch-mode -f cactus-build clean install || exit 1
+
+fi
 
 #
 # Build
 #
 
-HOME=$(pwd)
-export HOME
-
-if [[ -d cactus-build ]]; then
-
-    echo "Building maven plugin"
-    mvn --batch-mode -f cactus-build clean install || exit 1
-
-fi
-
 echo "Building"
 mvn --batch-mode clean install || exit 1
 
 #
-# Setup complete
+# Done
 #
 
 echo "Done."
