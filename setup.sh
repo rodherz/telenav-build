@@ -17,7 +17,9 @@ maven_version=$(mvn -version 2>&1 | awk -F ' ' '/Apache Maven/ {print $3}')
 git_version=$(git --version 2>&1 | awk -F' ' '{print $3}')
 
 # 4) Parse Git flow version from output like: 1.12.3 (AVH Edition)
-git_flow_version=$(git flow version)
+if [[ ! "$caller" == "ci-build" ]]; then
+    git_flow_version=$(git flow version)
+fi
 
 # Check Java version
 if [[ ! "$java_version" == "17."* ]]; then
@@ -25,7 +27,7 @@ if [[ ! "$java_version" == "17."* ]]; then
     echo "To install: https://jdk.java.net/archive/"
     exit 1
 else
-    echo "Using Java $java_version"
+    echo "Java $java_version"
 fi
 
 # Check Maven version
@@ -34,7 +36,7 @@ if [[ ! $maven_version =~ 3\.8\.[5-9][0-9]* ]]; then
     echo "To install: https://maven.apache.org/download.cgi"
     exit 1
 else
-    echo "Using Maven $maven_version"
+    echo "Maven $maven_version"
 fi
 
 # Check Git version
@@ -42,15 +44,19 @@ if [[ ! $git_version =~ 2\.3[0-9]\. ]]; then
     echo "Telenav Open Source projects require Git version 2.30 or higher"
     exit 1
 else
-    echo "Using Git $git_version"
+    echo "Git $git_version"
 fi
 
-if [[ ! $git_flow_version =~ 1.1[2-9]\..*\(AVH\ Edition\) ]]; then
-    echo "Telenav Open Source projects require Git Flow (AVH Edition) version 1.12 or higher"
-    echo "To install on macOS: brew install git-flow-avh"
-    exit 1
-else
-    echo "Using Git Flow $git_flow_version"
+# Check Git Flow version
+
+if [[ ! "$caller" == "ci-build" ]]; then
+    if [[ ! $git_flow_version =~ 1.1[2-9]\..*\(AVH\ Edition\) ]]; then
+        echo "Telenav Open Source projects require Git Flow (AVH Edition) version 1.12 or higher"
+        echo "To install on macOS: brew install git-flow-avh"
+        exit 1
+    else
+        echo "Git Flow $git_flow_version"
+    fi
 fi
 
 #
@@ -104,7 +110,7 @@ if [[ "$caller" == "ci-build" ]]; then
 
     echo "Creating temporary folder"
     export TMPDIR=./temporary/
-    mkdir $TMPDIR
+    mkdir -p $TMPDIR
 
 else
 
@@ -116,7 +122,7 @@ else
 
     echo "Initializing git flow"
     # shellcheck disable=SC2016
-    git submodule foreach '[[ "$path" == *-assets* ]] || git flow init -f -d --feature feature/ --bugfix bugfix/ --release release/ --hotfix hotfix/ --support support/ -t \"\"' || exit 1
+    git submodule foreach '[[ "$path" == *-assets ]] || git flow init -f -d --feature feature/ --bugfix bugfix/ --release release/ --hotfix hotfix/ --support support/ -t \"\"' || exit 1
 
 fi
 
@@ -132,23 +138,55 @@ source ./source-me || exit 1
 # Check out branch
 #
 
-echo "Switching to branch $branch_name"
-git checkout --quiet $branch_name || echo "Ignoring: No branch of telenav-build called $branch_name"
-export branch_name
-# shellcheck disable=SC2016
-git submodule --quiet foreach 'echo $path' | grep assets | xargs -I FOLDER echo "cd FOLDER && git checkout publish"
-# shellcheck disable=SC2016
-git submodule --quiet foreach 'echo $path' | grep -v assets | xargs -I FOLDER echo "cd FOLDER && git checkout $branch_name"
+echo "Checking out branch $branch_name"
+git checkout --quiet $branch_name || echo "Ignoring: No branch of telenav-build called $branch_name" || exit 1
+git submodule --quiet foreach '[[ ! "$path" == *-assets ]] || git checkout publish' || exit 1
+git submodule --quiet foreach "[[ "\$path" == *-assets ]] || git checkout $branch_name" || exit 1
+
+#
+# Install superpoms
+#
+
+echo "Installing superpom"
+mvn --batch-mode -f telenav-superpom/pom.xml clean install || exit 1
+
+#
+# Clear cache folders
+#
+
+project_version()
+{
+    project_home=$1
+
+    pushd "$project_home" 1>/dev/null || exit 1
+    mvn -q -DforceStdout org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version || exit 1
+    popd 1>/dev/null || exit 1
+}
+
+KIVAKIT_VERSION=$(project_version kivakit)
+echo "Removing ~/.kivakit/$KIVAKIT_VERSION"
+rm -rf "~/.kivakit/$KIVAKIT_VERSION"
+
+MESAKIT_VERSION=$(project_version mesakit)
+echo "Removing ~/.mesakit/$MESAKIT_VERSION"
+rm -rf "~/.mesakit/$MESAKIT_VERSION"
 
 #
 # Build
 #
 
-echo "Building"
 HOME=$(pwd)
 export HOME
-mvn --batch-mode -f telenav-superpom/pom.xml clean install
-mvn --batch-mode clean install
+
+if [[ -d cactus-build ]]; then
+
+    echo "Building maven plugin"
+    mvn --batch-mode -f cactus-build clean install || exit 1
+
+fi
+
+echo "Building"
+mvn --batch-mode clean install || exit 1
 
 #
 # Setup complete
