@@ -1,29 +1,4 @@
 
-export TELENAV_WORKSPACE=$PWD
-
-export CACTUS_HOME=$PWD/cactus-build
-export CACTUS_VERSION=`cat kivakit/pom.xml| grep version | head -1 | xargs echo | cut -b10- | awk -F '<' '{print $1;}'`
-
-export KIVAKIT_HOME=$PWD/kivakit
-export KIVAKIT_VERSION=`cat kivakit/pom.xml| grep version | head -1 | xargs echo | cut -b10- | awk -F '<' '{print $1;}'`
-export KIVAKIT_ASSETS_HOME=$PWD/kivakit-assets
-export KIVAKIT_STUFF_HOME=$PWD/kivakit-stuff
-export KIVAKIT_EXTENSIONS_HOME=$PWD/kivakit-extensions
-export KIVAKIT_EXAMPLES_HOME=$PWD/kivakit-examples
-export KIVAKIT_CACHE_HOME=~/.kivakit/$KIVAKIT_VERSION
-export KIVAKIT_TOOLS=$KIVAKIT_HOME/tools
-export KIVAKIT_JAVA_OPTIONS=-Xmx12g
-export KIVAKIT_AGENT_JAR=$KIVAKIT_TOOLS/agent/kivakit-agent.jar
-
-export MESAKIT_HOME=$PWD/mesakit
-export MESAKIT_VERSION=`cat mesakit/pom.xml| grep version | head -1 | xargs echo | cut -b10- | awk -F '<' '{print $1;}'`
-export MESAKIT_ASSETS_HOME=$PWD/mesakit-assets
-export MESAKIT_EXTENSIONS_HOME=$PWD/mesakit-extensions
-export MESAKIT_EXAMPLES_HOME=$PWD/mesakit-examples
-export MESAKIT_CACHE_HOME=~/.kivakit/$MESAKIT_VERSION
-export MESAKIT_JAVA_OPTIONS=-Xmx12g
-export MESAKIT_TOOLS=$MESAKIT_HOME/tools
-
 append_path()
 {
     export PATH="$PATH:$1"
@@ -34,11 +9,57 @@ prepend_path()
     export PATH="$1:$PATH"
 }
 
+project_version()
+{
+    project_home=$1
+
+    pushd "$project_home" 1>/dev/null || exit 1
+    mvn -q -DforceStdout org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version || exit 1
+    popd 1>/dev/null || exit 1
+}
+
+
+export TELENAV_WORKSPACE=$PWD
+
+export CACTUS_HOME=$PWD/cactus-build
+export KIVAKIT_HOME=$PWD/kivakit
+export MESAKIT_HOME=$PWD/mesakit
+
 append_path $CACTUS_HOME/bin
 prepend_path "$M2_HOME/bin"
 prepend_path "$JAVA_HOME/bin"
 
-source "$TELENAV_WORKSPACE"/cactus-build/bin/telenav-library-functions.sh
+if [[ -d "$CACTUS_HOME" ]]; then
+
+    export CACTUS_VERSION=$(project_version $CACTUS_HOME)
+
+fi
+
+if [[ -d "$KIVAKIT_HOME" ]]; then
+
+    export KIVAKIT_VERSION=$(project_version $KIVAKIT_HOME)
+    export KIVAKIT_ASSETS_HOME=$PWD/kivakit-assets
+    export KIVAKIT_STUFF_HOME=$PWD/kivakit-stuff
+    export KIVAKIT_EXTENSIONS_HOME=$PWD/kivakit-extensions
+    export KIVAKIT_EXAMPLES_HOME=$PWD/kivakit-examples
+    export KIVAKIT_CACHE_HOME=~/.kivakit/$KIVAKIT_VERSION
+    export KIVAKIT_TOOLS=$KIVAKIT_HOME/tools
+    export KIVAKIT_JAVA_OPTIONS=-Xmx12g
+    export KIVAKIT_AGENT_JAR=$KIVAKIT_TOOLS/agent/kivakit-agent.jar
+
+fi
+
+if [[ -d "$MESAKIT_HOME" ]]; then
+
+    export MESAKIT_VERSION=$(project_version $MESAKIT_HOME)
+    export MESAKIT_ASSETS_HOME=$PWD/mesakit-assets
+    export MESAKIT_EXTENSIONS_HOME=$PWD/mesakit-extensions
+    export MESAKIT_EXAMPLES_HOME=$PWD/mesakit-examples
+    export MESAKIT_CACHE_HOME=~/.kivakit/$MESAKIT_VERSION
+    export MESAKIT_JAVA_OPTIONS=-Xmx12g
+    export MESAKIT_TOOLS=$MESAKIT_HOME/tools
+
+fi
 
 export BASH_SILENCE_DEPRECATION_WARNING=1
 export MAVEN_OPTS="--add-opens=java.base/java.util=ALL-UNNAMED --add-opens=java.base/java.lang.reflect=ALL-UNNAMED --add-opens=java.base/java.text=ALL-UNNAMED --add-opens=java.desktop/java.awt.font=ALL-UNNAMED"
@@ -47,19 +68,31 @@ echo " "
 echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Telenav Workspace ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┋"
 echo "┋        TELENAV_WORKSPACE: $TELENAV_WORKSPACE"
+
+if [[ -d "$KIVAKIT_HOME" ]]; then
+
+    echo "┋"
+    echo "┋             KIVAKIT_HOME: $KIVAKIT_HOME"
+    echo "┋          KIVAKIT_VERSION: $KIVAKIT_VERSION"
+    echo "┋       KIVAKIT_CACHE_HOME: $KIVAKIT_CACHE_HOME"
+
+fi
+
+if [[ -d "$MESAKIT_HOME" ]]; then
+
+    echo "┋"
+    echo "┋             MESAKIT_HOME: $MESAKIT_HOME"
+    echo "┋          MESAKIT_VERSION: $MESAKIT_VERSION"
+    echo "┋       MESAKIT_CACHE_HOME: $MESAKIT_CACHE_HOME"
+
+fi
+
 echo "┋"
-echo "┋             KIVAKIT_HOME: $KIVAKIT_HOME"
-echo "┋          KIVAKIT_VERSION: $KIVAKIT_VERSION"
+echo "┋                JAVA_HOME: $JAVA_HOME"
 echo "┋"
-echo "┋  KIVAKIT_EXTENSIONS_HOME: $KIVAKIT_EXTENSIONS_HOME"
-echo "┋       KIVAKIT_STUFF_HOME: $KIVAKIT_STUFF_HOME"
-echo "┋    KIVAKIT_EXAMPLES_HOME: $KIVAKIT_EXAMPLES_HOME"
-echo "┋       KIVAKIT_CACHE_HOME: $KIVAKIT_CACHE_HOME"
-echo "┋      KIVAKIT_ASSETS_HOME: $KIVAKIT_ASSETS_HOME"
+echo "┋                  M2_HOME: $M2_HOME"
 echo "┋"
-echo "┋                     Java: $JAVA_HOME"
-echo "┋                    Maven: $M2_HOME"
-perl -e 'print "┋                     Path: " . join("\n┋                           ", split(":", $ENV{"PATH"})) . "\n"'
+perl -e 'print "┋                     PATH: " . join("\n┋                           ", split(":", $ENV{"PATH"})) . "\n"'
 echo "┋"
 echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 echo " "
