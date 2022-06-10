@@ -27,12 +27,12 @@
     -->
 
     <groupId>com.telenav</groupId>
-    <artifactId>kivakit-build</artifactId>
+    <artifactId>telenav-build</artifactId>
     <version>1.6.0</version>
 
     <packaging>pom</packaging>
 
-    <name>kivakit-build</name>
+    <name>telenav-build</name>
     <description>
         A bill-of-materials-only project that builds all KivaKit, MesaKit and Lexakai
         projects.

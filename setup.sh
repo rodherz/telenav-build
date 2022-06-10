@@ -157,9 +157,17 @@ source ./source-me || exit 1
 #
 
 echo "Checking out branch $branch_name"
-git checkout --quiet $branch_name || echo "Ignoring: No branch of telenav-build called $branch_name" || exit 1
-# shellcheck disable=SC2016
-git submodule --quiet foreach '[[ ! "$path" == *-assets ]] || git checkout publish' || exit 1
+
+if [[ $(git rev-parse --verify $branch_name) ]]; then
+
+    echo "Checking out telenav-build:$branch_name"
+    git checkout --quiet $branch_name || { echo "Ignoring: No branch of telenav-build called $branch_name"; exit 1; }
+
+fi
+
+echo "Checking out *:publish"
+git submodule --quiet foreach "[[ ! \"\$path\" == *-assets ]] || git checkout publish" || exit 1
+echo "Checking out *:$branch_name"
 git submodule --quiet foreach "[[ \"\$path\" == *-assets ]] || git checkout $branch_name" || exit 1
 
 #
