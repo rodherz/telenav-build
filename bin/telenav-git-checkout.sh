@@ -12,7 +12,7 @@ source telenav-library-functions.sh
 #
 # telenav-git-checkout.sh [scope]? [branch]
 #
-# scope = { all, this, <family-name> }
+# scope = { all, this, [family-name] }
 #
 
 #

@@ -10,19 +10,22 @@
 source telenav-library-functions.sh
 
 #
-# telenav-git-finish-hotfix.sh [scope] [branch-name]
+# telenav-git-pull-request.sh [scope] [authentication-token] [title] [body]
 #
 # scope = { all, this, [family-name] }
 #
 
-if [[ ! "$#" -eq 2 ]]; then
+if [[ ! "$#" -eq 4 ]]; then
 
-    echo "telenav-git-finish-hotfix.sh [scope] [branch-name]"
+    echo "telenav-git-pull-request.sh [scope] [authentication-token] [title] [body]"
+    exit 1
 
 fi
 
 scope=$(repository_scope "$1")
-branch_name=$2
+authentication_token=$2
+title=$3
+body=$4
 
 cd_workspace
-mvn --quiet "$scope" -Doperation=finish -Dbranch-type=hotfix -Dbranch-name="$branch_name" com.telenav.cactus:cactus-build-maven-plugin:git-flow || exit 1
+mvn --quiet "$scope" -DauthenticationToken="$authentication_token" -Dtitle="$title" -Dbody="$body" com.telenav.cactus:cactus-build-maven-plugin:git-pull-request || exit 1

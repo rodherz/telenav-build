@@ -12,7 +12,7 @@ source telenav-library-functions.sh
 #
 # telenav-git-pull.sh [scope]?
 #
-# scope = { all, this, <family-name> }
+# scope = { all, this, [family-name] }
 #
 
 cd_workspace

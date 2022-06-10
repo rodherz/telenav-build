@@ -12,7 +12,7 @@ source telenav-library-functions.sh
 #
 # telenav-build-lexakai-documentation.sh [scope]?
 #
-# scope = { all, this, <family-name> }
+# scope = { all, this, [family-name] }
 #
 
 cd_workspace
