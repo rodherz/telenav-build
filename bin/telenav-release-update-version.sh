@@ -33,4 +33,4 @@ fi
 
 cd_workspace
 scope=$(repository_scope "$1")
-mvn --quiet "$scope" -Dtelenav.version="$version" -Dtelenav.branch-name="$branch" com.telenav.cactus:cactus-build-maven-plugin:pull || exit 1
+mvn --quiet "$scope" -Dtelenav.version="$version" -Dtelenav.branch-name="$branch" com.telenav.cactus:cactus-build-maven-plugin:replace || exit 1
