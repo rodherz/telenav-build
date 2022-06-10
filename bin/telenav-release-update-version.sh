@@ -12,6 +12,7 @@ source telenav-library-functions.sh
 if [[ ! "$#" -eq 3 ]]; then
 
     echo "telenav-release-update-version.sh [repository-family] [version] [branch]"
+    exit 1
 
 fi
 

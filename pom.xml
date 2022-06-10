@@ -28,7 +28,7 @@
 
     <groupId>com.telenav</groupId>
     <artifactId>telenav-build</artifactId>
-    <version>1.6.0</version>
+    <version>1.6.0</version> <!-- [version] -->
 
     <packaging>pom</packaging>
 
