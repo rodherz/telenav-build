@@ -1,6 +1,6 @@
 <!--suppress HtmlUnknownTarget, HtmlRequiredAltAttribute -->
 
-# Initial Setup Instructions   <img src="https://telenav.github.io/telenav-assets/images/icons/box-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/box-32-2x.png 2x"/>
+# Initial Setup Instructions   <img src="https://telenav.github.io/telenav-assets/images/icons/box-24.png" srcset="https://telenav.github.io/telenav-assets/images/icons/box-24-2x.png 2x"/>
 
 [**1. Install Required Tools**](#install-tools)  
 [**2. Checkout and Build**](#setup)  
@@ -14,7 +14,7 @@ This article explains how to get set up to build Telenav open source projects, i
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
 
-### 1. Install Required Tools &nbsp; <a name = "install-tools"></a>  <img src="https://telenav.github.io/telenav-assets/images/icons/toolbox-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/toolbox-32-2x.png 2x"/>
+### 1. Install Required Tools &nbsp; <a name = "install-tools"></a>  <img src="https://telenav.github.io/telenav-assets/images/icons/toolbox-24.png" srcset="https://telenav.github.io/telenav-assets/images/icons/toolbox-24-2x.png 2x"/>
 
 - Bash
 - Git 2.30+
