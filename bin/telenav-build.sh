@@ -7,37 +7,22 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-BUILD_PROPERTIES="$KIVAKIT_HOME/kivakit-core/target/classes/build.properties"
+source telenav-library-functions.sh
 
-kivakit_build_all()
-{
-    cd "$TELENAV_WORKSPACE" || exit
+scope=$(repository_scope "$1")
 
-    mvn com.telenav.cactus:cactus-build-maven-plugin:build-metadata || exit
+require_variable M2_HOME "Must set M2_HOME"
+require_variable JAVA_HOME "Must set JAVA_HOME"
+require_variable TELENAV_WORKSPACE "Must set TELENAV_WORKSPACE"
 
-    if [[ "$1" == "help" ]]; then
-
-        SCRIPT=$(basename -- "$0")
-        usage "$SCRIPT"
-
-    fi
-
-    export -f build
-    export -f addSwitch
-    export -f require_variable
-
-    # shellcheck disable=SC2002
-    # shellcheck disable=SC2086
-    # shellcheck disable=SC2048
-    build "$TELENAV_WORKSPACE" $*
-}
+cd_workspace
 
 usage() {
 
     SCRIPT=$1
 
     echo " "
-    echo "Usage: $SCRIPT [build-type] [build-modifiers]*"
+    echo "Usage: $SCRIPT [scope] [build-type] [build-modifiers]*"
     echo " "
     echo "  BUILD TYPES"
     echo " "
@@ -47,9 +32,9 @@ usage() {
     echo " "
     echo "             compile - compile and shade (no tests)"
     echo " "
-    echo "        deploy-ossrh - clean-sparkling, compile, run tests, attach jars, build javadoc, sign artifacts and deploy to OSSRH"
+    echo "       release-ossrh - clean-sparkling, compile, run tests, attach jars, build javadoc, sign artifacts and deploy to OSSRH"
     echo " "
-    echo "        deploy-local - clean-sparkling, compile, run tests, attach jars, build javadoc, sign artifacts and deploy to local Maven repository"
+    echo "             release - clean-sparkling, compile, run tests, attach jars, build javadoc, sign artifacts and deploy to local Maven repository"
     echo " "
     echo "               tools - compile, shade, run tests, build tools"
     echo " "
@@ -106,10 +91,6 @@ build() {
     BUILD_TYPE=$2
     SWITCHES=""
     BUILD_ARGUMENTS=""
-
-    require_variable M2_HOME "Must set M2_HOME"
-    require_variable JAVA_HOME "Must set JAVA_HOME"
-    require_variable KIVAKIT_HOME "Must set KIVAKIT_HOME"
 
     case "${BUILD_TYPE}" in
 

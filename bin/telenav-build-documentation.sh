@@ -7,14 +7,11 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-source telenav-library-functions.sh
-source kivakit-library-build.sh
+#
+# telenav-build-documentation.sh [scope]?
+#
+# scope = { all, this, [family-name] }
+#
 
-# shellcheck disable=SC2068
-kivakit_build_all $@
-
-if [ -n "$BUILD_DOCUMENTATION" ]; then
-
-    bash telenav-build-documentation.sh
-
-fi
+bash telenav-build-javadoc.sh
+bash telenav-build-lexakai-documentation.sh

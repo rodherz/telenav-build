@@ -15,6 +15,7 @@ source telenav-library-functions.sh
 # scope = { all, this, [family-name] }
 #
 
-cd_workspace
 scope=$(repository_scope "$1")
+
+cd_workspace
 mvn --quiet "$scope" com.telenav.cactus:cactus-build-maven-plugin:pull || exit 1

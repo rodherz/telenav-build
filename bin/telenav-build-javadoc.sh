@@ -7,5 +7,13 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-bash kivakit-build-javadoc.sh
-bash kivakit-build-lexakai-documentation.sh
+source telenav-library-functions.sh
+
+#
+# telenav-build-javadoc.sh [scope]?
+#
+# scope = { all, this, [family-name] }
+#
+
+cd_workspace
+mvn --threads=12 -Dmaven.test.skip=true javadoc:aggregate
