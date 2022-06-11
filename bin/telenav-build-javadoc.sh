@@ -9,24 +9,11 @@
 
 source telenav-library-functions.sh
 
-help="[version]"
+#
+# telenav-build-javadoc.sh [scope]?
+#
+# scope = { all, this, [family-name] }
+#
 
-version=$1
-
-require_variable version "$help"
-
-for project_home in "${KIVAKIT_REPOSITORY_HOMES[@]}"; do
-
-    if ! git_flow_init "$project_home"; then
-
-        exit 1
-
-    fi
-
-done
-
-for project_home in "${KIVAKIT_REPOSITORY_HOMES[@]}"; do
-
-    git_flow_release_start "$project_home" "$version"
-
-done
+cd_workspace
+mvn --threads=12 -Dmaven.test.skip=true javadoc:aggregate

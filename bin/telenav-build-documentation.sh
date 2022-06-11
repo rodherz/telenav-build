@@ -7,20 +7,11 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-source telenav-library-functions.sh
+#
+# telenav-build-documentation.sh [scope]?
+#
+# scope = { all, this, [family-name] }
+#
 
-# shellcheck disable=SC2034
-branch_name=$1
-
-require_variable branch_name "[branch-name]"
-
-if git_flow_check_all_repositories; then
-
-    # shellcheck disable=SC2016
-    repository_foreach 'git-flow feature finish $branch_name'
-
-else
-
-    echo "Unable to finish branch $branch_name"
-
-fi
+bash telenav-build-javadoc.sh
+bash telenav-build-lexakai-documentation.sh

@@ -10,11 +10,22 @@
 source telenav-library-functions.sh
 
 #
-# telenav-build-lexakai-documentation.sh [scope]?
+# telenav-git-pull-request.sh [scope] [authentication-token] [title] [body]
 #
 # scope = { all, this, [family-name] }
 #
 
-cd_workspace
+if [[ ! "$#" -eq 4 ]]; then
+
+    echo "telenav-git-pull-request.sh [scope] [authentication-token] [title] [body]"
+    exit 1
+
+fi
+
 scope=$(repository_scope "$1")
-mvn --quiet "$scope" com.telenav.cactus:cactus-build-maven-plugin:lexakai || exit 1
+authentication_token=$2
+title=$3
+body=$4
+
+cd_workspace
+mvn --quiet "$scope" -DauthenticationToken="$authentication_token" -Dtitle="$title" -Dbody="$body" com.telenav.cactus:cactus-build-maven-plugin:git-pull-request || exit 1

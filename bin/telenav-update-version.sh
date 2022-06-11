@@ -11,7 +11,8 @@ source telenav-library-functions.sh
 
 if [[ ! "$#" -eq 3 ]]; then
 
-    echo "telenav-release-update-version.sh [repository-family] [version] [branch]"
+    echo "telenav-update-version.sh [repository-family] [version] [branch-name]"
+    exit 1
 
 fi
 
@@ -28,7 +29,7 @@ fi
 
 
 #
-# telenav-release-update-version.sh [repository-family]? [version] [branch-name]
+# telenav-update-version.sh [repository-family]? [version] [branch-name]
 #
 
 cd_workspace

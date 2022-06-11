@@ -10,11 +10,19 @@
 source telenav-library-functions.sh
 
 #
-# telenav-build-lexakai-documentation.sh [scope]?
+# telenav-git-start-feature.sh [scope] [branch-name]
 #
 # scope = { all, this, [family-name] }
 #
 
-cd_workspace
+if [[ ! "$#" -eq 2 ]]; then
+
+    echo "telenav-git-start-feature.sh [scope] [branch-name]"
+
+fi
+
 scope=$(repository_scope "$1")
-mvn --quiet "$scope" com.telenav.cactus:cactus-build-maven-plugin:lexakai || exit 1
+branch_name=$2
+
+cd_workspace
+mvn --quiet "$scope" -Doperation=start -Dbranch-type=feature -Dbranch-name="$branch_name" com.telenav.cactus:cactus-build-maven-plugin:git-flow || exit 1

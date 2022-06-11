@@ -25,7 +25,7 @@ export CACTUS_HOME=$PWD/cactus-build
 export KIVAKIT_HOME=$PWD/kivakit
 export MESAKIT_HOME=$PWD/mesakit
 
-append_path $CACTUS_HOME/bin
+append_path $TELENAV_WORKSPACE/bin
 prepend_path "$M2_HOME/bin"
 prepend_path "$JAVA_HOME/bin"
 
