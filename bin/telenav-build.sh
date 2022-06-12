@@ -9,8 +9,6 @@
 
 source telenav-library-functions.sh
 
-script=$0
-
 echo " "
 check_tools
 require_variable TELENAV_WORKSPACE "Must set TELENAV_WORKSPACE"
@@ -52,26 +50,26 @@ fi
 usage()
 {
     echo " "
-    echo "Usage: $script [build-scope] [build-type] [build-modifiers]*"
+    echo "Usage: telenav-build.sh [build-scope] [build-type] [build-modifiers]*"
     echo " "
     echo "  BUILD SCOPES"
     echo " "
-    echo "                all - all projects"
-    echo "               this - the project in the current folder"
-    echo "            kivakit - only the kivakit project"
-    echo "            mesakit - only the mesakit project"
-    echo "            lexakai - only the lexakai project"
-    echo "      cactus-build - only the cactus-build project"
+    echo "                all - build all projects"
+    echo "       cactus-build - build only the cactus-build project"
+    echo "            kivakit - build only the kivakit project"
+    echo "            lexakai - build only the lexakai project"
+    echo "            mesakit - build only the mesakit project"
+    echo "               this - build only the project in the current folder"
     echo " "
     echo "  BUILD TYPES"
     echo " "
     echo "           [default] - compile, shade and run all tests"
     echo "             compile - compile and shade (no tests)"
+    echo "                 dmg - compile, shade, run tests, build tools, build dmg"
+    echo "             javadoc - compile and build javadoc"
     echo "             release - clean-sparkling, compile, run tests, build javadoc, attach jars, sign artifacts and deploy to OSSRH"
     echo "       release-local - clean-sparkling, compile, run tests, build javadoc, attach jars, sign artifacts and deploy to local Maven repository"
     echo "               tools - compile, shade, run tests, build tools"
-    echo "                 dmg - compile, shade, run tests, build tools, build dmg"
-    echo "             javadoc - compile and build javadoc"
     echo " "
     echo "  BUILD MODIFIERS"
     echo " "
@@ -247,7 +245,7 @@ for modifier in "${build_modifiers[@]}"; do
         *)
             echo " "
             echo "Build modifier '$modifier' is not recognized"
-            usage "$script"
+            usage
             ;;
 
     esac
@@ -280,6 +278,7 @@ if [ -z "$dry_run" ]; then
         bash "$clean_script"
     fi
 
+    # shellcheck disable=SC2086
     "$M2_HOME/bin/mvn" "$(resolve_scope $build_scope)" ${maven_switches[*]} ${build_arguments[*]} 2>&1
 
     if [ "${PIPESTATUS[0]}" -ne "0" ]; then

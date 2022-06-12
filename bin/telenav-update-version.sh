@@ -27,7 +27,6 @@ if [[ "$family" == "all" || "$family" == "this" ]]; then
 
 fi
 
-
 #
 # telenav-update-version.sh [repository-family]? [version] [branch-name]
 #

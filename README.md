@@ -15,17 +15,6 @@ This enables a single, consistent build of any combination of the following proj
 > Note: The Maven `pom.xml` in this project is _bill of materials only_, and simply builds all child projects.  
 > Since they are all built in the same [Maven reactor](https://books.sonatype.com/mvnref-book/reference/_using_advanced_reactor_options.html), breaking changes can be detected immediately.
 
-[Initial Setup](documentation/initial-setup-instructions.md)  
-[Building](documentation/building.md)  
-[Developing](documentation/developing.md)
-
-This will cause all projects for the branch to be checked out and built.
-
-## Development Builds
-
-Once the initial setup has been completed, future builds can be executed like this:
-
-```
-source ./source-me
-mvn clean install
-```
+[**Initial Setup**](documentation/initial-setup-instructions.md)  
+[**Building**](documentation/building.md)  
+[**Developing**](documentation/developing.md)

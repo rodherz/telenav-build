@@ -17,9 +17,9 @@ The scripts below can be used to build Telenav open source projects and their do
 
 | Script                                                                  | Purpose                                                                                                    |
 |-------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
+| *telenav-build.sh* `scope`**?** `build-type` `build-modifiers`**&ast;** | Builds the scoped projects using the given build type and build modifiers (see below)                      |
 | *telenav-clean.sh*                                                      | Cleans caches, removes regenerable files, and clears all Telenav artifacts from the local Maven repository |
 | *telenav-clean-sparkling.sh*                                            | Removes local Maven repository (after prompting) and then runs telenav-clean.sh                            |
-| *telenav-build.sh* `scope`**?** `build-type` `build-modifiers`**&ast;** | Builds the scoped projects using the given build type and build modifiers (see below)                      |
 | *telenav-build-documentation.sh* `scope`**?**                           | Builds Javadoc and Lexakai documentation for the scoped projects                                           |
 | *telenav-build-javadoc-documentation.sh* `scope`**?**                   | Builds Javadoc for the scoped projects                                                                     |
 | *telenav-build-lexakai-documentation* `scope`**?**                      | Builds Lexakai documentation for the scoped projects                                                       |
@@ -35,56 +35,45 @@ Where `scope` is one of:
 
 ### telenav-build.sh
 
-The `telenav-build.sh` script takes an optional scope, a build-type parameter and zero or more 
-build-modifier parameters. These parameters are translated into an appropriate list of maven 
-switches and arguments. To see what build types are available, run `telenav-build.sh help`:
+The `telenav-build.sh` script takes an optional `build-scope`, a `build-type` 
+and zero or more `build-modifier` arguments. These arguments are translated 
+into a list of maven switches and targets. For this help page, run `telenav-build.sh help`:
 
-    Usage: telenav-build.sh [scope]? [build-type] [build-modifiers]*
-    
-    Build types:
-    
+    Usage: telenav-build.sh [build-scope] [build-type] [build-modifiers]*
+
+    BUILD SCOPES
+
+                all - build all projects [default]
+       cactus-build - build only the cactus-build project
+            kivakit - build only the kivakit project
+            lexakai - build only the lexakai project
+            mesakit - build only the mesakit project
+               this - build only the project in the current folder
+
+    BUILD TYPES
+
            [default] - compile, shade and run all tests
-    
-                 all - clean-all, compile, shade, run tests, build tools and javadoc
-    
              compile - compile and shade (no tests)
-    
-        deploy-ossrh - clean-sparkling, compile, run tests, attach jars, build javadoc, sign artifacts and deploy to OSSRH
-    
-        deploy-local - clean-sparkling, compile, run tests, attach jars, build javadoc, sign artifacts and deploy to local Maven repository
-    
-               tools - compile, shade, run tests, build tools
-    
                  dmg - compile, shade, run tests, build tools, build dmg
-    
              javadoc - compile and build javadoc
-    
-    Build modifiers:
-    
+             release - clean-sparkling, compile, run tests, build javadoc, attach jars, sign artifacts and deploy to OSSRH
+       release-local - clean-sparkling, compile, run tests, build javadoc, attach jars, sign artifacts and deploy to local Maven repository
+               tools - compile, shade, run tests, build tools
+
+    BUILD MODIFIERS
+
          attach-jars - attach source and javadoc jars to maven artifacts
-    
                clean - prompt to remove cached and temporary files
-    
-           clean-all - prompt to remove cached and temporary files and Telenav artifacts from ~/.m2
-    
-    clean-sparkling - prompt to remove entire .m2 repository and all cached and temporary files
-    
+           clean-all - prompt to remove cached and temporary files and kivakit artifacts from ~/.m2
+     clean-sparkling - prompt to remove entire .m2 repository and all cached and temporary files
                debug - turn maven debug mode on
-    
          debug-tests - stop in debugger on surefire tests
-    
              dry-run - show maven command line but don't build
-    
           no-javadoc - do not build javadoc
-    
             no-tests - do not run tests
-    
          quick-tests - run only quick tests
-    
-               quiet - build with minimal output
-    
-    single-threaded - build with only one thread
-    
+             verbose - build with full output
+     single-threaded - build with only one thread
                tests - run all tests
 
 <br/> 
