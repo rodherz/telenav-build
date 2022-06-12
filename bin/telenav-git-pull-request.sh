@@ -22,7 +22,7 @@ if [[ ! "$#" -eq 4 ]]; then
 
 fi
 
-scope=$(repository_scope "$1")
+scope=$(resolve_scope "$1")
 authentication_token=$2
 title=$3
 body=$4

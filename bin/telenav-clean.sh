@@ -9,8 +9,7 @@
 
 source "telenav-library-functions.sh"
 
-clean_cache "$KIVAKIT_CACHE_HOME"
-clean_cache "$MESAKIT_CACHE_HOME"
+clean_caches
 
 if [[ ! "$1" == "sparkling" ]]; then
 

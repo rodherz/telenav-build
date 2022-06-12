@@ -22,7 +22,7 @@ if [[ ! "$#" -eq 2 ]]; then
 
 fi
 
-scope=$(repository_scope "$1")
+scope=$(resolve_scope "$1")
 branch_name=$2
 
 cd_workspace

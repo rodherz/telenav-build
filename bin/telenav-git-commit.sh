@@ -31,5 +31,5 @@ fi
 #
 
 cd_workspace
-scope=$(repository_scope)
+scope=$(scope)
 echo mvn --quiet "$scope" -Dtelenav.commit-message=\""$message"\" -Dtelenav.update-root=true com.telenav.cactus:cactus-build-maven-plugin:commit || exit 1

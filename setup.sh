@@ -1,7 +1,11 @@
 #!/bin/bash
 
+source bin/telenav-library-functions
+
 branch_name=$1
 caller=$2
+
+check_tools "$caller"
 
 #
 # Set HOME for continuous integration build
@@ -12,62 +16,6 @@ if [[ "$caller" == "ci-build" ]]; then
     HOME=$(pwd)
     export HOME
 
-fi
-
-#
-# Check tools
-#
-
-# 1) Parse Java version from output like: openjdk version "17.0.3" 2022-04-19 LTS
-java_version=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}')
-
-# 2) Parse Maven version from output like: Apache Maven 3.8.5 (3599d3414f046de2324203b78ddcf9b5e4388aa0)
-maven_version=$(mvn -version 2>&1 | awk -F ' ' '/Apache Maven/ {print $3}')
-
-# 3) Parse Git version from output like: git version 2.36.1
-git_version=$(git --version 2>&1 | awk -F' ' '{print $3}')
-
-# 4) Parse Git flow version from output like: 1.12.3 (AVH Edition)
-if [[ ! "$caller" == "ci-build" ]]; then
-    git_flow_version=$(git flow version)
-fi
-
-# Check Java version
-if [[ ! "$java_version" == "17."* ]]; then
-    echo "Telenav Open Source projects require Java 17"
-    echo "To install: https://jdk.java.net/archive/"
-    exit 1
-else
-    echo "Java $java_version"
-fi
-
-# Check Maven version
-if [[ ! $maven_version =~ 3\.8\.[5-9][0-9]* ]]; then
-    echo "Telenav Open Source projects require Maven 3.8.5 or higher"
-    echo "To install: https://maven.apache.org/download.cgi"
-    exit 1
-else
-    echo "Maven $maven_version"
-fi
-
-# Check Git version
-if [[ ! $git_version =~ 2\.3[0-9]\. ]]; then
-    echo "Telenav Open Source projects require Git version 2.30 or higher"
-    exit 1
-else
-    echo "Git $git_version"
-fi
-
-# Check Git Flow version
-
-if [[ ! "$caller" == "ci-build" ]]; then
-    if [[ ! $git_flow_version =~ 1.1[2-9]\..*\(AVH\ Edition\) ]]; then
-        echo "Telenav Open Source projects require Git Flow (AVH Edition) version 1.12 or higher"
-        echo "To install on macOS: brew install git-flow-avh"
-        exit 1
-    else
-        echo "Git Flow $git_flow_version"
-    fi
 fi
 
 #
@@ -100,7 +48,7 @@ git submodule init || exit 1
 # Clone repositories
 #
 
-echo "Cloning git repositories"
+echo "Cloning repositories"
 if [[ "$caller" == "ci-build" ]]; then
 
     git submodule update --depth 1 || exit 1
@@ -115,8 +63,7 @@ fi
 # Configure repositories
 #
 
-echo "Configuring build"
-
+echo "Configuring repositories"
 if [[ "$caller" == "ci-build" ]]; then
 
     echo "Creating temporary folder"
@@ -157,7 +104,6 @@ source ./source-me || exit 1
 #
 
 echo "Checking out branch $branch_name"
-
 if [[ $(git rev-parse --verify $branch_name) ]]; then
 
     echo "Checking out telenav-build:$branch_name"
@@ -171,29 +117,10 @@ echo "Checking out *:$branch_name"
 git submodule --quiet foreach "[[ \"\$path\" == *-assets ]] || git checkout $branch_name" || exit 1
 
 #
-# Clear cache folders
-#
-
-project_version()
-{
-    project_home=$1
-
-    pushd "$project_home" 1>/dev/null || exit 1
-    mvn -q -DforceStdout org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version || exit 1
-    popd 1>/dev/null || exit 1
-}
-
-KIVAKIT_VERSION=$(project_version kivakit)
-echo "Removing ~/.kivakit/$KIVAKIT_VERSION"
-rm -rf "$HOME/.kivakit/$KIVAKIT_VERSION"
-
-MESAKIT_VERSION=$(project_version mesakit)
-echo "Removing $HOME/.mesakit/$MESAKIT_VERSION"
-rm -rf "$HOME/.mesakit/$MESAKIT_VERSION"
-
-#
 # Build cactus
 #
+
+clear_cache_folders
 
 if [[ -d cactus-build ]]; then
 
@@ -208,9 +135,4 @@ fi
 
 echo "Building"
 mvn --batch-mode clean install || exit 1
-
-#
-# Done
-#
-
 echo "Done."

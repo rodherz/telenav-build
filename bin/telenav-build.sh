@@ -9,349 +9,286 @@
 
 source telenav-library-functions.sh
 
-scope=$(repository_scope "$1")
+script=$0
 
-require_variable M2_HOME "Must set M2_HOME"
-require_variable JAVA_HOME "Must set JAVA_HOME"
+echo " "
+check_tools
 require_variable TELENAV_WORKSPACE "Must set TELENAV_WORKSPACE"
-
 cd_workspace
 
-usage() {
+allowed_scopes=(all this kivakit mesakit lexakai cactus-build)
+allowed_build_types=(compile release release-local tools dmg javadoc lexakai-documentation help)
+allowed_build_modifiers=(attach-jars clean clean-all clean-sparkling debug debug-tests dry-run no-javadoc no-tests quick-tests quiet verbose single-threaded tests)
 
-    SCRIPT=$1
+build_types=()
+build_modifiers=()
 
+for argument in "$@"
+do
+    if [[ " ${allowed_scopes[*]} " =~ ${argument} ]]; then
+        build_scope=$argument
+    fi
+    if [[ " ${allowed_build_types[*]} " =~ ${argument} ]]; then
+        build_types+=("$argument")
+    fi
+    if [[ " ${allowed_build_modifiers[*]} " =~ ${argument} ]]; then
+        build_modifiers+=("$argument")
+    fi
+done
+
+if [[ -z "$build_scope" ]]; then
+    build_scope="all"
+fi
+
+if [[ ${#build_types[@]} -eq 0 ]]; then
+    build_types=(default)
+fi
+
+if [[ ${#build_types[@]} -gt 1 ]]; then
+    echo "No more than one build type is allowed: ${build_types[*]}"
+    exit 1
+fi
+
+usage()
+{
     echo " "
-    echo "Usage: $SCRIPT [scope] [build-type] [build-modifiers]*"
+    echo "Usage: $script [build-scope] [build-type] [build-modifiers]*"
+    echo " "
+    echo "  BUILD SCOPES"
+    echo " "
+    echo "                all - all projects"
+    echo "               this - the project in the current folder"
+    echo "            kivakit - only the kivakit project"
+    echo "            mesakit - only the mesakit project"
+    echo "            lexakai - only the lexakai project"
+    echo "      cactus-build - only the cactus-build project"
     echo " "
     echo "  BUILD TYPES"
     echo " "
     echo "           [default] - compile, shade and run all tests"
-    echo " "
-    echo "                 all - clean-all, compile, shade, run tests, build tools and javadoc"
-    echo " "
     echo "             compile - compile and shade (no tests)"
-    echo " "
-    echo "       release-ossrh - clean-sparkling, compile, run tests, attach jars, build javadoc, sign artifacts and deploy to OSSRH"
-    echo " "
-    echo "             release - clean-sparkling, compile, run tests, attach jars, build javadoc, sign artifacts and deploy to local Maven repository"
-    echo " "
+    echo "             release - clean-sparkling, compile, run tests, build javadoc, attach jars, sign artifacts and deploy to OSSRH"
+    echo "       release-local - clean-sparkling, compile, run tests, build javadoc, attach jars, sign artifacts and deploy to local Maven repository"
     echo "               tools - compile, shade, run tests, build tools"
-    echo " "
     echo "                 dmg - compile, shade, run tests, build tools, build dmg"
-    echo " "
     echo "             javadoc - compile and build javadoc"
     echo " "
     echo "  BUILD MODIFIERS"
     echo " "
     echo "         attach-jars - attach source and javadoc jars to maven artifacts"
-    echo " "
     echo "               clean - prompt to remove cached and temporary files"
-    echo " "
     echo "           clean-all - prompt to remove cached and temporary files and kivakit artifacts from ~/.m2"
-    echo " "
     echo "     clean-sparkling - prompt to remove entire .m2 repository and all cached and temporary files"
-    echo " "
     echo "               debug - turn maven debug mode on"
-    echo " "
     echo "         debug-tests - stop in debugger on surefire tests"
-    echo " "
     echo "             dry-run - show maven command line but don't build"
-    echo " "
     echo "          no-javadoc - do not build javadoc"
-    echo " "
     echo "            no-tests - do not run tests"
-    echo " "
     echo "         quick-tests - run only quick tests"
-    echo " "
-    echo "               quiet - build with minimal output"
-    echo " "
+    echo "             verbose - build with full output"
     echo "     single-threaded - build with only one thread"
-    echo " "
     echo "               tests - run all tests"
     echo " "
     exit 1
 }
 
-addSwitch() {
+maven_switches=(--no-transfer-progress --batch-mode)
+build_arguments=()
+build_modifiers+=(quiet)
+threads="12"
 
-    SWITCH="$1"
+case "${build_types[0]}" in
 
-    if [ -z "$SWITCHES" ]; then
-        SWITCHES=$SWITCH
-    else
-        SWITCHES="$SWITCHES $SWITCH"
-    fi
-}
+    "compile")
+        build_arguments+=(clean compile)
+        build_modifiers+=(multi-threaded no-tests shade no-javadoc)
+        ;;
 
-build() {
+    "default")
+        build_arguments+=(clean install)
+        build_modifiers+=(multi-threaded tests shade no-javadoc)
+        ;;
 
-    PROJECT=$1
-    PROJECT_NAME=$(basename "$PROJECT")
-    BUILD_TYPE=$2
-    SWITCHES=""
-    BUILD_ARGUMENTS=""
+    "dmg")
+        build_arguments+=(clean install)
+        build_modifiers+=(multi-threaded tests shade tools dmg no-javadoc)
+        ;;
 
-    case "${BUILD_TYPE}" in
+    "help")
+        usage
+        ;;
 
-        "all")
-            JAVADOC=true
-            BUILD_ARGUMENTS="clean install"
-            # shellcheck disable=SC2206
-            BUILD_MODIFIERS=(multi-threaded clean-all tests shade tools ${@:3})
+    "javadoc")
+        build_arguments+=(clean install)
+        build_modifiers+=(multi-threaded no-tests javadoc)
+        ;;
+
+    "lexakai-documentation")
+        build_modifiers+=(lexakai-documentation)
+        ;;
+
+    "release")
+        build_arguments+=(clean deploy)
+        build_modifiers+=(multi-threaded clean-sparkling javadoc lexakai-documentation tests attach-jars sign-artifacts)
+        ;;
+
+    "release-local")
+        build_arguments+=(clean install)
+        build_modifiers+=(multi-threaded clean-sparkling javadoc lexakai-documentation tests attach-jars sign-artifacts)
+        ;;
+
+    "test")
+        build_arguments+=(clean install)
+        build_modifiers+=(single-threaded tests no-javadoc)
+        ;;
+
+    "tools")
+        build_arguments+=(clean install)
+        build_modifiers+=(multi-threaded tests shade tools no-javadoc)
+        ;;
+
+    "verbose")
+        build_modifiers=("${build_modifiers[@]//quiet}")
+        ;;
+
+    *)
+        echo "Unrecognized build type: ${build_types[0]}"
+        usage
+
+esac
+
+for modifier in "${build_modifiers[@]}"; do
+
+    case "$modifier" in
+
+        "attach-jars")
+            # To attach jars, we have to build the javadoc for the jars
+            build_arguments+=(-P attach-jars)
             ;;
 
-        "compile")
-            BUILD_ARGUMENTS="clean compile"
-            # shellcheck disable=SC2206
-            BUILD_MODIFIERS=(multi-threaded no-tests shade no-javadoc quiet ${@:3})
+        "clean")
+            clean_script="kivakit-clean.sh"
             ;;
 
-        "deploy-ossrh")
-            BUILD_ARGUMENTS="clean deploy"
-            # shellcheck disable=SC2206
-            BUILD_MODIFIERS=(multi-threaded clean-sparkling tests attach-jars sign-artifacts ${@:3})
-            export BUILD_DOCUMENTATION=true
+        "clean-all")
+            clean_script="kivakit-clean-all.sh"
             ;;
 
-        "deploy-local")
-            BUILD_ARGUMENTS="clean install"
-            # shellcheck disable=SC2206
-            BUILD_MODIFIERS=(multi-threaded no-javadoc clean-sparkling tests attach-jars sign-artifacts ${@:3})
-            export BUILD_DOCUMENTATION=true
+        "clean-sparkling")
+            clean_script="kivakit-clean-sparkling.sh"
             ;;
 
-        "javadoc")
-            JAVADOC="true"
-            BUILD_ARGUMENTS="clean install"
-            # shellcheck disable=SC2206
-            BUILD_MODIFIERS=(multi-threaded no-tests javadoc ${@:3})
+        "debug")
+            maven_switches+=(--debug)
             ;;
 
-        "setup")
-            BUILD_ARGUMENTS="clean install"
-            # shellcheck disable=SC2206
-            BUILD_MODIFIERS=(multi-threaded tests shade tools ${@:3})
+        "lexakai-documentation")
+            build_arguments+=(com.telenav.cactus:cactus-build-maven-plugin:lexakai)
             ;;
 
-        "test")
-            BUILD_ARGUMENTS="clean install"
-            # shellcheck disable=SC2206
-            BUILD_MODIFIERS=(single-threaded tests no-javadoc ${@:3})
-            ;;
-
-        "tools")
-            BUILD_ARGUMENTS="clean install"
-            # shellcheck disable=SC2206
-            BUILD_MODIFIERS=(multi-threaded tests shade tools no-javadoc ${@:3})
+        "debug-tests")
+            maven_switches+=(-Dmaven.surefire.debug)
             ;;
 
         "dmg")
-            BUILD_ARGUMENTS="clean install"
-            # shellcheck disable=SC2206
-            BUILD_MODIFIERS=(multi-threaded tests shade tools dmg no-javadoc ${@:3})
+            maven_switches+=(-P dmg)
+            ;;
+
+        "docker")
+            maven_switches+=(-P docker)
+            ;;
+
+        "javadoc")
+            build_arguments+=(javadoc:aggregate)
+            ;;
+
+        "multi-threaded")
+            ;;
+
+        "no-javadoc")
+            maven_switches+=("-Dmaven.javadoc.skip=true")
+            ;;
+
+        "no-tests")
+            maven_switches+=("-Dmaven.test.skip=true")
+            ;;
+
+        "quick-tests")
+            maven_switches+=(-P test-quick)
+            ;;
+
+        "quiet")
+            maven_switches+=(-q "-Dsurefire.printSummary=false" "-DKIVAKIT_LOG_LEVEL=Warning")
+            ;;
+
+        "shade")
+            maven_switches+=(-P shade)
+            ;;
+
+        "dry-run")
+            dry_run="true"
+            ;;
+
+        "sign-artifacts")
+            build_arguments+=(-P sign-artifacts)
+            ;;
+
+        "single-threaded")
+            threads="1"
+            ;;
+
+        "tests")
+            ;;
+
+        "tools")
+            maven_switches+=(-P tools)
             ;;
 
         *)
-            BUILD_TYPE="default"
-            BUILD_ARGUMENTS="clean install"
-            # shellcheck disable=SC2206
-            BUILD_MODIFIERS=(multi-threaded tests shade no-javadoc ${@:2})
+            echo " "
+            echo "Build modifier '$modifier' is not recognized"
+            usage "$script"
             ;;
 
     esac
+    shift
 
-    BUILD_MODIFIERS_STRING=""
-    DELIMITER=""
+done
 
-    # shellcheck disable=SC2068
-    for MODIFIER in ${BUILD_MODIFIERS[@]}; do
+if [ -z "$KIVAKIT_DEBUG" ]; then
+    KIVAKIT_DEBUG="!Debug"
+fi
 
-        BUILD_MODIFIERS_STRING="$BUILD_MODIFIERS_STRING$DELIMITER$MODIFIER"
-        DELIMITER=" "
+maven_switches+=(-DKIVAKIT_DEBUG=\""$KIVAKIT_DEBUG"\")
+maven_switches+=(--threads "$threads")
 
-        case "$MODIFIER" in
+build=$(project_build)
 
-            "attach-jars")
-                # To attach jars, we have to build the javadoc for the jars
-                SWITCHES="${SWITCHES//-Dmaven.javadoc.skip=true/}"
-                BUILD_ARGUMENTS="$BUILD_ARGUMENTS -Pattach-jars"
-                ;;
+echo " "
+echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Building $build"
+echo "┋"
+echo "┋          Build-Scope: ${build_scope}"
+echo "┋           Build-Type: ${build_types[0]}"
+echo "┋      Build-Modifiers: ${build_modifiers[*]}"
+echo "┋   Maven Command Line: mvn  ${maven_switches[*]} ${build_arguments[*]}"
+echo "┋            Workspace: $TELENAV_WORKSPACE"
+echo "┋"
 
-            "clean")
-                CLEAN_SCRIPT="kivakit-clean.sh"
-                ;;
+if [ -z "$dry_run" ]; then
 
-            "clean-all")
-                CLEAN_SCRIPT="kivakit-clean-all.sh"
-                ;;
-
-            "clean-sparkling")
-                CLEAN_SCRIPT="kivakit-clean-sparkling.sh"
-                ;;
-
-            "debug")
-                addSwitch "--debug"
-                ;;
-
-            "debug-tests")
-                addSwitch "-Dmaven.surefire.debug"
-                ;;
-
-            "dmg")
-                addSwitch "-P dmg"
-                ;;
-
-            "docker")
-                addSwitch "-P docker"
-                ;;
-
-            "javadoc")
-                if [ -n "$JAVADOC" ]; then
-
-                    BUILD_ARGUMENTS="$BUILD_ARGUMENTS javadoc:aggregate"
-
-                fi
-                ;;
-
-            "multi-threaded")
-                THREADS=12
-                ;;
-
-            "no-javadoc")
-                addSwitch "-Dmaven.javadoc.skip=true"
-                ;;
-
-            "no-tests")
-                addSwitch "-Dmaven.test.skip=true"
-                ;;
-
-            "quick-tests")
-                addSwitch "-P test-quick"
-                ;;
-
-            "quiet")
-                addSwitch "-q -Dsurefire.printSummary=false -DKIVAKIT_LOG_LEVEL=Warning"
-                ;;
-
-            "shade")
-                addSwitch "-P shade"
-                ;;
-
-            "dry-run")
-                DRY_RUN="true"
-                ;;
-
-            "sign-artifacts")
-                BUILD_ARGUMENTS="$BUILD_ARGUMENTS -P sign-artifacts"
-                ;;
-
-            "single-threaded")
-                THREADS=1
-                ;;
-
-            "tests") ;;
-
-            "tools")
-                addSwitch "-P tools"
-                ;;
-
-            *)
-                echo " "
-                echo "Build modifier '$MODIFIER' is not recognized"
-                usage "$SCRIPT"
-                ;;
-
-        esac
-        shift
-
-    done
-
-    addSwitch "--threads $THREADS"
-
-    if [ -z "$KIVAKIT_DEBUG" ]; then
-        KIVAKIT_DEBUG="!Debug"
+    if [ -n "$clean_script" ]; then
+        bash "$clean_script"
     fi
 
-    BUILD_FOLDER="$PROJECT"
+    "$M2_HOME/bin/mvn" "$(resolve_scope $build_scope)" ${maven_switches[*]} ${build_arguments[*]} 2>&1
 
-    if [ -f "$BUILD_PROPERTIES" ]; then
-
-        # shellcheck disable=SC2002
-        KIVAKIT_BUILD_NAME=$(cat "$BUILD_PROPERTIES" | grep "build-name" | cut -d'=' -f2 | xargs echo)
-        # shellcheck disable=SC2002
-        KIVAKIT_BUILD_DATE=$(cat "$BUILD_PROPERTIES" | grep "build-date" | cut -d'=' -f2 | xargs echo)
-
-    fi
-
-    if [ -n "$KIVAKIT_BUILD_NAME" ]; then
-
-        KIVAKIT_BUILD_NAME=" ($KIVAKIT_BUILD_DATE $KIVAKIT_BUILD_NAME)"
-
-    fi
-
-    if [ -e "$BUILD_FOLDER" ]; then
-
-        echo " "
-        echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Building '$PROJECT_NAME'$KIVAKIT_BUILD_NAME ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
-        echo "┋"
-        echo "┋         Build-Folder: $BUILD_FOLDER"
-        echo "┋           Build-Type: $BUILD_TYPE"
-        echo "┋      Build-Modifiers: $BUILD_MODIFIERS_STRING"
-        echo "┋   Maven Command Line: mvn -DKIVAKIT_DEBUG=\"$KIVAKIT_DEBUG\" $SWITCHES $BUILD_ARGUMENTS"
-        echo "┋"
-
-        if [ -z "$DRY_RUN" ]; then
-
-            cd "$BUILD_FOLDER" || exit
-
-            if [ -z "$CLEANED" ] && [ -n "$CLEAN_SCRIPT" ]; then
-
-                bash "$CLEAN_SCRIPT"
-
-                CLEANED=true
-
-            fi
-
-            if [ -z "$PREBUILT" ] && [ -n "$PREBUILD_SCRIPT" ]; then
-
-                bash "$PREBUILD_SCRIPT"
-
-                PREBUILT=true
-
-            fi
-
-            # shellcheck disable=SC2086
-            "$M2_HOME/bin/mvn" --no-transfer-progress -DKIVAKIT_DEBUG=$KIVAKIT_DEBUG $SWITCHES $BUILD_ARGUMENTS 2>&1
-
-            if [ "${PIPESTATUS[0]}" -ne "0" ]; then
-
-                echo "Unable to build $PROJECT_NAME."
-                exit 1
-
-            fi
-
-        fi
-
-        # shellcheck disable=SC2002
-        KIVAKIT_BUILD_NAME=$(cat "$KIVAKIT_HOME"/build.properties | grep "build-name" | cut -d'=' -f2 | xargs echo)
-        # shellcheck disable=SC2002
-        KIVAKIT_BUILD_DATE=$(cat "$KIVAKIT_HOME"/build.properties | grep "build-date" | cut -d'=' -f2 | xargs echo)
-
-        if [ -n "$KIVAKIT_BUILD_NAME" ]; then
-
-            KIVAKIT_BUILD_NAME=" ($KIVAKIT_BUILD_DATE $KIVAKIT_BUILD_NAME)"
-
-        fi
-
-        echo "┋"
-        echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Built '$PROJECT'$KIVAKIT_BUILD_NAME ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
-        echo " "
-
-    else
-
-        echo "$PROJECT not found"
+    if [ "${PIPESTATUS[0]}" -ne "0" ]; then
+        echo "Build failed."
         exit 1
-
     fi
-}
+
+fi
+
+echo "┋"
+echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Built $build"
+echo " "

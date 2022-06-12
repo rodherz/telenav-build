@@ -11,7 +11,17 @@ fi
 
 ################ BUILD ##################################################################################################
 
-repository_scope()
+cd_workspace()
+{
+    if [[ "$TELENAV_WORKSPACE" == "" ]]; then
+        echo "TELENAV_WORKSPACE must be defined"
+        exit 1
+    fi
+
+    cd "$TELENAV_WORKSPACE" || exit 1
+}
+
+resolve_scope()
 {
     scope=$1
 
@@ -42,25 +52,68 @@ repository_scope()
     esac
 }
 
-################ PROJECT ################################################################################################
-
-cd_workspace()
+check_tools()
 {
-    if [[ "$TELENAV_WORKSPACE" == "" ]]; then
-        echo "TELENAV_WORKSPACE must be defined"
-        exit 1
+    caller=$1
+
+    require_variable M2_HOME "Must set M2_HOME"
+    require_variable JAVA_HOME "Must set JAVA_HOME"
+
+    #
+    # Check tools
+    #
+
+    # 1) Parse Java version from output like: openjdk version "17.0.3" 2022-04-19 LTS
+    java_version=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}')
+
+    # 2) Parse Maven version from output like: Apache Maven 3.8.5 (3599d3414f046de2324203b78ddcf9b5e4388aa0)
+    maven_version=$(mvn -version 2>&1 | awk -F ' ' '/Apache Maven/ {print $3}')
+
+    # 3) Parse Git version from output like: git version 2.36.1
+    git_version=$(git --version 2>&1 | awk -F' ' '{print $3}')
+
+    # 4) Parse Git flow version from output like: 1.12.3 (AVH Edition)
+    if [[ ! "$caller" == "ci-build" ]]; then
+        git_flow_version=$(git flow version)
     fi
 
-    cd "$TELENAV_WORKSPACE" || exit 1
-}
+    # Check Java version
+    if [[ ! "$java_version" == "17."* ]]; then
+        echo "Telenav Open Source projects require Java 17"
+        echo "To install: https://jdk.java.net/archive/"
+        exit 1
+    else
+        echo "Java $java_version"
+    fi
 
-property_value()
-{
-    file=$1
-    key=$2
+    # Check Maven version
+    if [[ ! $maven_version =~ 3\.8\.[5-9][0-9]* ]]; then
+        echo "Telenav Open Source projects require Maven 3.8.5 or higher"
+        echo "To install: https://maven.apache.org/download.cgi"
+        exit 1
+    else
+        echo "Maven $maven_version"
+    fi
 
-    # shellcheck disable=SC2002
-    cat "$file" | grep "$key" | cut -d'=' -f2 | xargs echo
+    # Check Git version
+    if [[ ! $git_version =~ 2\.3[0-9]\. ]]; then
+        echo "Telenav Open Source projects require Git version 2.30 or higher"
+        exit 1
+    else
+        echo "Git $git_version"
+    fi
+
+    # Check Git Flow version
+
+    if [[ ! "$caller" == "ci-build" ]]; then
+        if [[ ! $git_flow_version =~ 1.1[2-9]\..*\(AVH\ Edition\) ]]; then
+            echo "Telenav Open Source projects require Git Flow (AVH Edition) version 1.12 or higher"
+            echo "To install on macOS: brew install git-flow-avh"
+            exit 1
+        else
+            echo "Git Flow $git_flow_version"
+        fi
+    fi
 }
 
 project_version()
@@ -100,33 +153,6 @@ project_build()
     fi
 }
 
-bracket()
-{
-    name=$1
-    shift
-
-    echo " " && echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ \$name && $*" && echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" && echo " "
-
-}
-
-repository_foreach()
-{
-    cd "$TELENAV_WORKSPACE" || exit
-    git submodule foreach --quiet "echo && echo ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ \$name && $* && echo ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ && echo "
-}
-
-repository_foreach_quiet()
-{
-    cd "$TELENAV_WORKSPACE" || exit
-    git submodule foreach --quiet $*
-}
-
-project_foreach()
-{
-    cd "$TELENAV_WORKSPACE" || exit
-    git submodule foreach ---recurse -quiet "echo && echo ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ \$name && $* && echo ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ && echo "
-}
-
 show_version()
 {
     project_home=$1
@@ -157,21 +183,31 @@ allow_cleaning()
     fi
 }
 
-clean_cache()
+
+clean_caches()
 {
     if allow_cleaning; then
 
-        cache=$1
+        KIVAKIT_VERSION=$(project_version kivakit)
+        clean_cache "$HOME/.kivakit/$KIVAKIT_VERSION"
 
-        if [ -d "$cache" ]; then
+        MESAKIT_VERSION=$(project_version mesakit)
+        clean_cache "$HOME/.mesakit/$MESAKIT_VERSION"
 
-            if yes_no "┋ Remove ALL cached files in $cache"; then
+    fi
+}
 
-                rm -rf "$cache"
+clean_cache()
+{
+    cache=$1
 
-            fi
+    if [ -d "$cache" ]; then
+
+        if yes_no "┋ Remove ALL cached files in $cache"; then
+
+            rm -rf "$cache"
+
         fi
-
     fi
 }
 
@@ -204,21 +240,6 @@ clean_maven_repository_telenav()
     fi
 }
 
-remove_maven_repository()
-{
-    if allow_cleaning; then
-
-        if [ -d "$HOME/.m2/repository" ]; then
-
-            if yes_no "┋ Remove ALL artifacts in $HOME/.m2/repository"; then
-
-                rm -rf "$HOME/.m2/repository"
-
-            fi
-        fi
-    fi
-}
-
 clean_temporary_files()
 {
     project_home=$1
@@ -234,7 +255,33 @@ clean_temporary_files()
     fi
 }
 
-################ COMMAND LINE ################################################################################################
+remove_maven_repository()
+{
+    if allow_cleaning; then
+
+        if [ -d "$HOME/.m2/repository" ]; then
+
+            if yes_no "┋ Remove ALL artifacts in $HOME/.m2/repository"; then
+
+                rm -rf "$HOME/.m2/repository"
+
+            fi
+        fi
+    fi
+}
+
+################ GIT ################################################################################################
+
+git_branch_name()
+{
+    project_home=$1
+
+    cd "$project_home" || exit
+    branch_name=$(git rev-parse --abbrev-ref HEAD)
+    echo "$branch_name"
+}
+
+################ UTILITY ################################################################################################
 
 script()
 {
@@ -282,222 +329,6 @@ require_folder()
     fi
 }
 
-################ GIT ################################################################################################
-
-
-git_flow_check_all_repositories()
-{
-    cd_workspace
-    git submodule --quiet foreach "git diff --name-only"
-}
-
-git_flow_check_changes()
-{
-    project_home=$1
-
-    cd "$project_home" || exit
-
-    names=$(git diff --name-only)
-    # shellcheck disable=SC2006
-    if [[  `git status --porcelain` ]]; then
-        echo "Uncommitted changes: $project_home"
-        exit 1
-    fi
-}
-
-git_flow_install()
-{
-    echo " "
-    echo "Please install latest git flow AVH Edition:"
-    echo " "
-    echo "MacOS: brew install git-flow-avh"
-    echo " "
-
-    exit 1
-}
-
-git_flow_init()
-{
-    project_home=$1
-
-    cd "$project_home" || exit
-
-    if [ "$(git flow config >/dev/null 2>&1)" ]; then
-
-        git_flow_install
-
-    fi
-
-    git_flow_version=$(git flow version);
-
-    if ! grep -q AVH <<<"$git_flow_version"; then
-
-        git_flow_install
-
-    fi
-
-    git_flow_check_changes "$project_home"
-
-    git flow init -f -d --feature feature/  --bugfix bugfix/ --release release/ --hotfix hotfix/ --support support/ -t ''
-
-
-}
-
-git_flow_release_start()
-{
-    project_home=$1
-    version=$2
-
-    echo " "
-    echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Preparing Release Branch  ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
-    echo "┋"
-    echo "┋  Preparing $(basename "$project_home") branch: release/$version"
-    echo "┋"
-    echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
-    echo " "
-
-    cd "$project_home" || exit
-
-    branch_name=$(git_branch_name "$project_home")
-
-    if [ "$branch_name" = "release/$version" ]; then
-
-        echo "Already on release branch: $branch_name"
-
-    else
-
-        git_flow_init "$project_home"
-
-        # Check out the develop branch
-        git checkout develop
-
-        # then start a new release branch
-        git flow release start "$version"
-
-        branch_name=$(git_branch_name "$project_home")
-
-        if [ "$branch_name" = "release/$version" ]; then
-
-            # switch to the release branch
-            git checkout release/"$version"
-
-        else
-
-            echo "Could not create release branch: release/$version"
-            exit 1
-
-        fi
-
-    fi
-
-    # and update its version
-    update_version "$project_home" "$version"
-}
-
-git_branch_name()
-{
-    project_home=$1
-
-    cd "$project_home" || exit
-    branch_name=$(git rev-parse --abbrev-ref HEAD)
-    echo "$branch_name"
-}
-
-git_flow_release_finish()
-{
-    project_home=$1
-    version=$2
-
-    cd "$project_home" || exit
-
-    git checkout master
-    git pull
-    git tag -a "$version" -m "$version"
-    git checkout release/"$version"
-    git flow release finish "$version"
-    git push origin --tags
-
-    echo " "
-    echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Release Merged to Master  ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
-    echo "┋"
-    echo "┋  The branch 'release/$version' has been merged into master."
-    echo "┋"
-    echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
-    echo " "
-}
-
-git_flow_feature_start()
-{
-    project_home=$1
-    feature_name=$2
-
-    if yes_no "Start '$feature_name' branch of $project_home"; then
-
-        cd "$project_home" || exit
-        git-flow feature start "$feature_name"
-
-    fi
-}
-
-git_flow_feature_finish()
-{
-    project_home=$1
-    feature_name=$2
-
-    if yes_no "Finish '$feature_name' branch of $project_home"; then
-        # shellcheck disable=SC2164
-        cd "$project_home"
-        git-flow feature finish "$feature_name"
-    fi
-}
-
-git_flow_hotfix_start()
-{
-    project_home=$1
-    feature_name=$2
-
-    if yes_no "Start '$feature_name' branch of $project_home"; then
-
-        cd "$project_home" || exit
-        git-flow hotfix start "$feature_name"
-
-    fi
-}
-
-git_flow_hotfix_finish()
-{
-    project_home=$1
-    feature_name=$2
-
-    if yes_no "Finish '$feature_name' branch of $project_home"; then
-
-        cd "$project_home" || exit
-        git-flow hotfix finish "$feature_name"
-
-    fi
-}
-
-################ VERSIONING ################################################################################################
-
-update_version()
-{
-    project_home=$1
-    new_version=$2
-
-    old_version=$(project_version "$project_home")
-
-    echo " "
-    echo "Updating $(project_name "$project_home") version from $old_version to $new_version"
-
-    # Update POM versions project.properties files
-    kivakit-update-version.pl "$project_home" "$old_version" "$new_version"
-
-    echo "Updated"
-    echo " "
-}
-
-################ UTILITY ################################################################################################
-
 append_path()
 {
     export PATH="$PATH:$1"
@@ -506,24 +337,6 @@ append_path()
 prepend_path()
 {
     export PATH="$1:$PATH"
-}
-
-source_project_profile()
-{
-    project_name=$1
-
-    common_profile="$TELENAV_WORKSPACE/${project_name}/tools/library/${project_name}-common-profile.sh"
-    project_profile="$HOME/.${project_name}-profile"
-
-    if test -e "$common_profile"; then
-        # shellcheck disable=SC1090
-        source "$common_profile"
-    fi
-
-    if test -e "$project_profile"; then
-        # shellcheck disable=SC1090
-        source "$project_profile"
-    fi
 }
 
 system_variable()
@@ -587,6 +400,24 @@ lexakai()
 
     # shellcheck disable=SC2068
     java -jar "$lexakai_jar" $@
+}
+
+property_value()
+{
+    file=$1
+    key=$2
+
+    # shellcheck disable=SC2002
+    cat "$file" | grep "$key" | cut -d'=' -f2 | xargs echo
+}
+
+bracket()
+{
+    name=$1
+    shift
+
+    echo " " && echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ \$name && $*" && echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" && echo " "
+
 }
 
 yes_no()

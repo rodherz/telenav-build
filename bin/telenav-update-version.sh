@@ -33,5 +33,5 @@ fi
 #
 
 cd_workspace
-scope=$(repository_scope "$1")
+scope=$(resolve_scope "$1")
 mvn --quiet "$scope" -Dtelenav.version="$version" -Dtelenav.branch-name="$branch" com.telenav.cactus:cactus-build-maven-plugin:replace || exit 1

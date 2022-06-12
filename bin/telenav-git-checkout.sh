@@ -44,5 +44,5 @@ if [[ "$#" -eq 0 ]]; then
 fi
 
 cd_workspace
-scope=$(repository_scope "$scope")
+scope=$(scope "$scope")
 mvn --quiet "$scope" -Dtelenav.branch="$branch" -Dtelenav.permit-local-modifications=false com.telenav.cactus:cactus-build-maven-plugin:checkout || exit 1
