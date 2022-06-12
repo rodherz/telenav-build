@@ -117,8 +117,7 @@ case "${build_types[0]}" in
         ;;
 
     "javadoc")
-        build_arguments+=(clean install)
-        build_modifiers+=(multi-threaded no-tests javadoc)
+        build_modifiers+=(multi-threaded no-tests)
         ;;
 
     "lexakai-documentation")
