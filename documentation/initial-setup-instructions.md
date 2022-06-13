@@ -2,10 +2,6 @@
 
 # Initial Setup Instructions   <img src="https://telenav.github.io/telenav-assets/images/icons/box-24.png" srcset="https://telenav.github.io/telenav-assets/images/icons/box-24-2x.png 2x"/>
 
-[**1. Install Required Tools**](#install-tools)  
-[**2. Checkout and Build**](#setup)  
-[**3. Set Up a Build Environment**](#build-environment)  
-
 This article explains how to get set up to build Telenav Open Source projects, including:
 
  - [kivakit](https://www.kivakit.org/)
