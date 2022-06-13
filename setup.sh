@@ -1,6 +1,6 @@
 #!/bin/bash
 
-source bin/telenav-library-functions
+source "$TELENAV_WORKSPACE"/bin/telenav-library-functions.sh
 
 branch_name=$1
 caller=$2
