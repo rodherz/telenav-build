@@ -2,81 +2,11 @@
 
 # Building   <img src="https://telenav.github.io/telenav-assets/images/icons/gears-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/gears-32-2x.png 2x"/>
 
-The *telenav-build* project contains a number of useful scripts for developers working on the project.
+> **IMPORTANT NOTE**: Please follow the [Initial Setup Instructions](initial-setup-instructions.md) before proceeding
 
-> To check out Telenav open source repositories and build them for the first time, follow the [initial setup instructions](initial-setup-instructions.md)
+To build all projects in the Telenav workspace, simply use Apache Maven. For example: `mvn clean install`
 
-<img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
-
-### Build Scripts
-
-The scripts below can be used to build Telenav open source projects and their documentation.
-
-> All Telenav scripts are named so that you can easily discover them with command-line completion.  
-> To see what scripts are available, type `telenav-` and hit `TAB`.
-
-| Script                                                                  | Purpose                                                                                                    |
-|-------------------------------------------------------------------------|------------------------------------------------------------------------------------------------------------|
-| *telenav-build.sh* `scope`**?** `build-type` `build-modifiers`**&ast;** | Builds the scoped projects using the given build type and build modifiers (see below)                      |
-| *telenav-clean.sh*                                                      | Cleans caches, removes regenerable files, and clears all Telenav artifacts from the local Maven repository |
-| *telenav-clean-sparkling.sh*                                            | Removes local Maven repository (after prompting) and then runs telenav-clean.sh                            |
-| *telenav-build-documentation.sh* `scope`**?**                           | Builds Javadoc and Lexakai documentation for the scoped projects                                           |
-| *telenav-build-javadoc-documentation.sh* `scope`**?**                   | Builds Javadoc for the scoped projects                                                                     |
-| *telenav-build-lexakai-documentation* `scope`**?**                      | Builds Lexakai documentation for the scoped projects                                                       |
-| *telenav-version.sh*                                                    | Shows tool versions and the versions of Telenav projects in your workspace                                 |
-
-Where `scope` is one of:
- 
- - `all` - All repositories in the TELENAV_WORKSPACE
- - `this` - The project in the current folder
- - `[family-name]` - A family of repositories, such as `kivakit`, `mesakit` or `lexakai`
-
-<img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
-
-### telenav-build.sh
-
-The `telenav-build.sh` script takes an optional `build-scope`, a `build-type` 
-and zero or more `build-modifier` arguments. These arguments are translated 
-into a list of maven switches and targets. For this help page, run `telenav-build.sh help`:
-
-    Usage: telenav-build.sh [build-scope] [build-type] [build-modifiers]*
-
-    BUILD SCOPES
-
-                all - build all projects [default]
-       cactus-build - build only the cactus-build project
-            kivakit - build only the kivakit project
-            lexakai - build only the lexakai project
-            mesakit - build only the mesakit project
-               this - build only the project in the current folder
-
-    BUILD TYPES
-
-           [default] - compile, shade and run all tests
-             compile - compile and shade (no tests)
-                 dmg - compile, shade, run tests, build tools, build dmg
-             javadoc - compile and build javadoc
-             release - clean-sparkling, compile, run tests, build javadoc, attach jars, sign artifacts and deploy to OSSRH
-       release-local - clean-sparkling, compile, run tests, build javadoc, attach jars, sign artifacts and deploy to local Maven repository
-               tools - compile, shade, run tests, build tools
-
-    BUILD MODIFIERS
-
-         attach-jars - attach source and javadoc jars to maven artifacts
-               clean - prompt to remove cached and temporary files
-           clean-all - prompt to remove cached and temporary files and kivakit artifacts from ~/.m2
-     clean-sparkling - prompt to remove entire .m2 repository and all cached and temporary files
-               debug - turn maven debug mode on
-         debug-tests - stop in debugger on surefire tests
-             dry-run - show maven command line but don't build
-          no-javadoc - do not build javadoc
-            no-tests - do not run tests
-         quick-tests - run only quick tests
-             verbose - build with full output
-     single-threaded - build with only one thread
-               tests - run all tests
-
-<br/> 
+> **DEVELOPERS**: For convenient build scripts, see [Developing](developing.md).
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
 

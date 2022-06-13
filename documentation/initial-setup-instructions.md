@@ -6,7 +6,7 @@
 [**2. Checkout and Build**](#setup)  
 [**3. Set Up a Build Environment**](#build-environment)  
 
-This article explains how to get set up to build Telenav open source projects, including:
+This article explains how to get set up to build Telenav Open Source projects, including:
 
  - [kivakit](https://www.kivakit.org/)
  - [mesakit](https://www.mesakit.org/)
@@ -35,7 +35,7 @@ This article explains how to get set up to build Telenav open source projects, i
 
 ### 2. Checkout and Build   <img src="https://telenav.github.io/telenav-assets/images/icons/box-24.png" srcset="https://telenav.github.io/telenav-assets/images/icons/box-24-2x.png 2x"/>
 
-To check out, configure and build all Telenav open source projects for the first time:
+To check out, configure and build all Telenav Open Source projects for the first time:
 
     mkdir ~/Workspaces
     cd ~/Workspaces
@@ -104,7 +104,7 @@ The resulting `.profile` should include steps similar to this:
 
 ### 4. Done!   <img src="https://telenav.github.io/telenav-assets/images/icons/rocket-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/rocket-32-2x.png 2x"/>
 
-Congratulations! You're set up and ready to build Telenav open source projects.
+Congratulations! You're set up and ready to build Telenav Open Source projects.
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
 

@@ -15,6 +15,9 @@ This enables a single, consistent build of any combination of the following proj
 > Note: The Maven `pom.xml` in this project is _bill of materials only_, and simply builds all child projects.  
 > Since they are all built in the same [Maven reactor](https://books.sonatype.com/mvnref-book/reference/_using_advanced_reactor_options.html), breaking changes can be detected immediately.
 
-[**Initial Setup**](documentation/initial-setup-instructions.md)  
-[**Building**](documentation/building.md)  
+> [**How to Build Telenav Open Source Projects**](documentation/building.md)
+
+### Quick Start <a name = "quick-start"></a>&nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/rocket-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/rocket-32-2x.png 2x"/>
+
+[**Setup**](documentation/initial-setup-instructions.md)  
 [**Developing**](documentation/developing.md)

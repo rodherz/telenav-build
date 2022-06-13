@@ -6,7 +6,7 @@
 
 Telenav Open Source projects are distributed under [Apache License, Version 2.0](../kivakit/LICENSE)</sub>. This guide explains how KivaKit is organized and maintained.
 
-Please keep the following in mind as you work on any Telenav open source project:
+Please keep the following in mind as you work on any Telenav Open Source project:
 
 1. Nobody owes you anything. Most people who work on open source projects do so out of pure passion for software development and to solve a problem they think is worth solving. This might not include the particular issue you are focused on. Being well-informed, friendly and patient can help you to make your case. Be willing to help out if you can.
 

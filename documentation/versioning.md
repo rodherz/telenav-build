@@ -2,7 +2,7 @@
 
 ## Versioning &nbsp; &nbsp;  <img src="https://telenav.github.io/telenav-assets/images/icons/coffee-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/coffee-32-2x.png 2x"/>
 
-All Telenav open source projects use [semantic versioning](https://semver.org).  
+All Telenav Open Source projects use [semantic versioning](https://semver.org).  
 Release versions have no prefix or suffix, as in `1.6.0`.   
 Snapshot builds have a snapshot suffix, as in `1.6.1-SNAPSHOT`.
 
