@@ -9,9 +9,10 @@
 
 source telenav-library-functions.sh
 
-if [[ ! "$#" -eq 2 ]]; then
+if [[ ! "$#" -eq 2 || "$1" == "all" ]]; then
 
-    echo "telenav-git-finish-release.sh [scope] [version]"
+    echo "telenav-git-finish-release.sh [project-family-name] [version]"
+    exit 1
 
 fi
 

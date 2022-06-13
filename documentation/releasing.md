@@ -12,15 +12,15 @@ Telenav Open Source projects adhere to the [Git Flow](https://www.atlassian.com/
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
 
-## Project Scopes
+## Project Families
 
 The `telenav-build` workspace can contain any set of Telenav Open Source projects.
-To allow scripts to release different subsets of these projects, a project `scope` 
-specifier is required, which must be one of:
+The release scripts take a `project-family` to choose which project to release:
  
- - `all` - All repositories in the TELENAV_WORKSPACE
- - `this` - The project in the current folder
- - `[family-name]` - A family of repositories, such as `kivakit`, `mesakit`, `cactus-build` or `lexakai`
+ - `kivakit`
+ - `mesakit`
+ - `cactus-build`
+ - `lexakai`
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
 
@@ -30,7 +30,7 @@ specifier is required, which must be one of:
 
 To create a release branch and update version numbers in the project:
 
-    telenav-git-start-release.sh [scope] [project-version]
+    telenav-release.sh [project-family] [project-version]
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
@@ -63,7 +63,7 @@ To update code flowers for the release:
 
 To build the release branch on the local machine:
 
-    telenav-build.sh [scope] release-local
+    telenav-build.sh [project-family] release-local
 
 This will build all project artifacts from scratch (answer 'y' to the prompt to remove all artifacts), including Javadoc and Lexakai documentation.
 
@@ -73,7 +73,7 @@ This will build all project artifacts from scratch (answer 'y' to the prompt to 
 
 Commit any final changes to the release branch:
 
-    telenav-git-finish-release.sh [scope] [project-version]
+    telenav-release-finish.sh [project-family] [project-version]
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
 
@@ -83,7 +83,7 @@ Commit any final changes to the release branch:
 
 To push the release to OSSRH, run:
 
-    telenav-build.sh [scope] release
+    telenav-build.sh [project-family] release
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
@@ -91,7 +91,7 @@ To push the release to OSSRH, run:
 
 Merge the release branch into the master branch:
 
-    telenav-finish-release.sh [scope]
+    telenav-finish-release.sh [project-family]
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
