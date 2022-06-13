@@ -1,10 +1,15 @@
 #!/bin/bash
 
+SCRIPT_PATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+
 if [[ -z "$TELENAV_WORKSPACE" ]]; then
-    export TELENAV_WORKSPACE=$PWD
+    export TELENAV_WORKSPACE=$SCRIPT_PATH
 fi
 
 source "$TELENAV_WORKSPACE"/bin/telenav-library-functions.sh
+
+bash telenav-workspace.sh
+# bash telenav-version.sh
 
 branch_name=$1
 caller=$2
