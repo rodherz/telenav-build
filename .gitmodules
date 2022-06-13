@@ -34,9 +34,9 @@
 	path = mesakit-examples
 	url = https://github.com/Telenav/mesakit-examples.git
 	branch = feature/new-build-scripts
-[submodule "cactus-build"]
-	path = cactus-build
-	url = https://github.com/Telenav/cactus-build.git
+[submodule "cactus"]
+	path = cactus
+	url = https://github.com/Telenav/cactus.git
 	branch = feature/new-build-scripts
 [submodule "telenav-superpom"]
 	path = telenav-superpom
@@ -54,7 +54,7 @@
 	path = kivakit-assets
 	url = https://github.com/Telenav/kivakit-assets.git
 	branch = publish
-[submodule "cactus-build-assets"]
-	path = cactus-build-assets
-	url = https://github.com/Telenav/cactus-build-assets.git
+[submodule "cactus-assets"]
+	path = cactus-assets
+	url = https://github.com/Telenav/cactus-assets.git
 	branch = publish
