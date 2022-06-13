@@ -1,5 +1,9 @@
 #!/bin/bash
 
+if [[ -z "$TELENAV_WORKSPACE" ]]; then
+    export TELENAV_WORKSPACE=$PWD
+fi
+
 source "$TELENAV_WORKSPACE"/bin/telenav-library-functions.sh
 
 branch_name=$1
