@@ -8,8 +8,7 @@ fi
 
 source "$TELENAV_WORKSPACE"/bin/telenav-library-functions.sh
 
-bash telenav-workspace.sh
-# bash telenav-version.sh
+bash "$TELENAV_WORKSPACE"/bin/telenav-workspace.sh"
 
 branch_name=$1
 caller=$2
