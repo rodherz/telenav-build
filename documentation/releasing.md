@@ -79,19 +79,19 @@ Commit any final changes to the release branch:
 
 ## 2. Publishing the Release &nbsp;  <img src="https://telenav.github.io/telenav-assets/images/icons/books-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/books-32-2x.png 2x"/>
 
-### 2.1 Push the Release to OSSRH (Maven Staging)
+### 2.0 Merge the Release Branch to Master
+
+Merge the release branch into the master branch:
+
+    telenav-finish-release.sh [project-family]
+
+### 2.1 Push the Release to OSSRH (Maven Central Staging)
 
 To push the release to OSSRH, run:
 
     telenav-build.sh [project-family] release
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
-
-### 2.0 Merge the Release Branch to Master
-
-Merge the release branch into the master branch:
-
-    telenav-finish-release.sh [project-family]
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 

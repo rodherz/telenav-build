@@ -21,3 +21,12 @@ version=$2
 
 cd_workspace
 mvn --quiet "$scope" -Doperation=finish -Dbranch-type=release -Dbranch-name="$version" com.telenav.cactus:cactus-build-maven-plugin:git-flow || exit 1
+
+echo " "
+echo "Next Steps:"
+echo " "
+echo "  1. Build the release and push to OSSRH (Maven Central Staging): telenav-build.sh [project-family] release"
+echo "  2. Sign into [OSSRH](http://s01.oss.sonatype.org) and push the build to Maven Central."
+echo " "
+echo "Done."
+echo " "
