@@ -21,6 +21,46 @@ cd_workspace()
     cd "$TELENAV_WORKSPACE" || exit 1
 }
 
+show_workspace()
+{
+    echo " "
+    echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Telenav Workspace ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
+    echo "┋"
+    echo "┋        TELENAV_WORKSPACE: $TELENAV_WORKSPACE"
+
+    if [[ -d "$KIVAKIT_HOME" ]]; then
+
+        echo "┋"
+        echo "┋             KIVAKIT_HOME: $KIVAKIT_HOME"
+        echo "┋          KIVAKIT_VERSION: $KIVAKIT_VERSION"
+        echo "┋       KIVAKIT_CACHE_HOME: $KIVAKIT_CACHE_HOME"
+        echo "┋      KIVAKIT_ASSETS_HOME: $KIVAKIT_ASSETS_HOME"
+        echo "┋     KIVAKIT_JAVA_OPTIONS: $KIVAKIT_JAVA_OPTIONS"
+
+    fi
+
+    if [[ -d "$MESAKIT_HOME" ]]; then
+
+        echo "┋"
+        echo "┋             MESAKIT_HOME: $MESAKIT_HOME"
+        echo "┋          MESAKIT_VERSION: $MESAKIT_VERSION"
+        echo "┋       MESAKIT_CACHE_HOME: $MESAKIT_CACHE_HOME"
+        echo "┋      MESAKIT_ASSETS_HOME: $MESAKIT_ASSETS_HOME"
+        echo "┋     MESAKIT_JAVA_OPTIONS: $MESAKIT_JAVA_OPTIONS"
+
+    fi
+
+    echo "┋"
+    echo "┋                JAVA_HOME: $JAVA_HOME"
+    echo "┋"
+    echo "┋                  M2_HOME: $M2_HOME"
+    echo "┋"
+    perl -e 'print "┋                     PATH: " . join("\n┋                           ", split(":", $ENV{"PATH"})) . "\n"'
+    echo "┋"
+    echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
+    echo " "
+}
+
 scoped_folders()
 {
     pattern=$1
