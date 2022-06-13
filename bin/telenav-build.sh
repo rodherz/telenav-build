@@ -25,12 +25,13 @@ for argument in "$@"
 do
     if [[ " ${allowed_scopes[*]} " =~ ${argument} ]]; then
         build_scope=$argument
-    fi
-    if [[ " ${allowed_build_types[*]} " =~ ${argument} ]]; then
+    elif [[ " ${allowed_build_types[*]} " =~ ${argument} ]]; then
         build_types+=("$argument")
-    fi
-    if [[ " ${allowed_build_modifiers[*]} " =~ ${argument} ]]; then
+    elif [[ " ${allowed_build_modifiers[*]} " =~ ${argument} ]]; then
         build_modifiers+=("$argument")
+    else
+        echo "Invalid argument: ${argument}"
+        exit 1
     fi
 done
 
@@ -66,7 +67,7 @@ usage()
     echo "           [default] - compile, shade and run all tests"
     echo "             compile - compile and shade (no tests)"
     echo "                 dmg - compile, shade, run tests, build tools, build dmg"
-    echo "             javadoc - compile and build javadoc"
+    echo "             javadoc - build javadoc documentation"
     echo "             release - clean-sparkling, compile, run tests, build javadoc, attach jars, sign artifacts and deploy to OSSRH"
     echo "       release-local - clean-sparkling, compile, run tests, build javadoc, attach jars, sign artifacts and deploy to local Maven repository"
     echo "               tools - compile, shade, run tests, build tools"
@@ -80,6 +81,7 @@ usage()
     echo "               debug - turn maven debug mode on"
     echo "         debug-tests - stop in debugger on surefire tests"
     echo "             dry-run - show maven command line but don't build"
+    echo "             javadoc - build javadoc documentation"
     echo "          no-javadoc - do not build javadoc"
     echo "            no-tests - do not run tests"
     echo "         quick-tests - run only quick tests"
@@ -117,7 +119,7 @@ case "${build_types[0]}" in
         ;;
 
     "javadoc")
-        build_modifiers+=(multi-threaded no-tests)
+        build_modifiers+=(multi-threaded no-tests javadoc)
         ;;
 
     "lexakai-documentation")
@@ -153,6 +155,8 @@ case "${build_types[0]}" in
         usage
 
 esac
+
+build_javadoc=false
 
 for modifier in "${build_modifiers[@]}"; do
 
@@ -196,7 +200,7 @@ for modifier in "${build_modifiers[@]}"; do
             ;;
 
         "javadoc")
-            build_arguments+=(javadoc:aggregate)
+            build_javadoc=true
             ;;
 
         "multi-threaded")
@@ -271,6 +275,10 @@ echo "┋   Maven Command Line: mvn  ${maven_switches[*]} ${build_arguments[*]}"
 echo "┋            Workspace: $TELENAV_WORKSPACE"
 echo "┋"
 
+if [[ "$build_javadoc" == "true" ]]; then
+    bash telenav-build-javadoc.sh "${build_scope}"
+fi
+
 if [ -z "$dry_run" ]; then
 
     if [ -n "$clean_script" ]; then
@@ -278,11 +286,15 @@ if [ -z "$dry_run" ]; then
     fi
 
     # shellcheck disable=SC2086
-    "$M2_HOME/bin/mvn" "$(resolve_scope $build_scope)" ${maven_switches[*]} ${build_arguments[*]} 2>&1
+    if [[ ${#build_arguments[@]} -gt 0 ]]; then
 
-    if [ "${PIPESTATUS[0]}" -ne "0" ]; then
-        echo "Build failed."
-        exit 1
+        "$M2_HOME/bin/mvn" "$(resolve_scope $build_scope)" ${maven_switches[*]} ${build_arguments[*]} 2>&1
+
+        if [ "${PIPESTATUS[0]}" -ne "0" ]; then
+            echo "Build failed."
+            exit 1
+        fi
+
     fi
 
 fi

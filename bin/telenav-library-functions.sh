@@ -21,6 +21,25 @@ cd_workspace()
     cd "$TELENAV_WORKSPACE" || exit 1
 }
 
+scoped_folders()
+{
+    pattern=$1
+
+    if [[ $pattern == "all" ]]; then
+        pattern="kivakit|mesakit|cactus-build|lexakai"
+    fi
+
+    cd_workspace
+    folders=()
+    for folder in */; do
+        if [[ "$folder" =~ $pattern ]]; then
+            if [[ ! "$folder" == *"-assets"* ]]; then
+                folders+=("$folder")
+            fi
+        fi
+    done
+}
+
 resolve_scope()
 {
     scope=$1
