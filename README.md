@@ -20,4 +20,5 @@ This enables a single, consistent build of any combination of the following proj
 ### Quick Start <a name = "quick-start"></a>&nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/rocket-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/rocket-32-2x.png 2x"/>
 
 [**Setup**](documentation/initial-setup-instructions.md)  
-[**Developing**](documentation/developing.md)
+[**Developing**](documentation/developing.md)  
+[**Releasing**](documentation/releasing.md)
