@@ -122,10 +122,10 @@ git submodule --quiet foreach "[[ \"\$path\" == *-assets ]] || git checkout $bra
 
 clear_cache_folders
 
-if [[ -d cactus-build ]]; then
+if [[ -d cactus ]]; then
 
     echo "Building cactus"
-    mvn --batch-mode -f cactus-build clean install || exit 1
+    mvn --batch-mode -f cactus clean install || exit 1
 
 fi
 

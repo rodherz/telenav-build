@@ -3,7 +3,7 @@ export TELENAV_WORKSPACE=$PWD
 
 source "$TELENAV_WORKSPACE"/bin/telenav-library-functions.sh
 
-export CACTUS_HOME=$PWD/cactus-build
+export CACTUS_HOME=$PWD/cactus
 export KIVAKIT_HOME=$PWD/kivakit
 export MESAKIT_HOME=$PWD/mesakit
 

@@ -19,7 +19,7 @@ The release scripts take a `project-family` to choose which project to release:
  
  - `kivakit`
  - `mesakit`
- - `cactus-build`
+ - `cactus`
  - `lexakai`
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>

@@ -20,7 +20,7 @@ scope=$(resolve_scope "$1")
 version=$2
 
 cd_workspace
-mvn --quiet $scope -DincludeRoot=false -Doperation=start -DbranchType=release -DbranchName="$version" com.telenav.cactus:cactus-build-maven-plugin:git-flow || exit 1
+mvn --quiet $scope -DincludeRoot=false -Doperation=start -DbranchType=release -DbranchName="$version" com.telenav.cactus:cactus-maven-plugin:git-flow || exit 1
 
 telenav-update-version.sh "$1" "release/$version" || exit 1
 

@@ -20,7 +20,7 @@ scope=$(resolve_scope "$1")
 version=$2
 
 cd_workspace
-mvn --quiet "$scope" -Doperation=finish -Dbranch-type=release -Dbranch-name="$version" com.telenav.cactus:cactus-build-maven-plugin:git-flow || exit 1
+mvn --quiet "$scope" -Doperation=finish -Dbranch-type=release -Dbranch-name="$version" com.telenav.cactus:cactus-maven-plugin:git-flow || exit 1
 
 echo " "
 echo "Next Steps:"

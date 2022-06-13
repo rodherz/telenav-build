@@ -12,4 +12,4 @@ source telenav-library-functions.sh
 scope=$(resolve_scope "$1")
 
 cd_workspace
-mvn --quiet "$scope" com.telenav.cactus:cactus-build-maven-plugin:is-dirty || exit 1
+mvn --quiet "$scope" com.telenav.cactus:cactus-maven-plugin:is-dirty || exit 1

@@ -14,7 +14,7 @@ check_tools
 require_variable TELENAV_WORKSPACE "Must set TELENAV_WORKSPACE"
 cd_workspace
 
-allowed_scopes=(all this kivakit mesakit lexakai cactus-build)
+allowed_scopes=(all this kivakit mesakit lexakai cactus)
 allowed_build_types=(compile release release-local tools dmg javadoc lexakai-documentation help)
 allowed_build_modifiers=(attach-jars clean clean-all clean-sparkling debug debug-tests dry-run no-javadoc no-tests quick-tests quiet verbose single-threaded tests)
 
@@ -56,7 +56,7 @@ usage()
     echo "  BUILD SCOPES"
     echo " "
     echo "                all - build all projects"
-    echo "       cactus-build - build only the cactus-build project"
+    echo "       cactus - build only the cactus project"
     echo "            kivakit - build only the kivakit project"
     echo "            lexakai - build only the lexakai project"
     echo "            mesakit - build only the mesakit project"
@@ -184,7 +184,7 @@ for modifier in "${build_modifiers[@]}"; do
             ;;
 
         "lexakai-documentation")
-            build_arguments+=(com.telenav.cactus:cactus-build-maven-plugin:lexakai)
+            build_arguments+=(com.telenav.cactus:cactus-maven-plugin:lexakai)
             ;;
 
         "debug-tests")

@@ -27,4 +27,4 @@ if [[ "$family" == "all" || "$family" == "this" ]]; then
 fi
 
 cd_workspace
-mvn --quiet "$scope" -Dtelenav.version="$version" -Dtelenav.branch-name="$version" com.telenav.cactus:cactus-build-maven-plugin:replace || exit 1
+mvn --quiet "$scope" -Dtelenav.version="$version" -Dtelenav.branch-name="$version" com.telenav.cactus:cactus-maven-plugin:replace || exit 1

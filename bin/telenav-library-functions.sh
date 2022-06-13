@@ -66,7 +66,7 @@ scoped_folders()
     pattern=$1
 
     if [[ $pattern == "all" ]]; then
-        pattern="kivakit|mesakit|cactus-build|lexakai"
+        pattern="kivakit|mesakit|cactus|lexakai"
     fi
 
     cd_workspace

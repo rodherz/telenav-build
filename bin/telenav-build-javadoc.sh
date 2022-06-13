@@ -13,7 +13,7 @@ source telenav-library-functions.sh
 
 scope=$1
 
-allowed_scopes=(all this kivakit mesakit lexakai cactus-build)
+allowed_scopes=(all this kivakit mesakit lexakai cactus)
 
 if [[ ! " ${allowed_scopes[*]} " == *" ${scope} "* ]]; then
     echo "Invalid scope"

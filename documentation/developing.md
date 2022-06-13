@@ -51,7 +51,7 @@ project `build-scope` specifier is accepted, which must be one of:
  
  - `all` `[default]` - All repositories in the TELENAV_WORKSPACE
  - `this` - The project in the current folder
- - `[family-name]` - A family of repositories, such as `kivakit`, `mesakit`, `cactus-build` or `lexakai`
+ - `[family-name]` - A family of repositories, such as `kivakit`, `mesakit`, `cactus` or `lexakai`
 
 ## The Build Script &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/command-line-24.png" srcset="https://telenav.github.io/telenav-assets/images/icons/command-line-24-2x.png 2x"/>
 

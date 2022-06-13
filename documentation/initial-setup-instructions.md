@@ -52,8 +52,8 @@ When the checkout and build process completes, you should have a project tree li
 
     └── Workspaces
         └── telenav-build <----------------- $TELENAV_WORKSPACE
-            ├── cactus-build
-            ├── cactus-build-assets
+            ├── cactus
+            ├── cactus-assets
             ├── kivakit <------------------- $KIVAKIT_HOME
             │   ├── kivakit-application
             │   ├── kivakit-collections

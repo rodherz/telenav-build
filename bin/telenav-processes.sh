@@ -9,5 +9,5 @@
 
 echo " "
 # shellcheck disable=SC2009
-ps aux | grep java | grep -e "kivakit|mesakit|cactus-build" | grep -v JetBrains | grep -v maven | grep -v surefire | grep -v Eclipse | grep -v "grep java"
+ps aux | grep java | grep -e "kivakit|mesakit|cactus" | grep -v JetBrains | grep -v maven | grep -v surefire | grep -v Eclipse | grep -v "grep java"
 echo " "
