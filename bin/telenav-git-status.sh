@@ -9,12 +9,8 @@
 
 source telenav-library-functions.sh
 
-#
-# telenav-git-status.sh
-#
-
-cd_workspace
 echo " "
+cd_workspace
 git status --short || exit 1
 git submodule --quiet foreach "git status --short" || exit 1
 echo " "

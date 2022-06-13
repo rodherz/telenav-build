@@ -1,17 +1,17 @@
 <!--suppress HtmlUnknownTarget, HtmlRequiredAltAttribute -->
 
-## Java 17 Migration Notes &nbsp;  <img src="https://telenav.github.io/telenav-assets/images/icons/footprints-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/footprints-32-2x.png 2x"/>
+# Java 17 Migration Notes &nbsp;  <img src="https://telenav.github.io/telenav-assets/images/icons/footprints-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/footprints-32-2x.png 2x"/>
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
 
-### Welcome to Java 17+ &nbsp;&nbsp;    <img src="https://telenav.github.io/telenav-assets/images/icons/coffee-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/coffee-32-2x.png 2x"/>
+## Welcome to Java 17+ &nbsp;&nbsp;    <img src="https://telenav.github.io/telenav-assets/images/icons/coffee-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/coffee-32-2x.png 2x"/>
 
 Starting with Java 9, the JDK has supported _modules_. KivaKit has a modular design and runs on Java 17+.
 
 > NOTE: Although KivaKit requires a Java 17+ virtual machine, this does NOT mean that client 
 > source code has to be upgraded to Java 17.
 
-### Why Upgrade the Java Virtual Machine to Version 11?
+## Why Upgrade the Java Virtual Machine to Version 11?
 
 There are a number of good reasons to move on to more recent versions of Java:
 
@@ -33,7 +33,7 @@ There are a number of good reasons to move on to more recent versions of Java:
     * [Lightweight multithreading and continuations](https://cr.openjdk.java.net/~rpressler/loom/Loom-Proposal.html)
     * [Faster, lower-latency garbage collection](https://blogs.oracle.com/javamagazine/understanding-the-jdks-new-superfast-garbage-collectors).
 
-### Advantages of Modules   <img src="https://telenav.github.io/telenav-assets/images/icons/stars-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/stars-32-2x.png 2x"/>
+## Advantages of Modules   <img src="https://telenav.github.io/telenav-assets/images/icons/stars-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/stars-32-2x.png 2x"/>
 
 Modules provide strong encapsulation, which has some advantages:
 
@@ -42,7 +42,7 @@ Modules provide strong encapsulation, which has some advantages:
 * HotSpot can perform more aggressive optimizations on code that isn't public
 * It's easier to use only part of the JDK or KivaKit without dragging in a lot of unneeded dependencies
 
-### Strong Encapsulation   <img src="https://telenav.github.io/telenav-assets/images/icons/box-24.png" srcset="https://telenav.github.io/telenav-assets/images/icons/box-24-2x.png 2x"/>
+## Strong Encapsulation   <img src="https://telenav.github.io/telenav-assets/images/icons/box-24.png" srcset="https://telenav.github.io/telenav-assets/images/icons/box-24-2x.png 2x"/>
 
 Modular Java is more secure and performs better, but it places certain restrictions of Java 9+ code.
 
@@ -54,7 +54,7 @@ Since KivaKit uses reflection, most modules in KivaKit are open modules. This al
 
 This warning is annoying, but it cannot be turned off by design. Although future versions of Java will restrict reflection further, it is nothing to worry about under Java 17.
 
-### Making Your Application Modular &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/stars-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/stars-32-2x.png 2x"/>
+## Making Your Application Modular &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/toolbox-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/toolbox-32-2x.png 2x"/>
 
 For users of KivaKit, it's only _required_ to declare your application to be an open module if you want KivaKit to be able to reflect on _your_ code. Even so, it can be useful to make your application modular, because you can specify exactly what parts of KivaKit you want to use.
 

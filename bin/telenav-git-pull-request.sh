@@ -9,12 +9,6 @@
 
 source telenav-library-functions.sh
 
-#
-# telenav-git-pull-request.sh [scope] [authentication-token] [title] [body]
-#
-# scope = { all, this, [family-name] }
-#
-
 if [[ ! "$#" -eq 4 ]]; then
 
     echo "telenav-git-pull-request.sh [scope] [authentication-token] [title] [body]"

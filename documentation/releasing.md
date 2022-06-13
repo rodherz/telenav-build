@@ -1,57 +1,48 @@
 <!--suppress HtmlUnknownTarget, HtmlRequiredAltAttribute -->
 
-# Releasing &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/rocket-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/rocket-32-2x.png 2x"/>
+# Releasing Telenav Open Source Projects  &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/rocket-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/rocket-32-2x.png 2x"/>
 
-### Step-by-Step Instructions &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/footprints-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/footprints-32-2x.png 2x"/>
+## Step-by-Step Instructions &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/footprints-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/footprints-32-2x.png 2x"/>
 
-This section documents how to release a new version of KivaKit, step by step.
+This section describes step-by-step how to release a new version of any Telenav Open Source project.
 
-In the text below *\[kivakit-version\]* refers to a [semantic versioning](https://semver.org) identifier, such as 2.1.7 or 1.4.0-beta.
+In the text below *\[project-version\]* refers to a [semantic versioning](https://semver.org) identifier, such as `2.1.7`, `4.0.1-SNAPSHOT` or `1.4.0-beta`.
 
-KivaKit adheres to the standard [Git Flow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) branching model.
+Telenav Open Source projects adhere to the [Git Flow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) branching model.
 
-### 0. Releasing Cactus Build (Optional)
+<img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
 
-Cactus build needs to be released only if it has been changed.
+## Project Scopes
 
-> The version number of *cactus-build* should always be in sync with *kivakit*
+The `telenav-build` workspace can contain any set of Telenav Open Source projects.
+To allow scripts to release different subsets of these projects, a project `scope` 
+specifier is required, which must be one of:
+ 
+ - `all` - All repositories in the TELENAV_WORKSPACE
+ - `this` - The project in the current folder
+ - `[family-name]` - A family of repositories, such as `kivakit`, `mesakit`, `cactus-build` or `lexakai`
 
-1. To prepare a release branch, and build the release:
+<img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
 
-       cactus-release.sh [kivakit-version]
+## 1. Preparing the Release <img src="https://telenav.github.io/telenav-assets/images/icons/branch-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/branch-32-2x.png 2x"/>
 
-2. Check that the release branch was created and that all version numbers were updated correctly in pom.xml and project.properties files.
+### 1.1 Creating the Release Branch
 
+To create a release branch and update version numbers in the project:
 
-3. To finalize the release:
+    telenav-git-start-release.sh [scope] [project-version]
 
-       cactus-release-finish.sh [version]
+<img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
-4. To build the release for Maven Central
-
-       cactus-build.sh deploy-ossrh
-
-5. Sign in to [OSSRH](https://s01.oss.sonatype.org) and release to Maven Central
-
-### 1. Preparing the KivaKit Release Branch <img src="https://telenav.github.io/telenav-assets/images/icons/branch-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/branch-32-2x.png 2x"/>
-
-#### 1.1 Create a release branch
-
-To create a release branch, and update version numbers:
-
-    kivakit-release.sh [kivakit-version]
-
-#### 1.2 Check the release
-
-Check that version numbers in *pom.xml* and *project.properties* files were updated correctly.
-
-#### 1.3 Update the change log
+### 1.2 Updating the Change Log
 
 Examine the git history log of all four *kivakit** repositories, and update the *change-log.md* file with any important information about the release.
 
-#### 1.4 Update the project code flowers
+<img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
-To update code flowers for the release
+### 1.3 Updating the Project Code Flowers
+
+To update code flowers for the release:
 
 1. On the command line, execute:
 
@@ -66,43 +57,45 @@ To update code flowers for the release
 
 4. If there have been any projects added or removed since the last release, open *site/index.html* in an editor and insert the &lt;option&gt; HTML code that was output by the kivakit-build-codeflowers.sh.
 
-#### 1.4 Build the release branch
+<img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
-To build the release branch, run the release script again:
+### 1.4 Building the Release Branch
 
-    kivakit-release.sh [kivakit-version]
+To build the release branch on the local machine:
 
-This will build all kivakit artifacts from scratch (answer 'y' to the prompt to remove all artifacts), including Javadoc and Lexakai documentation.
+    telenav-build.sh [scope] release-local
 
-#### 1.5 Committing Final Changes
+This will build all project artifacts from scratch (answer 'y' to the prompt to remove all artifacts), including Javadoc and Lexakai documentation.
 
-Commit any final changes to the release branch.
+<img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
-### 2. Publishing the Release &nbsp;  <img src="https://telenav.github.io/telenav-assets/images/icons/stars-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/stars-32-2x.png 2x"/>
+### 1.5 Committing Final Changes 
 
-#### 2.0 Merge the release branch into master
+Commit any final changes to the release branch:
 
-The release is finished and merged into master with:
+    telenav-git-finish-release.sh [scope] [project-version]
 
-    kivakit-release-finish.sh [kivakit-version]
+<img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
 
-#### 2.1 Update Docker build environment image
+## 2. Publishing the Release &nbsp;  <img src="https://telenav.github.io/telenav-assets/images/icons/books-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/books-32-2x.png 2x"/>
 
-Switch to the develop branch, then a docker build environment image can be created with:
-
-    kivakit-docker-build-create-image.sh
-
-When the image has been built, it can be pushed to DockerHub with:
-
-    kivakit-docker-build-push-image.sh
-
-#### 2.2 Push the Release to OSSRH
+### 2.1 Push the Release to OSSRH (Maven Staging)
 
 To push the release to OSSRH, run:
 
-    kivakit-build.sh deploy-ossrh
+    telenav-build.sh [scope] release
 
-#### 2.3 Publish from OSSRH to Maven Central
+<img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
+
+### 2.0 Merge the Release Branch to Master
+
+Merge the release branch into the master branch:
+
+    telenav-finish-release.sh [scope]
+
+<img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
+
+### 2.2 Publish from OSSRH to Maven Central
 
 The sign into [OSSRH](http://s01.oss.sonatype.org) and push the build to Maven Central.
 

@@ -1,12 +1,12 @@
 <!--suppress HtmlUnknownTarget, HtmlRequiredAltAttribute -->
 
-## Developing &nbsp; &nbsp;  <img src="https://telenav.github.io/telenav-assets/images/icons/bluebook-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/bluebook-32-2x.png 2x"/>
+# Developing &nbsp; &nbsp;  <img src="https://telenav.github.io/telenav-assets/images/icons/bluebook-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/bluebook-32-2x.png 2x"/>
 
 If you are helping to develop Telenav Open Source projects this page will help you get going. 
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
 
-### Setup
+## Setup
 
 1. Follow the [Initial Setup Instructions](initial-setup-instructions.md).
 
@@ -18,7 +18,7 @@ If you are helping to develop Telenav Open Source projects this page will help y
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
-### Our Development Practices
+## Our Development Practices
 
 Once you're ready to go, these articles can help you to understand our development practices:
 
@@ -30,7 +30,7 @@ Once you're ready to go, these articles can help you to understand our developme
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
-### Convenient Scripts for Developers
+## Convenient Scripts for Developers
 
 The `bin` folder of `telenav-build` contains a set of bash scripts, all prefixed with `telenav-`.
 After following the [Initial Setup Instructions](documentation/initial-setup-instructions.md), 
@@ -43,17 +43,17 @@ scripts does not matter.
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
-### Project Scopes
+## Project Scopes
 
 The `telenav-build` workspace can contain any set of Telenav Open Source projects.
 To allow `telenav-build.sh` to build different subsets of these projects, an optional
 project `build-scope` specifier is accepted, which must be one of:
  
- - `all` - All repositories in the TELENAV_WORKSPACE
+ - `all` `[default]` - All repositories in the TELENAV_WORKSPACE
  - `this` - The project in the current folder
  - `[family-name]` - A family of repositories, such as `kivakit`, `mesakit`, `cactus-build` or `lexakai`
 
-### The Build Script &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/command-line-24.png" srcset="https://telenav.github.io/telenav-assets/images/icons/command-line-24-2x.png 2x"/>
+## The Build Script &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/command-line-24.png" srcset="https://telenav.github.io/telenav-assets/images/icons/command-line-24-2x.png 2x"/>
 
 The `telenav-build.sh` script helps to compose Maven commands. It takes an optional `build-scope`,
 zero or more `build-modifiers`, and a `build-type`:
@@ -62,7 +62,7 @@ zero or more `build-modifiers`, and a `build-type`:
 
 > See below for descriptions of build scopes, modifiers, and types.
 
-### Examples &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/books-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/books-32-2x.png 2x"/>
+## Examples &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/books-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/books-32-2x.png 2x"/>
 
 
 For example, `telenav-build.sh kivakit release` builds a release of the KivaKit project and uploads
@@ -81,7 +81,7 @@ it to OSSRH (staging for Maven Central). Some common usages:
 | *telenav-build.sh single-threaded* | Build with only one thread (12 is the default)                                                     |
 
 
-### Different Kinds of Builds &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/set-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/set-32-2x.png 2x"/>
+## Different Kinds of Builds &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/set-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/set-32-2x.png 2x"/>
 
 The `build-type` parameter to `telenav-build` specifies the goal of the build.
 
@@ -93,7 +93,7 @@ The `build-type` parameter to `telenav-build` specifies the goal of the build.
 | *release-local* | Builds a release locally                                             |
 | *release*       | Builds a release and uploads it to OSSRH (staging for Maven Central) |
 
-### Build Modifiers &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/stars-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/stars-32-2x.png 2x"/>
+## Build Modifiers &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/stars-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/stars-32-2x.png 2x"/>
 
 
 The `build-modifier` parameter(s) adds or removes switches from those specified by `build-type`.
@@ -114,7 +114,7 @@ They effectively *modify* the kind of build.
 | single-threaded  | Build with only one thread                                                   |
 | tests            | Run tests for a build type that normally excludes testing                    |
 
-### Source Control Scripts <img src="https://telenav.github.io/telenav-assets/images/icons/branch-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/branch-32-2x.png 2x"/>
+## Source Control Scripts <img src="https://telenav.github.io/telenav-assets/images/icons/branch-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/branch-32-2x.png 2x"/>
 
 Telenav Open Source projects are published on [Github](https://www.github.com/) and use Git for source control. 
 All Telenav Open Source repositories adhere to the standard [Git Flow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) branching model.

@@ -9,12 +9,6 @@
 
 source telenav-library-functions.sh
 
-#
-# telenav-git-pull.sh [scope]?
-#
-# scope = { all, this, [family-name] }
-#
-
 scope=$(resolve_scope "$1")
 
 cd_workspace

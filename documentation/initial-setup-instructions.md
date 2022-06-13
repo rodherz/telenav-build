@@ -10,7 +10,7 @@ This article explains how to get set up to build Telenav Open Source projects, i
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
 
-### 1. Install Required Tools &nbsp; <a name = "install-tools"></a>  <img src="https://telenav.github.io/telenav-assets/images/icons/toolbox-24.png" srcset="https://telenav.github.io/telenav-assets/images/icons/toolbox-24-2x.png 2x"/>
+## 1. Install Required Tools &nbsp; <a name = "install-tools"></a>  <img src="https://telenav.github.io/telenav-assets/images/icons/toolbox-24.png" srcset="https://telenav.github.io/telenav-assets/images/icons/toolbox-24-2x.png 2x"/>
 
 - Bash
 - Git 2.30+
@@ -29,7 +29,7 @@ This article explains how to get set up to build Telenav Open Source projects, i
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
-### 2. Checkout and Build   <img src="https://telenav.github.io/telenav-assets/images/icons/box-24.png" srcset="https://telenav.github.io/telenav-assets/images/icons/box-24-2x.png 2x"/>
+## 2. Checkout and Build   <img src="https://telenav.github.io/telenav-assets/images/icons/box-24.png" srcset="https://telenav.github.io/telenav-assets/images/icons/box-24-2x.png 2x"/>
 
 To check out, configure and build all Telenav Open Source projects for the first time:
 
@@ -76,7 +76,7 @@ When the checkout and build process completes, you should have a project tree li
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
-### 3. Set Up a Build Environment   <img src="https://telenav.github.io/telenav-assets/images/icons/command-line-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/command-line-32-2x.png 2x"/>
+## 3. Set Up a Build Environment   <img src="https://telenav.github.io/telenav-assets/images/icons/command-line-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/command-line-32-2x.png 2x"/>
 
 To create an environment for future builds, you must set some environment variables in your `~/.profile`.
 You can either `cp setup/profile ~/.profile`, or you can modify your existing profile accordingly.
@@ -98,13 +98,13 @@ The resulting `.profile` should include steps similar to this:
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
 
-### 4. Done!   <img src="https://telenav.github.io/telenav-assets/images/icons/rocket-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/rocket-32-2x.png 2x"/>
+## 4. Done!   <img src="https://telenav.github.io/telenav-assets/images/icons/rocket-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/rocket-32-2x.png 2x"/>
 
 Congratulations! You're set up and ready to build Telenav Open Source projects.
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
 
-### Next Steps &nbsp; &nbsp;  <img src="https://telenav.github.io/telenav-assets/images/icons/footprints-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/footprints-32-2x.png 2x"/>
+## Next Steps &nbsp; &nbsp;  <img src="https://telenav.github.io/telenav-assets/images/icons/footprints-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/footprints-32-2x.png 2x"/>
 
 [I want to build](building.md)
 

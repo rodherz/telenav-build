@@ -9,10 +9,7 @@
 
 source telenav-library-functions.sh
 
-#
-# telenav-git-is-dirty.sh
-#
+scope=$(resolve_scope "$1")
 
 cd_workspace
-scope=$(resolve_scope "$1")
 mvn --quiet "$scope" com.telenav.cactus:cactus-build-maven-plugin:is-dirty || exit 1

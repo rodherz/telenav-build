@@ -9,28 +9,22 @@
 
 source telenav-library-functions.sh
 
-if [[ ! "$#" -eq 3 ]]; then
+if [[ ! "$#" -eq 2 ]]; then
 
-    echo "telenav-update-version.sh [repository-family] [version] [branch-name]"
+    echo "telenav-update-version.sh [scope] [version]"
     exit 1
 
 fi
 
-family=$1
+scope=$(resolve_scope "$1")
 version=$2
-branch=$3
 
 if [[ "$family" == "all" || "$family" == "this" ]]; then
 
-    echo "Must specify a repository family, like kivakit, mesakit or lexakai"
+    echo "Must specify a scope, like all, kivakit, mesakit or lexakai"
     exit 1
 
 fi
 
-#
-# telenav-update-version.sh [repository-family]? [version] [branch-name]
-#
-
 cd_workspace
-scope=$(resolve_scope "$1")
-mvn --quiet "$scope" -Dtelenav.version="$version" -Dtelenav.branch-name="$branch" com.telenav.cactus:cactus-build-maven-plugin:replace || exit 1
+mvn --quiet "$scope" -Dtelenav.version="$version" -Dtelenav.branch-name="$version" com.telenav.cactus:cactus-build-maven-plugin:replace || exit 1

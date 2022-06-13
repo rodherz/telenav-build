@@ -4,7 +4,7 @@
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
 
-### Maven Coordinates
+## Maven Coordinates
 
 Taking [kivakit](https://www.kivakit.org) as an example, maven coordinates have the following convention:
 
@@ -18,7 +18,7 @@ For example, this is the dependency for `kivakit-core-kernel`:
         <artifactId>kivakit-core-kernel</artifactId>
     </dependency>
     
-### Folder Names
+## Folder Names
 
 The first two levels of the folder hierarchy in a repository should have the project family prefix.  
 After that, the prefix is dropped. Note that this is independent of Maven project naming.
@@ -31,7 +31,7 @@ After that, the prefix is dropped. Note that this is independent of Maven projec
         ├── email         [kivakit-network-email]  
         └── http          [kivakit-network-http]  
 
-### Module Names
+## Module Names
 
 Module names use the fully qualified group and artifact ids with dots substituted for any hyphens. 
 For example, this *module-info.java* statement imports the *kivakit-core-kernel* project:

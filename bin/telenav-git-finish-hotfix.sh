@@ -9,12 +9,6 @@
 
 source telenav-library-functions.sh
 
-#
-# telenav-git-finish-hotfix.sh [scope] [branch-name]
-#
-# scope = { all, this, [family-name] }
-#
-
 if [[ ! "$#" -eq 2 ]]; then
 
     echo "telenav-git-finish-hotfix.sh [scope] [branch-name]"

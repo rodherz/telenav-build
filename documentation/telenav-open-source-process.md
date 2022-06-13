@@ -1,8 +1,8 @@
 <!--suppress HtmlUnknownTarget, HtmlRequiredAltAttribute -->
 
-## Telenav Open Source Process &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/world-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/world-32-2x.png 2x"/>
+# Telenav Open Source Process &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/world-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/world-32-2x.png 2x"/>
 
-### Overview &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/map-24.png" srcset="https://telenav.github.io/telenav-assets/images/icons/map-24-2x.png 2x"/>
+## Overview &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/map-24.png" srcset="https://telenav.github.io/telenav-assets/images/icons/map-24-2x.png 2x"/>
 
 Telenav Open Source projects are distributed under [Apache License, Version 2.0](../kivakit/LICENSE)</sub>. This guide explains how KivaKit is organized and maintained.
 
@@ -16,11 +16,11 @@ Please keep the following in mind as you work on any Telenav Open Source project
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
-### Setup &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/box-24.png" srcset="https://telenav.github.io/telenav-assets/images/icons/box-24-2x.png 2x"/>
+## Setup &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/box-24.png" srcset="https://telenav.github.io/telenav-assets/images/icons/box-24-2x.png 2x"/>
 
-This section describes the OSS setup requirements for users, developers and administrators.
+This section describes the OSS setup requirements for end-users, developers of Telenav Open Source projects, and administrators.
 
-#### Users
+### End-Users &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/32-24.png" srcset="https://telenav.github.io/telenav-assets/images/icons/team-32-2x.png 2x"/>
 
 KivaKit artifacts are published to *Maven Central* and no special setup is required for KivaKit users to include artifacts in a project. However, SNAPSHOT builds can be accessed from the *Open Source Software Repository Hosting (OSSRH)* snapshot repository by adding this to your POM.xml file:
 
@@ -35,11 +35,12 @@ KivaKit artifacts are published to *Maven Central* and no special setup is requi
          </snapshots>
      </repository>
 
-#### Developers
+### Telenav Open Source Developers &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/toolbox-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/toolbox-32-2x.png 2x"/>
 
 Contributions of bug fixes and improvements from developers in the form of pull requests (PRs) don't require any special setup, other than the setup required to [*develop for KivaKit*](developing.md).
 
-#### Administrators
+### Administrators &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/wand-24.png" srcset="https://telenav.github.io/telenav-assets/images/icons/wand-24-2x.png 2x"/>
+
 
 Project administrators require some additional setup to publish snapshots and releases:
 
@@ -51,14 +52,19 @@ Project administrators require some additional setup to publish snapshots and re
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
-### Publishing Requirements &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/books-24.png" srcset="https://telenav.github.io/telenav-assets/images/icons/books-24-2x.png 2x"/>
+## Publishing Requirements &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/books-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/books-32-2x.png 2x"/>
 
 OSSRH and *Maven Central* have rigorous requirements for publishing artifacts. A new organization must claim a namespace (group id) on *Maven Central*, and artifacts that are published there must adhere to the requirements described below under in section entitled *Publishing a New Project*.
 
-#### Setup for Telenav OSS Namespace
+## Setup for an OSS Namespace  &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/box-24.png" srcset="https://telenav.github.io/telenav-assets/images/icons/box-24-2x.png 2x"/>
 
-The following steps were executed to set up the *com.telenav* namespace (group id) to allow publishing of artifacts from *Telenav*. *These steps have already been performed and do not need to be followed again*, but they are noted here to serve as a reference in the future for how things were done and to guide any future projects that might not be published under the *Telenav*
-namespace.
+The following steps were executed to set up the *com.telenav* namespace (group id) to allow publishing of artifacts 
+from *Telenav*.
+
+> *These steps have already been performed and do not need to be followed again*
+> but they are noted here to serve as a reference in the future for how things were 
+> done, and to guide any future projects that might be published under a different
+> namespace.
 
 1. Create a [*Sonatype JIRA*](https://issues.sonatype.org/) account
 
@@ -77,7 +83,7 @@ namespace.
 
 *Again, all of these steps have already been performed and should not be needed again.*
 
-#### Publishing a Project
+## Publishing a Project &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/truck-40.png" srcset="https://telenav.github.io/telenav-assets/images/icons/truck-40-2x.png 2x"/>
 
 To publish artifacts to *Maven Central* in the *Telenav* namespace established above, the project build must conform to the specifications enforced by the *Sonatype Nexus* publishing tools:
 
@@ -116,7 +122,7 @@ Once a project is ready to publish, the *Sonatype Nexus Repository Manager* prov
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
-### GitHub Continuous Integration (CI) Builds
+## GitHub Continuous Integration (CI) Builds &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/box-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/gears-32-2x.png 2x"/>
 
 When code is checked into KivaKit,
 [*GitHub actions*](https://github.com/Telenav/kivakit/actions) will automatically perform a build. If the check-in occurs to the *develop* branch or to a feature or bug-fix branch, a build will occur automatically, and the status of the build will appear on this page when it completes.
