@@ -95,7 +95,7 @@ fi
 #
 
 echo "Installing super-pom"
-mvn --batch-mode -f telenav-superpom/pom.xml clean install || exit 1
+mvn --batch-mode --quiet -f telenav-superpom/pom.xml clean install || exit 1
 
 #
 # Configure environment
