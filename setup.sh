@@ -120,7 +120,7 @@ if [[ $(git rev-parse --verify $branch_name) ]]; then
 fi
 
 echo "Checking out branches"
-git submodule --quiet foreach "/bin/bash -c \"cd $TELENAV_WORKSPACE/\$path && if [[ \$path == *\"assets\" ]]; then git checkout publish; else git checkout $branch_name; fi\"" || exit 1
+git submodule --quiet foreach "/bin/bash -c \"cd $TELENAV_WORKSPACE/\\$path && if [[ \\$path == *\"assets\" ]]; then git checkout publish; else git checkout $branch_name; fi\"" || exit 1
 
 #
 # Build cactus
