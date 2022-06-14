@@ -292,12 +292,13 @@ clean_maven_repository_telenav()
 {
     if allow_cleaning; then
 
-        if yes_no "┋ Remove all Telenav artifacts from $HOME/.m2/repository"; then
+        if [[ -d "$HOME/.m2/repository/com/telenav" ]]; then
 
-            rm -rf "$HOME/.m2/repository/com/telenav"
+            if yes_no "┋ Remove all Telenav artifacts from $HOME/.m2/repository"; then
+                rm -rf "$HOME/.m2/repository/com/telenav"
+            fi
 
         fi
-
     fi
 }
 
