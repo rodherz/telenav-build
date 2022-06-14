@@ -115,8 +115,10 @@ check_tools()
 {
     caller=$1
 
-    require_variable M2_HOME "Must set M2_HOME"
-    require_variable JAVA_HOME "Must set JAVA_HOME"
+    if [[ ! "$caller" == "ci-build " ]]; then
+        require_variable M2_HOME "Must set M2_HOME"
+        require_variable JAVA_HOME "Must set JAVA_HOME"
+    fi
 
     #
     # Check tools
