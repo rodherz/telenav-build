@@ -56,7 +56,7 @@ usage()
     echo "  BUILD SCOPES"
     echo " "
     echo "                all - build all projects"
-    echo "       cactus - build only the cactus project"
+    echo "             cactus - build only the cactus project"
     echo "            kivakit - build only the kivakit project"
     echo "            lexakai - build only the lexakai project"
     echo "            mesakit - build only the mesakit project"

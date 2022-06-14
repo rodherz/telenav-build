@@ -7,7 +7,7 @@ This project combines all Telenav Open Source projects into a single parent repo
 using [git submodules](https://git-scm.com/book/en/v2/Git-Tools-Submodules).  
 This enables a single, consistent build of any combination of the following projects:
 
- * *Cactus Build* - maven plugins and build libraries
+ * *Cactus* - maven plugins and build libraries
  * *KivaKit* - general purpose development kit
  * *MesaKit* - development kit for map data processing
  * *Lexakai* - automated UML and markdown documentation tool
