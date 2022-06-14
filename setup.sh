@@ -126,7 +126,8 @@ git submodule --quiet foreach "[[ \"\$path\" == *-assets ]] || git checkout $bra
 # Build cactus
 #
 
-clear_cache_folders
+clean_caches
+clean_maven_repository_telenav
 
 if [[ -d cactus ]]; then
 
