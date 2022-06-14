@@ -117,11 +117,8 @@ if [[ $(git rev-parse --verify $branch_name) ]]; then
 
 fi
 
-echo "Checking out *:publish"
-git submodule --quiet foreach "[[ ! \$path =~ assets ]] || git checkout publish" || exit 1
-echo git submodule --quiet foreach "[[ ! \$path =~ assets ]] || git checkout publish" || exit 1
-echo "Checking out *:$branch_name"
-git submodule --quiet foreach "[[ \$path =~ assets ]] || git checkout $branch_name" || exit 1
+echo "Checking out branches"
+git submodule --quiet foreach "if [[ \$path =~ assets ]]; then git checkout publish; else git checkout $branch_name; fi" || exit 1
 
 #
 # Build cactus
