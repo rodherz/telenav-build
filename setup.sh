@@ -1,12 +1,12 @@
-#!/bin/bash
+#!/bin/sh
 
 SCRIPT_PATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
-if [[ -z "$TELENAV_WORKSPACE" ]]; then
+if [ -z "$TELENAV_WORKSPACE" ]; then
     export TELENAV_WORKSPACE=$SCRIPT_PATH
 fi
 
-source "$TELENAV_WORKSPACE"/bin/telenav-library-functions.sh
+. "$TELENAV_WORKSPACE"/bin/telenav-library-functions.sh
 
 branch_name=$1
 caller=$2
@@ -17,7 +17,7 @@ check_tools "$caller"
 # Set HOME for continuous integration build
 #
 
-if [[ "$caller" == "ci-build" ]]; then
+if [ "$caller" = "ci-build" ]; then
 
     HOME=$(pwd)
     export HOME
@@ -29,7 +29,7 @@ fi
 #
 
 # shellcheck disable=SC2039
-if [[ -z "$branch_name" ]]; then
+if [ -z "$branch_name" ]; then
 
     read -p "Branch [develop] ? " -r
     echo " "
@@ -55,7 +55,7 @@ git submodule init || exit 1
 #
 
 echo "Cloning repositories"
-if [[ "$caller" == "ci-build" ]]; then
+if [ "$caller" = "ci-build" ]; then
 
     git submodule update --depth 1 || exit 1
 
@@ -70,7 +70,7 @@ fi
 #
 
 echo "Configuring repositories"
-if [[ "$caller" == "ci-build" ]]; then
+if [ "$caller" = "ci-build" ]; then
 
     echo "Creating temporary folder"
     export TMPDIR=./temporary/
@@ -110,7 +110,8 @@ source ./source-me || exit 1
 #
 
 echo "Checking out branch $branch_name"
-if [[ $(git rev-parse --verify $branch_name) ]]; then
+# shellcheck disable=SC2046
+if [ $(git rev-parse --verify $branch_name) ]; then
 
     echo "Checking out telenav-build:$branch_name"
     git checkout --quiet $branch_name || { echo "Ignoring: No branch of telenav-build called $branch_name"; exit 1; }
@@ -118,7 +119,11 @@ if [[ $(git rev-parse --verify $branch_name) ]]; then
 fi
 
 echo "Checking out branches"
-git submodule --quiet foreach "if [[ \$path == *\"assets\" ]]; then git checkout publish; else git checkout $branch_name; fi" || exit 1
+git submodule --quiet foreach "case \$path in *assets) git checkout publish ;; *) git checkout $branch_name ;; esac" || exit 1
+
+#"if [[ \$path == *\"assets\" ]]; then git checkout publish; else ; fi" || exit 1
+
+
 
 #
 # Build cactus
@@ -127,8 +132,9 @@ git submodule --quiet foreach "if [[ \$path == *\"assets\" ]]; then git checkout
 clean_caches
 clean_maven_repository_telenav
 
-if [[ -d cactus ]]; then
+if [ -d cactus ]; then
 
+    echo " "
     echo "Building cactus"
     mvn --batch-mode --quiet -f cactus clean install || exit 1
 
