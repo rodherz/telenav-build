@@ -115,6 +115,7 @@ check_tools()
 {
     caller=$1
 
+    echo "caller = $caller"
     if [[ ! "$caller" == "ci-build " ]]; then
         require_variable M2_HOME "Must set M2_HOME"
         require_variable JAVA_HOME "Must set JAVA_HOME"
