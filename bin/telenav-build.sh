@@ -127,7 +127,7 @@ case "${build_types[0]}" in
         ;;
 
     "release")
-        build_arguments+=(clean deploy)
+        build_arguments+=(clean install nexus-staging:deploy)
         build_modifiers+=(multi-threaded clean-sparkling javadoc lexakai-documentation tests attach-jars sign-artifacts)
         ;;
 

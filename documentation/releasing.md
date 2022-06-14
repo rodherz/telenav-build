@@ -40,26 +40,7 @@ Examine the git history log of all four *kivakit** repositories, and update the 
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
-### 1.3 Updating the Project Code Flowers
-
-To update code flowers for the release:
-
-1. On the command line, execute:
-
-        mkdir -p $KIVAKIT_WORKSPACE/kivakit-assets/docs/$KIVAKIT_VERSION
-
-2. Copy the *codeflowers* folder from a previous build into this folder
-
-
-3. Inside the *codeflowers* folder, execute:
-
-        ./kivakit-build-codeflowers.sh
-
-4. If there have been any projects added or removed since the last release, open *site/index.html* in an editor and insert the &lt;option&gt; HTML code that was output by the kivakit-build-codeflowers.sh.
-
-<img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
-
-### 1.4 Building the Release Branch
+### 1.3 Building the Release Branch
 
 To build the release branch on the local machine:
 
