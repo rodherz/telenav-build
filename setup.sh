@@ -91,10 +91,10 @@ else
 fi
 
 #
-# Install super-poms
+# Install superpoms
 #
 
-echo "Installing super-pom"
+echo "Installing superpom"
 mvn --batch-mode --quiet -f telenav-superpom/pom.xml clean install || exit 1
 
 #
@@ -119,6 +119,7 @@ fi
 
 echo "Checking out *:publish"
 git submodule --quiet foreach "[[ ! \$path =~ assets ]] || git checkout publish" || exit 1
+echo git submodule --quiet foreach "[[ ! \$path =~ assets ]] || git checkout publish" || exit 1
 echo "Checking out *:$branch_name"
 git submodule --quiet foreach "[[ \$path =~ assets ]] || git checkout $branch_name" || exit 1
 
