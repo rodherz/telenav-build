@@ -64,13 +64,13 @@ usage()
     echo " "
     echo "  BUILD TYPES"
     echo " "
-    echo "           [default] - compile, shade and run all tests"
-    echo "             compile - compile and shade (no tests)"
-    echo "                 dmg - compile, shade, run tests, build tools, build dmg"
+    echo "           [default] - compile and run all tests"
+    echo "             compile - compile (no tests)"
+    echo "                 dmg - compile, run tests, build tools, build dmg"
     echo "             javadoc - build javadoc documentation"
     echo "             release - clean-sparkling, compile, run tests, build javadoc, attach jars, sign artifacts and deploy to OSSRH"
     echo "       release-local - clean-sparkling, compile, run tests, build javadoc, attach jars, sign artifacts and deploy to local Maven repository"
-    echo "               tools - compile, shade, run tests, build tools"
+    echo "               tools - compile, run tests, build tools"
     echo " "
     echo "  BUILD MODIFIERS"
     echo " "
@@ -101,17 +101,17 @@ case "${build_types[0]}" in
 
     "compile")
         build_arguments+=(clean compile)
-        build_modifiers+=(multi-threaded no-tests shade no-javadoc)
+        build_modifiers+=(multi-threaded no-tests no-javadoc)
         ;;
 
     "default")
         build_arguments+=(clean install)
-        build_modifiers+=(multi-threaded tests shade no-javadoc)
+        build_modifiers+=(multi-threaded tests no-javadoc)
         ;;
 
     "dmg")
         build_arguments+=(clean install)
-        build_modifiers+=(multi-threaded tests shade tools dmg no-javadoc)
+        build_modifiers+=(multi-threaded tests tools dmg no-javadoc)
         ;;
 
     "help")
@@ -143,7 +143,7 @@ case "${build_types[0]}" in
 
     "tools")
         build_arguments+=(clean install)
-        build_modifiers+=(multi-threaded tests shade tools no-javadoc)
+        build_modifiers+=(multi-threaded tests tools no-javadoc)
         ;;
 
     "verbose")
@@ -220,10 +220,6 @@ for modifier in "${build_modifiers[@]}"; do
 
         "quiet")
             maven_switches+=(-q "-Dsurefire.printSummary=false" "-DKIVAKIT_LOG_LEVEL=Warning")
-            ;;
-
-        "shade")
-            maven_switches+=(-P shade)
             ;;
 
         "dry-run")
