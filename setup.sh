@@ -86,7 +86,14 @@ else
 
     echo "Initializing git flow"
     # shellcheck disable=SC2016
-    git submodule foreach '[[ "$path" == *-assets ]] || git flow init -f -d --feature feature/ --bugfix bugfix/ --release release/ --hotfix hotfix/ --support support/ -t \"\"' || exit 1
+    if [[ "$caller" == "ci-build" ]]; then
+        git submodule foreach '[[ "$path" == *-assets ]] || git flow init -f -d --feature feature/ --bugfix bugfix/ --release release/ --hotfix hotfix/ --support support/ -t \"\"' || exit 1
+    else
+        echo "Checking out *:publish"
+        git submodule --quiet foreach "[[ ! \"\$path\" == *-assets ]] || git checkout publish" || exit 1
+        echo "Checking out *:$branch_name"
+        git submodule --quiet foreach "[[ \"\$path\" == *-assets ]] || git checkout $branch_name" || exit 1
+    fi
 
 fi
 
