@@ -13,6 +13,9 @@ caller=$2
 
 check_tools "$caller"
 
+clean_caches
+clean_maven_repository_telenav
+
 #
 # Set HOME for continuous integration build
 #
@@ -130,9 +133,6 @@ git submodule --quiet foreach "/bin/bash -c \"cd $TELENAV_WORKSPACE/\\\$path && 
 #
 # Build cactus
 #
-
-clean_caches
-clean_maven_repository_telenav
 
 if [[ -d cactus ]]; then
 
