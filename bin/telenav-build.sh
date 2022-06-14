@@ -128,12 +128,12 @@ case "${build_types[0]}" in
 
     "release")
         build_arguments+=(clean install nexus-staging:deploy)
-        build_modifiers+=(multi-threaded clean-sparkling javadoc lexakai-documentation tests attach-jars sign-artifacts)
+        build_modifiers+=(single-threaded clean-sparkling javadoc lexakai-documentation tests attach-jars sign-artifacts)
         ;;
 
     "release-local")
         build_arguments+=(clean install)
-        build_modifiers+=(multi-threaded clean-sparkling javadoc lexakai-documentation tests attach-jars sign-artifacts)
+        build_modifiers+=(single-threaded clean-sparkling javadoc lexakai-documentation tests attach-jars sign-artifacts)
         ;;
 
     "test")
