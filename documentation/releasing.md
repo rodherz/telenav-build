@@ -26,7 +26,11 @@ The release scripts take a `project-family` to choose which project to release:
 
 ## 1. Preparing the Release <img src="https://telenav.github.io/telenav-assets/images/icons/branch-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/branch-32-2x.png 2x"/>
 
-### 1.1 Creating the Release Branch
+### 1.1 Starting the Release
+
+Check out the develop branch of each project in the project family. Be sure to merge any feature branches into develop before proceeding.
+
+### 1.2 Creating the Release Branch
 
 To create a release branch and update version numbers in the project:
 
@@ -34,13 +38,13 @@ To create a release branch and update version numbers in the project:
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
-### 1.2 Updating the Change Log
+### 1.3 Updating the Change Log
 
 Examine the git history log of all four *kivakit** repositories, and update the *change-log.md* file with any important information about the release.
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
-### 1.3 Building the Release Branch
+### 1.4 Building the Release Branch
 
 To build the release branch on the local machine:
 
