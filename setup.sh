@@ -128,6 +128,7 @@ if [[ $(git rev-parse --verify $branch_name) ]]; then
 fi
 
 echo "Checking out branches"
+echo git submodule --quiet foreach "/bin/bash -c \"cd $TELENAV_WORKSPACE/\\\$path && if [[ \\\$path == *\"assets\" ]]; then git checkout publish; else git checkout $branch_name; fi\"" || exit 1
 git submodule --quiet foreach "/bin/bash -c \"cd $TELENAV_WORKSPACE/\\\$path && if [[ \\\$path == *\"assets\" ]]; then git checkout publish; else git checkout $branch_name; fi\"" || exit 1
 
 #
@@ -138,7 +139,7 @@ if [[ -d cactus ]]; then
 
     echo " "
     echo "Building cactus"
-    mvn --batch-mode --quiet -f cactus clean install || exit 1
+    mvn --batch-mode --quiet -Dmaven.javadoc.skip=true -f cactus clean install || exit 1
 
 fi
 
