@@ -22,4 +22,4 @@ title=$3
 body=$4
 
 cd_workspace
-mvn --quiet "$scope" -DauthenticationToken="$authentication_token" -Dtitle="$title" -Dbody="$body" com.telenav.cactus:cactus-maven-plugin:git-pull-request || exit 1
+mvn --quiet "$scope" -Dtelenav.authentication-token="$authentication_token" -Dtelenav.title="$title" -Dtelenav.body="$body" com.telenav.cactus:cactus-maven-plugin:git-pull-request || exit 1

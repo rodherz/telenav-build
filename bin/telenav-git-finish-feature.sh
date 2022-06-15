@@ -20,4 +20,4 @@ scope=$(resolve_scope "$1")
 branch_name=$2
 
 cd_workspace
-mvn --quiet "$scope" -Doperation=finish -Dbranch-type=feature -Dbranch-name="$branch_name" com.telenav.cactus:cactus-maven-plugin:git-flow || exit 1
+mvn --quiet "$scope" -Dtelenav.operation=finish -Dtelenav.branch-type=feature -Dtelenav.branch="$branch_name" com.telenav.cactus:cactus-maven-plugin:git-flow || exit 1
