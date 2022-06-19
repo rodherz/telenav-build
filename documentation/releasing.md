@@ -82,7 +82,7 @@ To push the release to OSSRH, run:
 
 ### 2.2 Publish from OSSRH to Maven Central
 
-The sign into [OSSRH](http://s01.oss.sonatype.org) and push the build to Maven Central.
+The sign into [OSSRH](https://s01.oss.sonatype.org) and push the build to Maven Central.
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
 
