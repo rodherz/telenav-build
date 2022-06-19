@@ -19,4 +19,4 @@ scope=$(resolve_scope "$1")
 branch_name=$2
 
 cd_workspace
-mvn --quiet "$scope" -Dtelenav.operation=start -Dtelenav.branch-type=hotfix -Dtelenav.branch="$branch_name" com.telenav.cactus:cactus-maven-plugin:git-flow || exit 1
+mvn --quiet "$scope" -Dcactus.operation=start -Dcactus.branch-type=hotfix -Dcactus.branch="$branch_name" com.telenav.cactus:cactus-maven-plugin:git-flow || exit 1

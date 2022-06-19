@@ -24,7 +24,7 @@ cd_workspace
 telenav-build.sh "$scope" release || exit 1
 
 # shellcheck disable=SC2086
-mvn --quiet $scope -Dtelenav.operation=finish -Dtelenav.branch-type=release -Dtelenav.branch="$version" com.telenav.cactus:cactus-maven-plugin:git-flow || exit 1
+mvn --quiet $scope -Dcactus.operation=finish -Dcactus.branch-type=release -Dcactus.branch="$version" com.telenav.cactus:cactus-maven-plugin:git-flow || exit 1
 
 echo " "
 echo "Next Steps:"

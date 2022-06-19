@@ -29,7 +29,7 @@ fi
 
 
 # shellcheck disable=SC2086
-mvn --quiet $scope -Dtelenav.include-root=false -Dtelenav.operation=start -Dtelenav.branch-type=release -Dtelenav.branch="$version" com.telenav.cactus:cactus-maven-plugin:git-flow || exit 1
+mvn --quiet $scope -Dcactus.include-root=false -Dcactus.operation=start -Dcactus.branch-type=release -Dcactus.branch="$version" com.telenav.cactus:cactus-maven-plugin:git-flow || exit 1
 
 telenav-update-version.sh "$1" "release/$version" || exit 1
 

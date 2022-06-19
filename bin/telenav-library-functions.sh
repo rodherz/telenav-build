@@ -87,24 +87,24 @@ resolve_scope()
     case "${scope}" in
 
     "all")
-        echo "-Dtelenav.scope=ALL"
+        echo "-Dcactus.scope=ALL"
         ;;
 
     "this")
-        echo "-Dtelenav.scope=JUST_THIS"
+        echo "-Dcactus.scope=JUST_THIS"
         ;;
 
     *)
         if [[ "${scope}" == "" ]]; then
 
             if [[ "${TELENAV_SCOPE}" == "" ]]; then
-                echo "-Dtelenav.scope=ALL"
+                echo "-Dcactus.scope=ALL"
             else
                 echo "$TELENAV_SCOPE"
             fi
 
         else
-            echo "-Dtelenav.scope=FAMILY -Dtelenav.family=${scope}"
+            echo "-Dcactus.scope=FAMILY -Dcactus.family=${scope}"
         fi
         ;;
 
