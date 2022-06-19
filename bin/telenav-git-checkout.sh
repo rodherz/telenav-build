@@ -16,7 +16,7 @@ source telenav-library-functions.sh
 if [[ "$#" -eq 0 ]]; then
 
     read -p "Branch? " -r
-    scope="all"
+    scope="all-project-families"
     branch=$REPLY
 
 fi
@@ -26,7 +26,7 @@ fi
 #
 
 if [[ "$#" -eq 1 ]]; then
-    scope="all"
+    scope="all-project-families"
     branch=$1
 fi
 
