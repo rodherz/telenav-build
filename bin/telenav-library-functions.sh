@@ -86,19 +86,19 @@ resolve_scope()
 
     case "${scope}" in
 
-    "all")
-        echo "-Dcactus.scope=ALL"
+    "all-project-families")
+        echo "-Dcactus.scope=all-project-families"
         ;;
 
     "this")
-        echo "-Dcactus.scope=JUST_THIS"
+        echo "-Dcactus.scope=just-this"
         ;;
 
     *)
         if [[ "${scope}" == "" ]]; then
 
             if [[ "${TELENAV_SCOPE}" == "" ]]; then
-                echo "-Dcactus.scope=ALL"
+                echo "-Dcactus.scope=all"
             else
                 echo "$TELENAV_SCOPE"
             fi
