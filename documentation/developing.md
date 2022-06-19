@@ -26,7 +26,7 @@ Once you're ready to go, these articles can help you to understand our developme
 - [Versioning](versioning.md)  
 - [Releasing](releasing.md)  
 - [Naming Conventions](naming-conventions.md)  
-- [Java 17+ Migration Notes](java-17-migration-notes.md)
+- [Java 17+ Migration Notes](java-migration-notes.md)
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 

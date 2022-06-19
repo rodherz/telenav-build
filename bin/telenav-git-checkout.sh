@@ -41,4 +41,4 @@ fi
 
 cd_workspace
 scope=$(resolve_scope "$scope")
-mvn --quiet "$scope" -Dtelenav.branch="$branch" -Dtelenav.permit-local-modifications=false com.telenav.cactus:cactus-maven-plugin:checkout || exit 1
+mvn --quiet "$scope" -Dtelenav.target.branch="$branch" com.telenav.cactus:cactus-maven-plugin:checkout || exit 1
