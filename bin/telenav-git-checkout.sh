@@ -9,34 +9,21 @@
 
 source telenav-library-functions.sh
 
-#
-# checkout
-#
-
-if [[ "$#" -eq 0 ]]; then
-
-    read -p "Branch? " -r
-    scope="all-project-families"
-    branch=$REPLY
-
-fi
-
-#
-# checkout [branch]
-#
-
 if [[ "$#" -eq 1 ]]; then
+
     scope="all-project-families"
     branch=$1
-fi
 
-#
-# checkout [scope] [branch]
-#
+elif [[ "$#" -eq 2 ]]; then
 
-if [[ "$#" -eq 2 ]]; then
     scope=$1
     branch=$2
+
+else
+
+    echo "$(script) [scope]? [branch-name]"
+    exit 1
+
 fi
 
 cd_workspace
