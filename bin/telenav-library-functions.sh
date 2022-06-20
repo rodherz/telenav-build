@@ -365,6 +365,33 @@ git_branch_name()
     echo "$branch_name"
 }
 
+git_flow_initialize()
+{
+    git config --worktree gitflow.branch.master "release/current"
+    git config --worktree gitflow.branch.develop "develop"
+    git config --worktree gitflow.prefix.hotfix "hotfix/"
+    git config --worktree gitflow.prefix.feature "feature/"
+    git config --worktree gitflow.prefix.bugfix "bugfix/"
+    git config --worktree gitflow.prefix.release "release/"
+    git config --worktree gitflow.prefix.support "support/"
+    git flow init -f -d -t ""
+}
+
+export -f git_flow_initialize
+
+git_repository_initialize()
+{
+    echo "Git pull fast-forward"
+    git config pull.ff only || exit 1
+    # shellcheck disable=SC2016
+    git submodule foreach 'git config pull.ff only && echo "Configuring $name"' || exit 1
+
+    echo "Git flow initialize"
+    git_flow_initialize
+    # shellcheck disable=SC2016
+    git submodule foreach '[[ "$path" == *-assets ]] || git_flow_initialize' || exit 1
+}
+
 ################ UTILITY ################################################################################################
 
 script()

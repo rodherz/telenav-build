@@ -69,7 +69,7 @@ else
 fi
 
 #
-# Configure repositories
+# Configure repositories and check out branch
 #
 
 echo "Configuring repositories"
@@ -81,22 +81,12 @@ if [[ "$caller" == "ci-build" ]]; then
 
 else
 
-    echo "Configuring git repositories"
-    git config pull.ff only || exit 1
+    git_repository_initialize
 
-    # shellcheck disable=SC2016
-    git submodule foreach 'git config pull.ff only && echo "Configuring $name"' || exit 1
-
-    echo "Initializing git flow"
-    # shellcheck disable=SC2016
-    if [[ "$caller" == "ci-build" ]]; then
-        git submodule foreach '[[ "$path" == *-assets ]] || git flow init -f -d --feature feature/ --bugfix bugfix/ --release release/ --hotfix hotfix/ --support support/ -t \"\"' || exit 1
-    else
-        echo "Checking out *:publish"
-        git submodule --quiet foreach "[[ ! \"\$path\" == *-assets ]] || git checkout publish" || exit 1
-        echo "Checking out *:$branch_name"
-        git submodule --quiet foreach "[[ \"\$path\" == *-assets ]] || git checkout $branch_name" || exit 1
-    fi
+    echo "Checking out *:publish"
+    git submodule --quiet foreach "[[ ! \"\$path\" == *-assets ]] || git checkout publish" || exit 1
+    echo "Checking out *:$branch_name"
+    git submodule --quiet foreach "[[ \"\$path\" == *-assets ]] || git checkout $branch_name" || exit 1
 
 fi
 
