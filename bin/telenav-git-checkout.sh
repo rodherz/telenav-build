@@ -47,4 +47,4 @@ mvn --quiet \
     -Dcactus.base-branch="$branch" \
     -Dcactus.update-root=true \
     -Dcactus.permit-local-changes=true \
-    com.telenav.cactus:cactus-maven-plugin:1.4.11:checkout || exit 1
+    com.telenav.cactus:cactus-maven-plugin:1.4.12:checkout || exit 1
