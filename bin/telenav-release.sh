@@ -16,7 +16,7 @@ if [[ ! "$#" -eq 2 || "$1" == "all" ]]; then
 
 fi
 
-scope=$(resolve_scope "$1")
+resolve_scope "$1"
 version=$2
 
 cd_workspace
@@ -29,7 +29,14 @@ fi
 
 
 # shellcheck disable=SC2086
-mvn --quiet $scope -Dcactus.include-root=false -Dcactus.operation=start -Dcactus.branch-type=release -Dcactus.branch="$version" com.telenav.cactus:cactus-maven-plugin:git-flow || exit 1
+mvn --quiet \
+    -Dcactus.scope="$resolved_scope" \
+    -Dcactus.family="$resolved_family" \
+    -Dcactus.include-root=false \
+    -Dcactus.operation=start \
+    -Dcactus.branch-type=release \
+    -Dcactus.branch="$version" \
+    com.telenav.cactus:cactus-maven-plugin:git-flow || exit 1
 
 telenav-update-version.sh "$1" "release/$version" || exit 1
 

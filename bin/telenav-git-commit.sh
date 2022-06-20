@@ -31,5 +31,10 @@ fi
 #
 
 cd_workspace
-scope=$(scope)
-echo mvn --quiet "$scope" -Dcactus.commit-message=\""$message"\" -Dcactus.update-root=true com.telenav.cactus:cactus-maven-plugin:commit || exit 1
+resolve_scope=$(scope)
+mvn --quiet \
+    -Dcactus.scope="$resolved_scope" \
+    -Dcactus.family="$resolved_family" \
+    -Dcactus.commit-message=\""$message"\" \
+    -Dcactus.update-root=true \
+    com.telenav.cactus:cactus-maven-plugin:commit || exit 1

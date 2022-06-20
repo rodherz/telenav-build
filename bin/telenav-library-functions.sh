@@ -80,31 +80,51 @@ scoped_folders()
     done
 }
 
+resolved_scope=""
+resolved_family=""
+export resolved_scope
+export resolved_family
+
 resolve_scope()
 {
     scope=$1
 
     case "${scope}" in
 
+    "all")
+        resolved_scope="all"
+        resolved_family=""
+        ;;
+
     "all-project-families")
-        echo "-Dcactus.scope=all-project-families"
+        resolved_scope="all-project-families"
+        resolved_family=""
         ;;
 
     "this")
-        echo "-Dcactus.scope=just-this"
+        resolved_scope="just-this"
+        resolved_family=""
+        ;;
+
+    "just-this")
+        resolved_scope="just-this"
+        resolved_family=""
         ;;
 
     *)
         if [[ "${scope}" == "" ]]; then
 
             if [[ "${TELENAV_SCOPE}" == "" ]]; then
-                echo "-Dcactus.scope=all"
+                resolved_scope="all-project-families"
+                resolved_family=""
             else
-                echo "$TELENAV_SCOPE"
+                resolved_scope="$TELENAV_SCOPE"
+                resolved_family="$TELENAV_FAMILY"
             fi
 
         else
-            echo "-Dcactus.scope=FAMILY -Dcactus.family=${scope}"
+            resolved_scope="family"
+            resolved_family="${scope}"
         fi
         ;;
 

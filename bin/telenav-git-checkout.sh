@@ -40,8 +40,10 @@ if [[ "$#" -eq 2 ]]; then
 fi
 
 cd_workspace
-scope=$(resolve_scope "$scope")
-mvn --quiet "$scope" \
+resolve_scope "$scope"
+mvn --quiet \
+    -Dcactus.scope="$resolved_scope" \
+    -Dcactus.family="$resolved_family" \
     -Dcactus.base-branch="$branch" \
     -Dcactus.update-root=true \
     -Dcactus.permit-local-changes=true \
