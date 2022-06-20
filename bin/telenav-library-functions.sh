@@ -315,7 +315,9 @@ clean_maven_repository_telenav()
         if [[ -d "$HOME/.m2/repository/com/telenav" ]]; then
 
             if yes_no "┋ Remove all Telenav artifacts from $HOME/.m2/repository"; then
+
                 rm -rf "$HOME/.m2/repository/com/telenav"
+
             fi
 
         fi
@@ -330,8 +332,8 @@ clean_temporary_files()
 
         if yes_no "┋ Remove transient files from $project_home tree"; then
 
-        # shellcheck disable=SC2038
-        find "$project_home" \( -name \.DS_Store -o -name \.metadata -o -name \.classpath -o -name \.project -o -name \*\.hprof -o -name \*~ \) | xargs rm
+            # shellcheck disable=SC2038
+            find "$project_home" \( -name \.DS_Store -o -name \.metadata -o -name \.classpath -o -name \.project -o -name \*\.hprof -o -name \*~ \) | xargs rm
 
         fi
     fi
@@ -508,8 +510,8 @@ yes_no()
 
         prompt=$1
 
-        echo " "
         read -p "$prompt (y/n)? " -n 1 -r
+        printf "\n"
 
         if [[ $REPLY =~ ^[Yy]$ ]]; then
             true
