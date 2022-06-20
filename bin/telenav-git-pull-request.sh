@@ -28,4 +28,4 @@ mvn --quiet \
     -Dcactus.authentication-token="$authentication_token" \
     -Dcactus.title="$title" \
     -Dcactus.body="$body" \
-    com.telenav.cactus:cactus-maven-plugin:git-pull-request || exit 1
+    com.telenav.cactus:cactus-maven-plugin:1.4.12:git-pull-request || exit 1

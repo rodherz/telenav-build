@@ -27,7 +27,6 @@ if [[ ! "$branch_name" == "develop" ]]; then
     exit 1
 fi
 
-
 # shellcheck disable=SC2086
 mvn --quiet \
     -Dcactus.scope="$resolved_scope" \
@@ -36,7 +35,7 @@ mvn --quiet \
     -Dcactus.operation=start \
     -Dcactus.branch-type=release \
     -Dcactus.branch="$version" \
-    com.telenav.cactus:cactus-maven-plugin:git-flow || exit 1
+    com.telenav.cactus:cactus-maven-plugin:1.4.12:git-flow || exit 1
 
 telenav-update-version.sh "$1" "release/$version" || exit 1
 

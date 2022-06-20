@@ -25,4 +25,4 @@ mvn --quiet \
     -Doperation=telenav.start \
     -Dcactus.branch-type=feature \
     -Dcactus.branch="$branch_name" \
-    com.telenav.cactus:cactus-maven-plugin:git-flow || exit 1
+    com.telenav.cactus:cactus-maven-plugin:1.4.12:git-flow || exit 1

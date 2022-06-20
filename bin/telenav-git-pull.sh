@@ -15,4 +15,4 @@ cd_workspace
 mvn --quiet \
     -Dcactus.scope="$resolved_scope" \
     -Dcactus.family="$resolved_family" \
-    com.telenav.cactus:cactus-maven-plugin:pull || exit 1
+    com.telenav.cactus:cactus-maven-plugin:1.4.12:pull || exit 1
