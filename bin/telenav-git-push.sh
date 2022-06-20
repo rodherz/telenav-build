@@ -1,0 +1,18 @@
+#!/bin/bash
+
+#///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#
+#  © 2011-2021 Telenav, Inc.
+#  Licensed under Apache License, Version 2.0
+#
+#///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+source telenav-library-functions.sh
+
+resolve_scope "$1"
+
+cd_workspace
+mvn --quiet \
+    -Dcactus.scope="$resolved_scope" \
+    -Dcactus.family="$resolved_family" \
+    com.telenav.cactus:cactus-maven-plugin:push || exit 1
