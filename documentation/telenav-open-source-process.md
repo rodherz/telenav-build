@@ -26,13 +26,9 @@ This section describes the OSS setup requirements for end-users, developers of T
 
 Telenav Open Source artifacts are published to *Maven Central* and no special setup is required to use these artifacts.
  
-<img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
-
 ### Telenav Open Source Developers
 
 Contributions of bug fixes and improvements from developers in the form of pull requests (PRs) don't require any special setup, other than the [*setup for developing*](developing.md).
-
-<img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
 ### Administrators
 
