@@ -23,7 +23,7 @@ fi
 require_variable TELENAV_WORKSPACE "Must set TELENAV_WORKSPACE"
 cd_workspace
 
-javadoc()
+lexakai()
 {
     folder=$1
     cd "$TELENAV_WORKSPACE/$folder" || exit
@@ -36,18 +36,23 @@ javadoc()
         -Dmaven.test.skip=true \
         -DKIVAKIT_DEBUG="!Debug" \
         --threads 12 \
-        javadoc:aggregate || exit 1
+        -Dcactus.verbose=true \
+        -Dcactus.overwrite-resources=true \
+        -Dcactus.update-readme=true \
+        -Dcactus.lexakai-version=1.0.7 \
+        -Dcactus.show-lexakai-output=true \
+        com.telenav.cactus:cactus-maven-plugin:1.4.12:lexakai || exit 1
 }
 
-build_javadoc()
+build_lexakai_documentation()
 {
     scope=$1
 
     scoped_folders "$scope"
     for folder in "${folders[@]}";
     do
-        javadoc "$folder"
+        lexakai "$folder"
     done
 }
 
-build_javadoc "$scope"
+build_lexakai_documentation "$scope"
