@@ -31,6 +31,13 @@ To prepare the release for publication, the following steps must be followed.
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
+### 1.0 Prerequisites
+
+1. Complete all steps of [developer setup](developing.md)
+2. Releasing software to Maven Central requires PGP keys to be installed. Contact the project's administrator(s) for access to them.
+
+<img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
+
 ### 1.1 Preparing the Develop Branch
 
 To prepare the `develop` branch for the release:
@@ -69,7 +76,7 @@ When the build is successful, and it looks good, the build is ready to be publis
 
 ## 2. Publishing the Release &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/books-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/books-32-2x.png 2x"/>
 
-### 2.1 Pushing the Release to OSSRH (Maven Central Staging)
+### 2.0 Pushing the Release to OSSRH (Maven Central Staging)
 
 Execute this command to publish the release:
 
@@ -83,13 +90,18 @@ The `telenav-release.sh` script does the following:
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
-### 2.2 Pushing the Release from OSSRH to Maven Central
+### 2.1 Pushing the Release from OSSRH to Maven Central
 
-The sign into [OSSRH](https://s01.oss.sonatype.org) and push the build to Maven Central.
+The sign into Sonatype [OSSRH](https://s01.oss.sonatype.org) (using credentials provided by a project administrator), and push the build to Maven Central:
+
+1. Locate the staged build (created above) by clicking the *Staging Repositories* link
+2. Select the repository to publish and click the *Close* button (YES, this is counterintuitive!)
+3. Check the activities tab for the selected repository. If all went well, the *Release* button will be available and can be pushed to publish the build to *Maven Central*. If the release button remains disabled, the specific requirement that failed will be displayed in the list of verification activities, so it can be addressed before trying again.
+
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
 
-## 2. Preparing to Develop the Next Version &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/books-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/books-32-2x.png 2x"/>
+## 3. Preparing to Develop the Next Version &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/right-arrow-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/right-arrow-32-2x.png 2x"/>
 
 To prepare for development of the next version of the project:
 
