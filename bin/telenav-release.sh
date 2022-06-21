@@ -11,7 +11,7 @@ source telenav-library-functions.sh
 
 usage()
 {
-    echo "$(script) [project-family] [version]"
+    echo "$(script) [project-family] [release-version]"
     exit 1
 }
 
@@ -82,6 +82,6 @@ telenav-build.sh "$scope" "release-local" || exit 1
 echo " "
 echo "Next Steps:"
 echo " "
-echo "  - Inspect the release"
+echo "  - Check the release carefully"
 echo "  - Run telenav-release-finish.sh $scope $version"
 echo " "

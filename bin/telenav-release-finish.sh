@@ -11,7 +11,7 @@ source telenav-library-functions.sh
 
 usage()
 {
-    echo "$(script) [project-family] [version]"
+    echo "$(script) [project-family] [release-version]"
     exit 1
 }
 
@@ -54,5 +54,4 @@ echo " "
 echo "Next Steps:"
 echo " "
 echo "  - Sign into [OSSRH](http://s01.oss.sonatype.org) and push the build to Maven Central."
-echo "  - Done!"
 echo " "

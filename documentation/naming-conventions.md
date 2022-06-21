@@ -4,6 +4,10 @@
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
 
+## Abbreviations
+
+Telenav Open Source projects *avoid abbreviations*, except where the abbreviation is better known than the full name (for example, URL).
+
 ## Maven Coordinates
 
 Taking [kivakit](https://www.kivakit.org) as an example, maven coordinates have the following convention:

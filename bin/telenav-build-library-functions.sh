@@ -70,10 +70,6 @@ telenav_build_parse_build_modifiers()
                 clean_script="kivakit-clean.sh"
                 ;;
 
-            "clean-all")
-                clean_script="kivakit-clean-all.sh"
-                ;;
-
             "clean-sparkling")
                 # shellcheck disable=SC2034
                 clean_script="kivakit-clean-sparkling.sh"
@@ -81,10 +77,6 @@ telenav_build_parse_build_modifiers()
 
             "debug")
                 maven_switches+=(--debug)
-                ;;
-
-            "lexakai-documentation")
-                build_arguments+=(com.telenav.cactus:cactus-maven-plugin:lexakai)
                 ;;
 
             "debug-tests")
@@ -99,9 +91,18 @@ telenav_build_parse_build_modifiers()
                 maven_switches+=(-P docker)
                 ;;
 
+            "dry-run")
+                # shellcheck disable=SC2034
+                dry_run="true"
+                ;;
+
             "javadoc")
                 # shellcheck disable=SC2034
                 build_javadoc=true
+                ;;
+
+            "lexakai-documentation")
+                build_arguments+=(com.telenav.cactus:cactus-maven-plugin:lexakai)
                 ;;
 
             "multi-threaded")
@@ -123,11 +124,6 @@ telenav_build_parse_build_modifiers()
                 maven_switches+=(--quiet "-Dsurefire.printSummary=false" "-DKIVAKIT_LOG_LEVEL=Warning")
                 ;;
 
-            "dry-run")
-                # shellcheck disable=SC2034
-                dry_run="true"
-                ;;
-
             "sign-artifacts")
                 build_arguments+=(-P sign-artifacts)
                 ;;
@@ -142,6 +138,10 @@ telenav_build_parse_build_modifiers()
 
             "tools")
                 maven_switches+=(-P tools)
+                ;;
+
+            "verbose")
+                build_modifiers=("${build_modifiers[@]//quiet}")
                 ;;
 
             *)
@@ -237,10 +237,6 @@ telenav_build_parse_build_types()
         "tools")
             build_arguments+=(clean install)
             build_modifiers+=(multi-threaded tests tools no-javadoc)
-            ;;
-
-        "verbose")
-            build_modifiers=("${build_modifiers[@]//quiet}")
             ;;
 
         *)

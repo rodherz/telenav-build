@@ -11,7 +11,7 @@ Starting with Java 9, the JDK has supported _modules_. KivaKit has a modular des
 > NOTE: Although KivaKit requires a Java 17+ virtual machine, this does NOT mean that client 
 > source code has to be upgraded to Java 17.
 
-## Why Upgrade the Java Virtual Machine to Version 11?
+## Why Upgrade the Java Virtual Machine to Version 17?
 
 There are a number of good reasons to move on to more recent versions of Java:
 
