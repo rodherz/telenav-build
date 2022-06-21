@@ -367,14 +367,16 @@ git_branch_name()
 
 git_flow_initialize()
 {
-    git config --worktree gitflow.branch.master "release/current"
-    git config --worktree gitflow.branch.develop "develop"
-    git config --worktree gitflow.prefix.hotfix "hotfix/"
-    git config --worktree gitflow.prefix.feature "feature/"
-    git config --worktree gitflow.prefix.bugfix "bugfix/"
-    git config --worktree gitflow.prefix.release "release/"
-    git config --worktree gitflow.prefix.support "support/"
-    git flow init -f -d -t ""
+    if ! $(git flow config >/dev/null 2>&1); then
+        git config --worktree gitflow.branch.master "release/current"
+        git config --worktree gitflow.branch.develop "develop"
+        git config --worktree gitflow.prefix.hotfix "hotfix/"
+        git config --worktree gitflow.prefix.feature "feature/"
+        git config --worktree gitflow.prefix.bugfix "bugfix/"
+        git config --worktree gitflow.prefix.release "release/"
+        git config --worktree gitflow.prefix.support "support/"
+        git flow init -f -d -t ""
+    fi
 }
 
 export -f git_flow_initialize

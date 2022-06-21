@@ -9,40 +9,79 @@
 
 source telenav-library-functions.sh
 
-if [[ ! "$#" -eq 2 || "$1" == "all" ]]; then
-
-    echo "telenav-release.sh [project-family-name] [version]"
+usage()
+{
+    echo "$(script) [project-family] [version]"
     exit 1
+}
 
+#
+# Check that there are two arguments and get them
+#
+
+if [[ ! "$#" -eq 2 ]]; then
+    usage
 fi
 
-resolve_scope "$1"
+scope=$1
 version=$2
 
-cd_workspace
+#
+# Check that the scope is a project family
+#
 
-branch_name=$(git_branch_name "$1")
-if [[ ! "$branch_name" == "develop" ]]; then
-    echo "Must be on develop branch to start a release"
-    exit 1
+resolve_scope "$scope"
+# shellcheck disable=SC2154
+if [[ ! "$resolved_scope" == "family" ]]; then
+    usage
 fi
 
-# shellcheck disable=SC2086
-mvn --quiet \
-    -Dcactus.scope="$resolved_scope" \
-    -Dcactus.family="$resolved_family" \
-    -Dcactus.include-root=false \
-    -Dcactus.operation=start \
-    -Dcactus.branch-type=release \
-    -Dcactus.branch="$version" \
-    com.telenav.cactus:cactus-maven-plugin:1.4.12:git-flow || exit 1
+#
+# Check that the project is on the 'develop' branch
+#
+
+cd_workspace
+branch_name=$(git_branch_name "$1")
+
+if [[ ! "$branch_name" == "develop" ]]; then
+    echo "Must be on develop branch to start a release"
+    usage
+fi
+
+#
+# Check that the change log has been updated
+#
+
+if ! grep -q "Version $version" "$scope/change-log.md"; then
+    echo "Please update $scope/change-log.md before releasing"
+    usage
+fi
+
+#
+# Start a release branch
+#
+
+telenav-git-release-start.sh "$scope" "$version" || exit 1
+
+#
+# Update version information
+#
 
 telenav-update-version.sh "$1" "release/$version" || exit 1
+
+#
+# Build the release into the local repository
+#
+
+telenav-build.sh "$scope" "release-local" || exit 1
+
+#
+# Describe the next steps to take
+#
 
 echo " "
 echo "Next Steps:"
 echo " "
-echo "  1. Update change-log.md"
-echo "  2. Build the release branch: telenav-build [project-family] release-local"
-echo "  3. Complete the release branch: telenav-release-finish.sh [project-family] [project-version]"
+echo "  - Inspect the release"
+echo "  - Run telenav-release-finish.sh $scope $version"
 echo " "

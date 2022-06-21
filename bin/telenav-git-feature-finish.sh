@@ -21,7 +21,7 @@ elif [[ "$#" -eq 2 ]]; then
 
 else
 
-    echo "telenav-git-start-feature.sh [scope]? [branch-name]"
+    echo "$(script) [scope]? [branch-name]"
     exit 1
 
 fi
@@ -29,11 +29,10 @@ fi
 resolve_scope "$scope"
 
 cd_workspace
-git_repository_initialize
 mvn --quiet \
     -Dcactus.scope="$resolved_scope" \
     -Dcactus.family="$resolved_family" \
-    -Dcactus.operation=start \
+    -Dcactus.operation=finish \
     -Dcactus.branch-type=feature \
     -Dcactus.branch="$branch_name" \
     com.telenav.cactus:cactus-maven-plugin:1.4.12:git-flow || exit 1

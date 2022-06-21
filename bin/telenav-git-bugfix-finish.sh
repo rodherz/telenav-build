@@ -9,20 +9,30 @@
 
 source telenav-library-functions.sh
 
-if [[ ! "$#" -eq 2 ]]; then
+if [[ "$#" -eq 1 ]]; then
 
-    echo "telenav-git-finish-hotfix.sh [scope] [branch-name]"
+    scope="all-project-families"
+    branch_name=$1
+
+elif [[ "$#" -eq 2 ]]; then
+
+    scope=$1
+    branch_name=$2
+
+else
+
+    echo "$(script) [scope]? [branch-name]"
+    exit 1
 
 fi
 
-resolve_scope "$1"
-branch_name=$2
+resolve_scope "$scope"
 
 cd_workspace
 mvn --quiet \
     -Dcactus.scope="$resolved_scope" \
     -Dcactus.family="$resolved_family" \
     -Dcactus.operation=finish \
-    -Dcactus.branch=hotfix \
+    -Dcactus.branch=bugfix \
     -Dcactus.branch="$branch_name" \
     com.telenav.cactus:cactus-maven-plugin:1.4.12:git-flow || exit 1

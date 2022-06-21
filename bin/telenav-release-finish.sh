@@ -9,32 +9,50 @@
 
 source telenav-library-functions.sh
 
-if [[ ! "$#" -eq 2 || "$1" == "all" ]]; then
-
-    echo "telenav-release-finish.sh [project-family-name] [version]"
+usage()
+{
+    echo "$(script) [project-family] [version]"
     exit 1
+}
 
+#
+# Check that there are two parameters and get them
+#
+
+if [[ ! "$#" -eq 2 ]]; then
+    usage
 fi
 
-resolve_scope "$1"
+scope=$1
 version=$2
 
-cd_workspace
 
+#
+# Check that the scope is a project family
+#
+
+resolve_scope "$scope"
+# shellcheck disable=SC2154
+if [[ ! "$resolved_scope" == "family" ]]; then
+    usage
+fi
+
+#
+# Build the release
+#
+
+cd_workspace
 telenav-build.sh "$resolved_scope" release || exit 1
 
-# shellcheck disable=SC2086
-mvn --quiet \
-    -Dcactus.scope="$resolved_scope" \
-    -Dcactus.family="$resolved_family" \
-    -Dcactus.operation=finish \
-    -Dcactus.branch-type=release \
-    -Dcactus.branch="$version" \
-    com.telenav.cactus:cactus-maven-plugin:1.4.12:git-flow || exit 1
+#
+# Finish the release branch
+#
+
+telenav-git-release-finish.sh "$scope" "release/$version"
 
 echo " "
 echo "Next Steps:"
 echo " "
-echo "  1. Sign into [OSSRH](http://s01.oss.sonatype.org) and push the build to Maven Central."
-echo "  2. Done."
+echo "  - Sign into [OSSRH](http://s01.oss.sonatype.org) and push the build to Maven Central."
+echo "  - Done!"
 echo " "
