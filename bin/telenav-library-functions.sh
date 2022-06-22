@@ -61,7 +61,10 @@ show_workspace()
     echo " "
 }
 
-scoped_folders()
+resolved_folders=()
+export resolved_folders
+
+resolve_scoped_folders()
 {
     pattern=$1
 
@@ -70,11 +73,11 @@ scoped_folders()
     fi
 
     cd_workspace
-    folders=()
+    resolved_folders=()
     for folder in */; do
         if [[ "$folder" =~ $pattern ]]; then
             if [[ ! "$folder" == *"-assets"* ]]; then
-                folders+=("$folder")
+                resolved_folders+=("$TELENAV_WORKSPACE/$folder")
             fi
         fi
     done
@@ -367,6 +370,7 @@ git_branch_name()
 
 git_flow_initialize()
 {
+    # shellcheck disable=SC2091
     if ! $(git flow config >/dev/null 2>&1); then
         git config --worktree gitflow.branch.master "release/current"
         git config --worktree gitflow.branch.develop "develop"

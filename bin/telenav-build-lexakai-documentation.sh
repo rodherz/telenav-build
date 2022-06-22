@@ -7,8 +7,6 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-folders=()
-
 source telenav-library-functions.sh
 
 scope=$1
@@ -26,9 +24,10 @@ cd_workspace
 lexakai()
 {
     folder=$1
-    cd "$TELENAV_WORKSPACE/$folder" || exit
+
     echo "┋ ================= Building $folder"
-    mvn --no-transfer-progress \
+    cd "$folder" || exit 1
+    mvn -e -X --no-transfer-progress \
         --batch-mode \
         --quiet \
         -Dsurefire.printSummary=false \
@@ -48,8 +47,8 @@ build_lexakai_documentation()
 {
     scope=$1
 
-    scoped_folders "$scope"
-    for folder in "${folders[@]}";
+    resolve_scoped_folders "$scope"
+    for folder in "${resolved_folders[@]}";
     do
         lexakai "$folder"
     done
