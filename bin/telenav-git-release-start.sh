@@ -15,9 +15,4 @@ get_scope_and_branch_arguments "$@"
 
 cd_workspace
 git_repository_initialize
-mvn --quiet \
-    "$(resolve_scope_switches "$scope")" \
-    -Dcactus.operation=start \
-    -Dcactus.branch-type=release \
-    -Dcactus.branch="$branch" \
-    com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":git-flow || exit 1
+telenav-git-checkout.sh "$scope" "$branch"

@@ -152,6 +152,9 @@ get_scope_argument()
     fi
 }
 
+resolved_scope_switches=()
+export resolved_scope_switches
+
 resolve_scope_switches()
 {
     scope=$1
@@ -162,11 +165,11 @@ resolve_scope_switches()
 
     if [[ ${#resolved_families[@]} == 1 ]]; then
 
-        echo "-Dcactus.scope=\"$resolved_scope\" -Dcactus.family=\"$families\""
+        resolved_scope_switches=(-Dcactus.scope="$resolved_scope" -Dcactus.family="$families")
 
     else
 
-        echo "-Dcactus.scope=\"$resolved_scope\" -Dcactus.families=\"$families\""
+        resolved_scope_switches=(-Dcactus.scope="$resolved_scope" -Dcactus.families="$families")
 
     fi
 }

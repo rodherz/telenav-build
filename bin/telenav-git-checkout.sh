@@ -9,13 +9,15 @@
 
 source telenav-library-functions.sh
 
-branch=""
 scope=""
+branch=""
+resolved_scope_switches=()
 get_scope_and_branch_arguments "$@"
 
 cd_workspace
-echo mvn --quiet \
-    "$(resolve_scope_switches "$scope")" \
+resolve_scope_switches "$scope"
+mvn --quiet \
+    "${resolved_scope_switches[@]}" \
     -Dcactus.target-branch="$branch" \
     -Dcactus.update-root=true \
     -Dcactus.create-branches=false \
