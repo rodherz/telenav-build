@@ -9,30 +9,14 @@
 
 source telenav-library-functions.sh
 
-if [[ "$#" -eq 1 ]]; then
-
-    scope="all-project-families"
-    branch_name=$1
-
-elif [[ "$#" -eq 2 ]]; then
-
-    scope=$1
-    branch_name=$2
-
-else
-
-    echo "$(script) [scope]? [branch-name]"
-    exit 1
-
-fi
-
-resolve_scope "$scope"
+branch=""
+scope=""
+get_scope_and_branch_arguments "$@"
 
 cd_workspace
 mvn --quiet \
-    -Dcactus.scope="$resolved_scope" \
-    -Dcactus.family="$resolved_family" \
+    "$(resolve_scope_switches "$scope")" \
     -Dcactus.operation=finish \
-    -Dcactus.branch=bugfix \
-    -Dcactus.branch="$branch_name" \
+    -Dcactus.branch-type=bugfix \
+    -Dcactus.branch="$branch" \
     com.telenav.cactus:cactus-maven-plugin:1.4.12:git-flow || exit 1

@@ -25,23 +25,29 @@ fi
 
 scope=$1
 version=$2
+resolved_families=()
 
 #
-# Check that the scope is a project family
+# Check that the scope is a single project family
 #
 
 resolve_scope "$scope"
+
 # shellcheck disable=SC2154
 if [[ ! "$resolved_scope" == "family" ]]; then
     usage
 fi
 
+if [[ ! ${#resolved_families[@]} -eq 1 ]]; then
+    usage
+fi
+
 #
-# Check that the project is on the 'develop' branch
+# Check that the project family is on the 'develop' branch
 #
 
 cd_workspace
-branch_name=$(git_branch_name "$1")
+branch_name=$(git_branch_name "$scope")
 
 if [[ ! "$branch_name" == "develop" ]]; then
     echo "Must be on develop branch to start a release"
@@ -52,7 +58,7 @@ fi
 # Check that the change log has been updated
 #
 
-if ! grep -q "Version $version" "$scope/change-log.md"; then
+if ! grep -q "## Version $version" "$scope/change-log.md"; then
     echo "Please update $scope/change-log.md before releasing"
     usage
 fi
@@ -62,6 +68,8 @@ fi
 #
 
 telenav-git-release-start.sh "$scope" "$version" || exit 1
+
+exit 1
 
 #
 # Update version information

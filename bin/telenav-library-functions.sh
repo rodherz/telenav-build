@@ -84,50 +84,140 @@ resolve_scoped_folders()
 }
 
 resolved_scope=""
-resolved_family=""
+resolved_families=()
 export resolved_scope
-export resolved_family
+export resolved_families
+
+function join_by()
+{
+    local d=${1-} f=${2-}
+    if shift 2; then
+        printf %s "$f" "${@/#/$d}"
+    fi
+}
+
+cactus_version()
+{
+    echo "1.4.18"
+}
+
+scope=""
+branch=""
+export scope
+export branch
+
+get_scope_and_branch_arguments()
+{
+    arguments=("$@")
+
+    # If there is only one argument
+    if [[ ${#arguments[@]} -eq 1 ]]; then
+
+        # switch all project families to the given branch,
+        scope="all-project-families"
+        branch=${arguments[0]}
+
+    # and if there are two arguments,
+    elif [[ ${#arguments[@]} -eq 2 ]]; then
+
+        # switch the scoped project families to the given branch,
+        scope=${arguments[0]}
+        branch=${arguments[1]}
+
+    else
+
+        # otherwise, exit with usage.
+        echo "$(script) [scope]? [branch-name]"
+        exit 1
+
+    fi
+}
+
+get_scope_argument()
+{
+    arguments=("$@")
+
+    # If there is only one argument
+    if [[ ${#arguments[@]} -eq 1 ]]; then
+
+        # that is the scope,
+        scope=${arguments[0]}
+
+    else
+
+        # otherwise, exit with usage.
+        echo "$(script) [scope]"
+        exit 1
+
+    fi
+}
+
+resolve_scope_switches()
+{
+    scope=$1
+
+    resolve_scope "$scope"
+
+    families=$(join_by , "${resolved_families[@]}")
+
+    if [[ ${#resolved_families[@]} == 1 ]]; then
+
+        echo "-Dcactus.scope=\"$resolved_scope\" -Dcactus.family=\"$families\""
+
+    else
+
+        echo "-Dcactus.scope=\"$resolved_scope\" -Dcactus.families=\"$families\""
+
+    fi
+}
 
 resolve_scope()
 {
     scope=$1
 
+    resolved_families=()
+
     case "${scope}" in
 
     "all")
         resolved_scope="all"
-        resolved_family=""
         ;;
 
     "all-project-families")
         resolved_scope="all-project-families"
-        resolved_family=""
         ;;
 
     "this")
         resolved_scope="just-this"
-        resolved_family=""
         ;;
 
     "just-this")
         resolved_scope="just-this"
-        resolved_family=""
         ;;
 
     *)
         if [[ "${scope}" == "" ]]; then
 
             if [[ "${TELENAV_SCOPE}" == "" ]]; then
+
                 resolved_scope="all-project-families"
-                resolved_family=""
+
             else
+
                 resolved_scope="$TELENAV_SCOPE"
-                resolved_family="$TELENAV_FAMILY"
+                resolved_families=("$TELENAV_FAMILY")
+
             fi
 
         else
+
             resolved_scope="family"
-            resolved_family="${scope}"
+
+            IFS=',' read -ra ARRAY <<< "$scope"
+            for family in "${ARRAY[@]}"; do
+                resolved_families+=("$family")
+            done
+
         fi
         ;;
 

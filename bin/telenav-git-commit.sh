@@ -9,10 +9,6 @@
 
 source telenav-library-functions.sh
 
-#
-# telenav-git-commit.sh [scope]? [message]
-#
-
 if [[ "$#" -eq 1 ]]; then
 
     scope="all-project-families"
@@ -25,15 +21,13 @@ elif [[ "$#" -eq 2 ]]; then
 
 else
 
-    echo "$(script) [scope]? [branch]"
+    echo "$(script) [scope]? [message]"
 
 fi
 
 cd_workspace
-resolve_scope "$scope"
 mvn --quiet \
-    -Dcactus.scope="$resolved_scope" \
-    -Dcactus.family="$resolved_family" \
+    "$(resolve_scope_switches "$scope")" \
     -Dcactus.commit-message=\""$message"\" \
     -Dcactus.update-root=true \
-    com.telenav.cactus:cactus-maven-plugin:1.4.12:commit || exit 1
+    com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":commit || exit 1
