@@ -7,7 +7,7 @@
 This section describes, step-by-step, how to release a new version of any Telenav Open Source project.
 
 In the text below `project-version` refers to a [semantic versioning](https://semver.org) identifier, such as `2.1.7`, `4.0.1-SNAPSHOT` or `1.4.0-beta`.
-Telenav Open Source projects adhere to the [Git Flow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) branching model.
+Although Telenav Open Source projects do not use git flow, they adhere to the [Git Flow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) branching model.
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
 

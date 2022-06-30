@@ -14,14 +14,6 @@ This article explains how to get set up to build Telenav Open Source projects, i
 
 - Bash
 - Git 2.30+
-- Git Flow 1.12.3+ (AVH Edition)  
-   On macOS, install Homebrew,
-
-        /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-    then use that to install git-flow AVH Edition:
-
-        brew install git-flow-avh
 
 - [Java](https://adoptopenjdk.net/?variant=openjdk17&jvmVariant=hotspot) 17.0.2 or later
 

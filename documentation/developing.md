@@ -58,7 +58,6 @@ To get the versions of tools, and repository families in the Telenav workspace, 
     ┋             Java: 17.0.3
     ┋            Maven: 3.8.5
     ┋              Git: 2.36.1
-    ┋         Git Flow: 1.12.3 (AVH Edition)
     ┋
     ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
@@ -179,9 +178,9 @@ They effectively *modify* the kind of build.
 
 Telenav Open Source projects are published on [Github](https://www.github.com/) and use Git for source control. 
 
-### Git Flow Branching
+### The Git Flow Branching Model
 
-All Telenav Open Source repositories adhere to the standard [Git Flow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) branching model.
+Although Telenav Open Source projects do not use git flow, they adhere to the [Git Flow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) branching model.
 This model specifies the following branch naming convention:
 
 | Git Flow Branch     | Purpose               |
@@ -207,8 +206,8 @@ After following the [Initial Setup Instructions](initial-setup-instructions.md),
 | `telenav-git-pull-request.sh` `scope`**?** `authentication-token` `title` `body` | Pulls from all scoped repositories                        |
 | `telenav-git-push.sh` `scope`**?**                                               | Pushes staged changes from all scoped repositories        |
 | `telenav-git-status.sh`                                                          | Shows the status of all repositories in the workspace     |
-| `telenav-git-[branch-type]-start.sh` `branch-name`                               | Starts a git flow branch of the given type                |
-| `telenav-git-[branch-type]-finish.sh` `branch-name`                              | Ends a git flow branch of the given type                  |
+| `telenav-git-[branch-type]-start.sh` `branch-name`                               | Starts a branch of the given git-flow type                |
+| `telenav-git-[branch-type]-finish.sh` `branch-name`                              | Ends a branch of the given git-flow type                  |
 
 Where `scope` is one of:
  
