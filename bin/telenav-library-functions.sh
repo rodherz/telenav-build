@@ -444,6 +444,16 @@ git_branch_name()
     echo "$branch_name"
 }
 
+git_check_branch_name()
+{
+    arguments=("$@")
+
+    scope=$1
+    branch=$2
+
+    # TODO
+}
+
 git_checkout_branch()
 {
     arguments=("$@")

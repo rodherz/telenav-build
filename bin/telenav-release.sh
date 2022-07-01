@@ -9,21 +9,19 @@
 
 family=""
 version=""
-scope=""
 
 source telenav-library-functions.sh
 source telenav-release-library-functions.sh
 
 echo "Releasing $family $version"
-cd_workspace
 
 #
 # Check that the project family is on the 'develop' branch
 #
 
-echo " - Checking project family branches"
+echo " - Checking project branches"
 
-if [[ ! "$(git_branch_name "$family")" == "develop" ]]; then
+if [[ ! $(git_check_branch_name "$family" develop)  ]]; then
     echo "Must be on develop branch to start a release"
     usage
 fi
@@ -34,8 +32,8 @@ fi
 
 echo " - Checking change log"
 
-if ! grep -q "## Version $version" "$scope/change-log.md"; then
-    echo "Please update $scope/change-log.md before releasing"
+if ! grep -q "## Version $version" "$family/change-log.md"; then
+    echo "Please update $family/change-log.md before releasing"
     usage
 fi
 
@@ -45,7 +43,9 @@ fi
 
 echo " - Creating release branch"
 
-telenav-git-release-start.sh "$scope" "$version" || exit 1
+# TODO: need to check branch inside the start/finish scripts
+
+telenav-git-release-start.sh "$family" "$version" || exit 1
 
 exit 1
 
@@ -63,7 +63,7 @@ telenav-update-version.sh "$version" "release/$version" || exit 1
 
 echo " - Building local release"
 
-telenav-build.sh "$scope" "release-local" || exit 1
+telenav-build.sh "$family" "release-local" || exit 1
 
 echo " - Local release built successfully"
 
@@ -75,5 +75,5 @@ echo " "
 echo "Next Steps:"
 echo " "
 echo "  - Check the release carefully"
-echo "  - Run \"telenav-release-finish.sh $scope $version\""
+echo "  - Run \"telenav-release-finish.sh $family $version\""
 echo " "
