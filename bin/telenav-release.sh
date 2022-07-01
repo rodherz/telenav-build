@@ -22,7 +22,7 @@ echo "Releasing $family $version"
 echo " - Checking project branches"
 
 if [[ ! $(git_check_branch_name "$family" develop)  ]]; then
-    echo "Must be on develop branch to start a release"
+    echo "Must be on 'develop' branch to start a release"
     usage
 fi
 
@@ -42,8 +42,6 @@ fi
 #
 
 echo " - Creating release branch"
-
-# TODO: need to check branch inside the start/finish scripts
 
 telenav-git-release-start.sh "$family" "$version" || exit 1
 

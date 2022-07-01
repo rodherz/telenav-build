@@ -23,16 +23,16 @@ fi
 # 1. Merge branch to develop
 # need to understand attempt-merge and finish-attempt-merge
 
-# 2. Remove branch
-# TODO
-
-# 3. Switch back to develop
-telenav-git-checkout.sh "$scope" develop || exit 1
-
-
 cd_workspace
 mvn --quiet \
     "$(resolve_scope_switches "$scope")" \
     -Dcactus.branch-type=feature \
     -Dcactus.branch="$branch" \
     com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":attempt-merge || exit 1
+
+
+# 2. Remove branch
+# TODO
+
+# 3. Switch back to develop
+telenav-git-checkout.sh "$scope" develop || exit 1

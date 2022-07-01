@@ -16,7 +16,7 @@ source telenav-library-functions.sh
 get_scope_and_branch_arguments "$@"
 
 if [[ ! $(git_check_branch_name "$scope" develop)  ]]; then
-    echo "Must be on develop branch to start a $type"
+    echo "Must be on 'develop' branch to start a $type"
     exit 1
 fi
 
