@@ -7,10 +7,10 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-source telenav-library-functions.sh
-
 scope=""
 branch=""
-get_scope_and_branch_arguments "$@"
 
+source telenav-library-functions.sh
+
+get_scope_and_branch_arguments "$@"
 git_checkout_branch "$scope" "bugfix/$branch" true || exit 1
