@@ -9,15 +9,8 @@
 
 source telenav-library-functions.sh
 
-branch=""
 scope=""
+branch=""
 get_scope_and_branch_arguments "$@"
 
-cd_workspace
-git_repository_initialize
-mvn --quiet \
-    "$(resolve_scope_switches "$scope")" \
-    -Dcactus.operation=start \
-    -Dcactus.branch-type=bugfix \
-    -Dcactus.branch="$branch" \
-    com.telenav.cactus:cactus-maven-plugin:1.4.12:git-flow || exit 1
+git_checkout_branch "$scope" "bugfix/$branch" true || exit 1

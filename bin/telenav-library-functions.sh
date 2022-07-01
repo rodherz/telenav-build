@@ -249,11 +249,6 @@ check_tools()
     # 3) Parse Git version from output like: git version 2.36.1
     git_version=$(git --version 2>&1 | awk -F' ' '{print $3}')
 
-    # 4) Parse Git flow version from output like: 1.12.3 (AVH Edition)
-    if [[ ! "$caller" == "ci-build" ]]; then
-        git_flow_version=$(git flow version)
-    fi
-
     # Check Java version
     if [[ ! "$java_version" == "17."* ]]; then
         echo "Telenav Open Source projects require Java 17"
@@ -278,18 +273,6 @@ check_tools()
         exit 1
     else
         echo "Git $git_version"
-    fi
-
-    # Check Git Flow version
-
-    if [[ ! "$caller" == "ci-build" ]]; then
-        if [[ ! $git_flow_version =~ 1.1[2-9]\..*\(AVH\ Edition\) ]]; then
-            echo "Telenav Open Source projects require Git Flow (AVH Edition) version 1.12 or higher"
-            echo "To install on macOS: brew install git-flow-avh"
-            exit 1
-        else
-            echo "Git Flow $git_flow_version"
-        fi
     fi
 }
 
@@ -461,22 +444,26 @@ git_branch_name()
     echo "$branch_name"
 }
 
-git_flow_initialize()
+git_checkout_branch()
 {
-    # shellcheck disable=SC2091
-    if ! $(git flow config >/dev/null 2>&1); then
-        git config --worktree gitflow.branch.master "release/current"
-        git config --worktree gitflow.branch.develop "develop"
-        git config --worktree gitflow.prefix.hotfix "hotfix/"
-        git config --worktree gitflow.prefix.feature "feature/"
-        git config --worktree gitflow.prefix.bugfix "bugfix/"
-        git config --worktree gitflow.prefix.release "release/"
-        git config --worktree gitflow.prefix.support "support/"
-        git flow init -f -d -t ""
-    fi
-}
+    arguments=("$@")
 
-export -f git_flow_initialize
+    scope=$1
+    branch=$2
+    create=$3
+
+    resolve_scope_switches "$scope"
+
+    cd_workspace
+    mvn --quiet \
+        "${resolved_scope_switches[@]}" \
+        -Dcactus.target-branch="bugfix/$branch" \
+        -Dcactus.update-root=true \
+        -Dcactus.create-branches="$create" \
+        -Dcactus.push=false \
+        -Dcactus.permit-local-changes=true \
+        com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":checkout || exit 1
+}
 
 git_repository_initialize()
 {
@@ -484,11 +471,6 @@ git_repository_initialize()
     git config pull.ff only || exit 1
     # shellcheck disable=SC2016
     git submodule foreach 'git config pull.ff only && echo "Configuring $name"' || exit 1
-
-    echo "Git flow initialize"
-    git_flow_initialize
-    # shellcheck disable=SC2016
-    git submodule foreach '[[ "$path" == *-assets ]] || git_flow_initialize' || exit 1
 }
 
 ################ UTILITY ################################################################################################

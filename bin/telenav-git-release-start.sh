@@ -9,10 +9,8 @@
 
 source telenav-library-functions.sh
 
-branch=""
 scope=""
+branch=""
 get_scope_and_branch_arguments "$@"
 
-cd_workspace
-git_repository_initialize
-telenav-git-checkout.sh "$scope" "$branch"
+git_checkout_branch "$scope" "release/$branch" true || exit 1
