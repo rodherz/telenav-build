@@ -444,6 +444,31 @@ git_branch_name()
     echo "$branch_name"
 }
 
+update_version_and_checkout()
+{
+    arguments=("$@")
+
+    family=$1
+    version=$2
+
+    mvn -Dcactus.create.release.branch=true \
+        -Dcactus.scope="family" \
+        -Dcactus.family="$family" \
+        -Dcactus.commit-changes=true \
+        -Dcactus.explicit.version="$version" \
+        com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":bump-version
+}
+
+git_delete_branch()
+{
+    arguments=("$@")
+
+    scope=$1
+    branch=$2
+
+    # TODO
+}
+
 git_check_branch_name()
 {
     arguments=("$@")
@@ -478,9 +503,9 @@ git_checkout_branch()
 git_repository_initialize()
 {
     echo "Git pull fast-forward"
-    git config pull.ff only || exit 1
+    git config pull.ff false || exit 1
     # shellcheck disable=SC2016
-    git submodule foreach 'git config pull.ff only && echo "Configuring $name"' || exit 1
+    git submodule foreach 'git config pull.ff false && echo "Configuring $name"' || exit 1
 }
 
 ################ UTILITY ################################################################################################

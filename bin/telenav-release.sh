@@ -38,22 +38,12 @@ if ! grep -q "## Version $version" "$family/change-log.md"; then
 fi
 
 #
-# Start a release branch
+# Update version on 'develop' then start a release branch (which moves the changes to the new branch)
 #
 
-echo " - Creating release branch"
+echo " - Updating version and creating release branch 'release/$version'"
 
-telenav-git-release-start.sh "$family" "$version" || exit 1
-
-exit 1
-
-#
-# Update version information
-#
-
-echo " - Updating version to $version"
-
-telenav-update-version.sh "$version" "release/$version" || exit 1
+update_version_and_checkout "$family" "$version" || exit 1
 
 #
 # Build the release into the local repository
