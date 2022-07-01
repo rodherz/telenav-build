@@ -16,7 +16,7 @@ source telenav-library-functions.sh
 source telenav-release-library-functions.sh
 
 #
-# Build the release
+# 1. Build and publish the release
 #
 
 echo "Building $family $version release"
@@ -24,10 +24,14 @@ echo "Building $family $version release"
 telenav-build.sh "$resolved_scope" release || exit 1
 
 #
-# Finish the release branch
+# 2. Finish the release branch
 #
 
 telenav-git-release-finish.sh "$scope" "release/$version"
+
+#
+# 3. Show final step
+#
 
 echo " "
 echo "Next Steps:"

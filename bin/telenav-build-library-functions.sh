@@ -91,6 +91,10 @@ telenav_build_parse_build_modifiers()
                 maven_switches+=(-P docker)
                 ;;
 
+            "documentation")
+                maven_switches+=(-P release)
+                ;;
+
             "dry-run")
                 # shellcheck disable=SC2034
                 dry_run="true"
@@ -221,12 +225,12 @@ telenav_build_parse_build_types()
 
         "release")
             build_arguments+=(clean install nexus-staging:deploy)
-            build_modifiers+=(single-threaded clean-sparkling javadoc lexakai-documentation tests attach-jars sign-artifacts)
+            build_modifiers+=(single-threaded clean-sparkling documentation attach-jars sign-artifacts)
             ;;
 
         "release-local")
             build_arguments+=(clean install)
-            build_modifiers+=(single-threaded clean-sparkling javadoc lexakai-documentation tests attach-jars sign-artifacts)
+            build_modifiers+=(single-threaded clean-sparkling documentation tests attach-jars sign-artifacts)
             ;;
 
         "test")

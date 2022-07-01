@@ -459,16 +459,6 @@ update_version_and_checkout()
         com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":bump-version
 }
 
-git_delete_branch()
-{
-    arguments=("$@")
-
-    scope=$1
-    branch=$2
-
-    # TODO
-}
-
 git_check_branch_name()
 {
     arguments=("$@")
@@ -476,7 +466,12 @@ git_check_branch_name()
     scope=$1
     branch=$2
 
-    # TODO
+    resolve_scope_switches "$scope"
+
+    cd_workspace
+    mvn "${resolved_scope_switches[@]}" \
+        -Dcactus.expected.branch="$branch" \
+        com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":check
 }
 
 git_checkout_branch()

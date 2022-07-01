@@ -21,7 +21,7 @@ mvn --quiet \
     -Dcactus.branch="$branch" \
     com.telenav.cactus:cactus-maven-plugin:1.4.12:git-flow || exit 1
 
- - Merges the release branch back into 'master'
+ - Merges the release branch back into 'release/current'
  - Tags the release with its name
  - Back-merges the release into 'develop'
  - Removes the release branch

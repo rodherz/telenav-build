@@ -7,6 +7,8 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+set -x
+
 family=""
 version=""
 
@@ -16,7 +18,7 @@ source telenav-release-library-functions.sh
 echo "Releasing $family $version"
 
 #
-# Check that the project family is on the 'develop' branch
+# 1. Check that the project family is on the 'develop' branch
 #
 
 echo " - Checking project branches"
@@ -27,7 +29,7 @@ if [[ ! $(git_check_branch_name "$family" develop)  ]]; then
 fi
 
 #
-# Check that the change log has been updated
+# 2. Check that the change log has been updated
 #
 
 echo " - Checking change log"
@@ -38,7 +40,7 @@ if ! grep -q "## Version $version" "$family/change-log.md"; then
 fi
 
 #
-# Update version on 'develop' then start a release branch (which moves the changes to the new branch)
+# 3. Update version on 'develop' then start a release branch (which moves the changes to the new branch)
 #
 
 echo " - Updating version and creating release branch 'release/$version'"
@@ -46,7 +48,7 @@ echo " - Updating version and creating release branch 'release/$version'"
 update_version_and_checkout "$family" "$version" || exit 1
 
 #
-# Build the release into the local repository
+# 4. Build the release into the local repository
 #
 
 echo " - Building local release"
@@ -56,7 +58,7 @@ telenav-build.sh "$family" "release-local" || exit 1
 echo " - Local release built successfully"
 
 #
-# Describe the next steps to take
+# 5. Describe the next steps to take
 #
 
 echo " "
