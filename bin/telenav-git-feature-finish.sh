@@ -13,10 +13,15 @@ branch=""
 scope=""
 get_scope_and_branch_arguments "$@"
 
+# 1. Merge branch to develop
+
+# 2. Remove branch
+
+# 3. Switch back to develop
+
 cd_workspace
 mvn --quiet \
     "$(resolve_scope_switches "$scope")" \
-    -Dcactus.operation=finish \
     -Dcactus.branch-type=feature \
     -Dcactus.branch="$branch" \
-    com.telenav.cactus:cactus-maven-plugin:1.4.12:git-flow || exit 1
+    com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":attempt-merge || exit 1

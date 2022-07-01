@@ -7,49 +7,23 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+family=""
+version=""
+scope=""
+
 source telenav-library-functions.sh
+source telenav-release-library-functions.sh
 
-usage()
-{
-    echo "$(script) [project-family] [release-version]"
-    exit 1
-}
-
-#
-# Check that there are two arguments and get them
-#
-
-if [[ ! "$#" -eq 2 ]]; then
-    usage
-fi
-
-scope=$1
-version=$2
-resolved_families=()
-
-#
-# Check that the scope is a single project family
-#
-
-resolve_scope "$scope"
-
-# shellcheck disable=SC2154
-if [[ ! "$resolved_scope" == "family" ]]; then
-    usage
-fi
-
-if [[ ! ${#resolved_families[@]} -eq 1 ]]; then
-    usage
-fi
+echo "Releasing $family $version"
+cd_workspace
 
 #
 # Check that the project family is on the 'develop' branch
 #
 
-cd_workspace
-branch_name=$(git_branch_name "$scope")
+echo " - Checking project family branches"
 
-if [[ ! "$branch_name" == "develop" ]]; then
+if [[ ! "$(git_branch_name "$family")" == "develop" ]]; then
     echo "Must be on develop branch to start a release"
     usage
 fi
@@ -57,6 +31,8 @@ fi
 #
 # Check that the change log has been updated
 #
+
+echo " - Checking change log"
 
 if ! grep -q "## Version $version" "$scope/change-log.md"; then
     echo "Please update $scope/change-log.md before releasing"
@@ -67,6 +43,8 @@ fi
 # Start a release branch
 #
 
+echo " - Creating release branch"
+
 telenav-git-release-start.sh "$scope" "$version" || exit 1
 
 exit 1
@@ -75,13 +53,19 @@ exit 1
 # Update version information
 #
 
-telenav-update-version.sh "$1" "release/$version" || exit 1
+echo " - Updating version to $version"
+
+telenav-update-version.sh "$version" "release/$version" || exit 1
 
 #
 # Build the release into the local repository
 #
 
+echo " - Building local release"
+
 telenav-build.sh "$scope" "release-local" || exit 1
+
+echo " - Local release built successfully"
 
 #
 # Describe the next steps to take
@@ -91,5 +75,5 @@ echo " "
 echo "Next Steps:"
 echo " "
 echo "  - Check the release carefully"
-echo "  - Run telenav-release-finish.sh $scope $version"
+echo "  - Run \"telenav-release-finish.sh $scope $version\""
 echo " "
