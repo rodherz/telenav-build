@@ -224,7 +224,7 @@ telenav_build_parse_build_types()
             ;;
 
         "release")
-            build_arguments+=(clean install nexus-staging:deploy)
+            build_arguments+=(clean install com.telenav.cactus:cactus-maven-plugin:check-published nexus-staging:deploy)
             build_modifiers+=(single-threaded clean-sparkling documentation attach-jars sign-artifacts)
             ;;
 
