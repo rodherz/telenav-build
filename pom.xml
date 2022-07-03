@@ -28,7 +28,7 @@
 
     <groupId>com.telenav</groupId>
     <artifactId>telenav-build</artifactId>
-    <version>2.0.1</version>
+    <version>2.0.2</version>
 
     <packaging>pom</packaging>
 
@@ -52,6 +52,87 @@
         <module>mesakit-examples</module>
 
     </modules>
+    
+    <properties>
+        <!-- We need to skip building javadoc for the root
+             bill-of-materials ITSELF, because we do not want
+             aggregation at this level and because it will fail. -->
+        <maven.javadoc.skip>true</maven.javadoc.skip>
+        <maven.plugin.plugin.version>3.6.4</maven.plugin.plugin.version>
+
+        <!-- We cannot build lexakai docs for the root project -->
+        <cactus.lexakai.skip>true</cactus.lexakai.skip>
+    </properties>
+
+    <build>
+        <plugins>
+            <plugin>
+                <!-- Javadoc hackery - when building everything,
+                our javadoc config comes from here, not from the
+                parent or project pom. -->
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-javadoc-plugin</artifactId>
+                <version>3.4.0</version>
+                <configuration>
+                    <!-- add-reads is an experimental javadoc option -->
+                    <additionalOptions>
+                        --limit-modules kivakit.web.wicket
+                        --add-reads org.apiguardian.api=ALL-UNNAMED
+                    </additionalOptions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.3.0</version>
+                <configuration>
+                    <skip>${maven.shade.skip}</skip>
+                </configuration>
+            </plugin>
+            <plugin>
+
+                <artifactId>maven-plugin-plugin</artifactId>
+                <version>${maven.plugin.plugin.version}</version>
+                <configuration>
+                    <goalPrefix>cactus</goalPrefix>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>mojo-descriptor-compile-time</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>descriptor</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>mojo-descriptor</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>descriptor</goal>
+                        </goals>
+                    </execution>
+                    
+                    <execution>
+                        <id>generated-helpmojo</id>
+                        <goals>
+                            <goal>helpmojo</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
+            </plugin>
+
+        </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>4.0.0-M1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 
     <!-- Licensing -->
 
