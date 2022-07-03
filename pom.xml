@@ -58,6 +58,7 @@
              bill-of-materials ITSELF, because we do not want
              aggregation at this level and because it will fail. -->
         <maven.javadoc.skip>true</maven.javadoc.skip>
+        <maven.plugin.plugin.version>3.6.4</maven.plugin.plugin.version>
     </properties>
 
     <build>
@@ -85,8 +86,49 @@
                     <skip>${maven.shade.skip}</skip>
                 </configuration>
             </plugin>
+            <plugin>
+
+                <artifactId>maven-plugin-plugin</artifactId>
+                <version>${maven.plugin.plugin.version}</version>
+                <configuration>
+                    <goalPrefix>cactus</goalPrefix>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>mojo-descriptor-compile-time</id>
+                        <phase>compile</phase>
+                        <goals>
+                            <goal>descriptor</goal>
+                        </goals>
+                    </execution>
+                    <execution>
+                        <id>mojo-descriptor</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>descriptor</goal>
+                        </goals>
+                    </execution>
+                    
+                    <execution>
+                        <id>generated-helpmojo</id>
+                        <goals>
+                            <goal>helpmojo</goal>
+                        </goals>
+                    </execution>
+                </executions>
+
+            </plugin>
 
         </plugins>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-site-plugin</artifactId>
+                    <version>4.0.0-M1</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
     </build>
 
     <!-- Licensing -->
