@@ -59,6 +59,9 @@
              aggregation at this level and because it will fail. -->
         <maven.javadoc.skip>true</maven.javadoc.skip>
         <maven.plugin.plugin.version>3.6.4</maven.plugin.plugin.version>
+
+        <!-- We cannot build lexakai docs for the root project -->
+        <cactus.lexakai.skip>true</cactus.lexakai.skip>
     </properties>
 
     <build>
