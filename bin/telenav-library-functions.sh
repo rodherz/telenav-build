@@ -642,6 +642,14 @@ bracket()
 
 }
 
+ask()
+{
+    prompt=$1
+
+    read -r -p "$prompt? "
+    printf "\n"
+}
+
 yes_no()
 {
     if [ -z "${NO_PROMPT}" ]; then
