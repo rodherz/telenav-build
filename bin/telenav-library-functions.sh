@@ -255,16 +255,16 @@ check_tools()
         echo "To install: https://jdk.java.net/archive/"
         exit 1
     else
-        echo "Java $java_version"
+        echo "┋ Java $java_version"
     fi
 
     # Check Maven version
     if [[ ! $maven_version =~ 3\.8\.[5-9][0-9]* ]]; then
-        echo "Telenav Open Source projects require Maven 3.8.5 or higher"
-        echo "To install: https://maven.apache.org/download.cgi"
+        echo "Telenav Open Source projects require Maven 3.8.5 or higher, but you have Maven $maven_version"
+        echo "To upgrade: https://maven.apache.org/download.cgi"
         exit 1
     else
-        echo "Maven $maven_version"
+        echo "┋ Maven $maven_version"
     fi
 
     # Check Git version
@@ -272,7 +272,7 @@ check_tools()
         echo "Telenav Open Source projects require Git version 2.30 or higher"
         exit 1
     else
-        echo "Git $git_version"
+        echo "┋ Git $git_version"
     fi
 }
 
@@ -487,7 +487,7 @@ git_checkout_branch()
     cd_workspace
     mvn --quiet \
         "${resolved_scope_switches[@]}" \
-        -Dcactus.target-branch="bugfix/$branch" \
+        -Dcactus.target-branch="$branch" \
         -Dcactus.update-root=true \
         -Dcactus.create-branches="$create" \
         -Dcactus.push=false \

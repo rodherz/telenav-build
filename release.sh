@@ -1,61 +1,105 @@
 #!/bin/bash
 
 ##############################################################################
-#
-# Configuration
-#
+# Settings
+##############################################################################
 
 # Version of the Cactus Maven plugin to use
-export CACTUS_PLUGIN_VERSION=1.5.5
+export CACTUS_PLUGIN_VERSION=1.5.8
 
 # Set this to whatever profile makes the right GPG keys available, from your ~/.m2/settings.xml
 export GPG_PROFILE=gpg
 
 # This should be 'release' when really releasing or something else when testing
-export RELEASE_BRANCH_PREFIX=great_googly_moogly
+export RELEASE_BRANCH_PREFIX=release
+
+
 
 ##############################################################################
-#
-# Determine the workspace to release
-#
+# Determine project families to release
+##############################################################################
 
-setopt interactivecomments
+echo " "
+echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Cactus ${CACTUS_PLUGIN_VERSION}"
+echo "┋"
+
+read -r -p "┋ What project families do you want to release [kivakit,lexakai,mesakit]? "
+if [[ -z "${REPLY}" ]]; then
+    export PROJECT_FAMILIES='kivakit,lexakai,mesakit'
+else
+    export PROJECT_FAMILIES=$REPLY
+fi
+
+
+
+##############################################################################
+# Locate the workspace we're releasing based on this script's path
+##############################################################################
 
 # shellcheck disable=SC2164
-SCRIPT_PATH="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
+WORKSPACE="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
-if [[ -z "$TELENAV_WORKSPACE" ]]; then
-    export TELENAV_WORKSPACE=$SCRIPT_PATH
+echo "┋"
+echo "┋ Release project families: ${PROJECT_FAMILIES}"
+echo "┋ Release workspace: ${WORKSPACE}"
+echo "┋ Release branch prefix: ${RELEASE_BRANCH_PREFIX}"
+
+cd "${WORKSPACE}" || exit 1
+
+
+
+##############################################################################
+# RELEASE PHASE 0 - Check the workspace to make sure it is ready to be
+# released, then clone the develop branch into a temporary workspace,
+# whose location we parse from the output of the plugin.
+##############################################################################
+
+echo "┋ "
+echo "┋━━━━━━━ PHASE 0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
+echo "Cloning develop branch for release... (this may take a while)"
+
+output=$(mvn \
+    -P release-phase-0 \
+    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
+    -Dcactus.families="${PROJECT_FAMILIES}" \
+        validate)
+
+root=$(echo "$output" | grep "checkout-root: ")
+
+if [[ ! $root == *"checkout-root: "* ]]; then
+    echo "$output"
+    echo " "
+    echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ ERROR!"
+    echo "┋ "
+    echo "┋ PHASE 0 - Release checkout failed. Please check your workspace."
+    echo "┋ All projects should be on their 'develop' branches with no modified files."
+    echo "┋"
+    echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
+    echo " "
+    exit 1
 fi
 
-##############################################################################
-#
-# Determine what project families to release
-#
+TEMPORARY_WORKSPACE=${root#*checkout-root: }
 
-ask "What project families do you want to release [kivakit,lexakai,mesakit]? "
-if [[ -z "$REPLY" ]]; then
-    export FAMILIES_TO_RELEASE='kivakit,lexakai,mesakit'
-else
-    export FAMILIES_TO_RELEASE=$REPLY
-fi
+echo "┋ Temporary workspace: ${TEMPORARY_WORKSPACE}"
+
+
 
 ##############################################################################
-#
-# Check installed tools and clean out caches
-#
+# Create temporary maven repository to ensure a clean build
+##############################################################################
 
-source "$TELENAV_WORKSPACE"/bin/telenav-library-functions.sh
+export MAVEN_REPOSITORY="${TEMPORARY_WORKSPACE}"/maven-repository
+rm -rf "${MAVEN_REPOSITORY}" 1> /dev/null
 
-check_tools
-clean_caches
+echo "┋ Maven repository: ${MAVEN_REPOSITORY}"
+
+
 
 ##############################################################################
-#
-# Maven options we will need. Note the system property cactus.release.branch.prefix --
-# this lets us create test release branches without squatting the real release branch,
-# so we can even test pushing the branch before we commit to a release.
-#
+# Define Maven JVM options. The system property cactus.release.branch.prefix
+# lets us create test release branches without stepping the real release.
+##############################################################################
 
 export MAVEN_OPTS="-XX:+UseG1GC \
     -Dcactus.debug=false \
@@ -67,113 +111,157 @@ export MAVEN_OPTS="-XX:+UseG1GC \
     --add-opens=java.desktop/java.awt.font=ALL-UNNAMED \
     -Dcactus.release.branch.prefix=\"${RELEASE_BRANCH_PREFIX}\""
 
-##############################################################################
-#
-# Use a temporary Maven repository for the release to ensure it's a fresh build
-#
 
-export MAVEN_REPOSITORY=$TMPDIR/release-maven-repository
-rm -rf "$MAVEN_REPOSITORY"
 
 ##############################################################################
-#
-# 1. Clone the develop branch
-#
+# Check installed tools and clean out project caches
+##############################################################################
 
-cd "$TMPDIR" || exit
-rm -Rf release-workspace
-cp -Ra "$TELENAV_WORKSPACE" release-workspace
-cd release-workspace || exit
+source "${WORKSPACE}"/bin/telenav-library-functions.sh
+
+echo "┋ Checking tools"
+check_tools
+echo "┋ Cleaning project caches"
+clean_caches
+
+
 
 ##############################################################################
-#
-# 2. Build the workspace
-#
+# Install superpoms and build the workspace without tests enabled
+##############################################################################
 
-mvn -f telenav-superpom/pom.xml install
-mvn clean install -Dmaven.test.skip=true
+echo "┋ Installing superpoms"
+mvn --quiet -f telenav-superpom/pom.xml install | exit 1
+
+echo "┋ Checking build (no tests)"
+mvn --quiet -Dmaven.test.skip=true clean install | exit 1
+
+echo "┋━━━━━━━ PHASE 0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
+
+
 
 ##############################################################################
-#
-# 3. Update versions appropriately - kivakit gets a major rev, the rest minor ones.
-# For testing, so we don't have to delete branches later, we are overriding the release-branch
-# prefix - just remove -Dcactus.release.branch.prefix= for a real release
-#
+# RELEASE PHASE 1 - Update versions and branch references
+##############################################################################
 
-mvn -P release-phase-1 \
+echo "┋ "
+echo "┋━━━━━━━ PHASE 1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
+echo "┋ Updating versions and branch references"
+
+mvn --quiet \
+    -P release-phase-1 \
     -Denforcer.skip=true \
     -Dcactus.expected.branch=develop \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
-    -Dcactus.families="${FAMILIES_TO_RELEASE}" \
-    -Dcactus.release.branch.prefix="$RELEASE_BRANCH_PREFIX" \
+    -Dcactus.families="${PROJECT_FAMILIES}" \
+    -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
     -Dmaven.test.skip=true \
-        clean \
-        validate
+        clean validate | exit 1
+
+
 
 ##############################################################################
-#
-# 4. Rebuild everything now that some things have new versions
-#
+# Rebuild everything with tests now that some things have new versions
+##############################################################################
 
-mvn -f telenav-superpom/pom.xml install
-mvn clean install -Dmaven.test.skip=true
+echo "┋ Installing superpoms"
+mvn -f telenav-superpom/pom.xml install | exit 1
+
+echo "┋ Checking build (tests enabled)"
+mvn clean install | exit 1
+
+echo "┋━━━━━━━ PHASE 1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
+
+
 
 ##############################################################################
-#
-# 5. Update the docs
-#
+# RELEASE PHASE 2 - Build documentation
+##############################################################################
+
+echo "┋ "
+echo "┋━━━━━━━ PHASE 2 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
+echo "┋ Building documentation"
 
 mvn -P release-phase-2 \
+    --quiet \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
-    -Dcactus.families="${FAMILIES_TO_RELEASE}" \
-    -Dcactus.release.branch.prefix="$RELEASE_BRANCH_PREFIX" \
+    -Dcactus.families="${PROJECT_FAMILIES}" \
+    -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
     -Dmaven.test.skip=true \
         clean \
         install \
-        org.apache.maven.plugins:maven-site-plugin:4.0.0-M1:site verify
+        org.apache.maven.plugins:maven-site-plugin:4.0.0-M1:site verify | exit 1
+
+echo "┗━━━━━━━ PHASE 2 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
+
+
 
 ##############################################################################
-#
-# 6. Review the release
-#
+# Review the release
+##############################################################################
 
 echo " "
 echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Review ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┋"
-echo "┋ Review the release now:"
+echo "┋ Release is ready for you to review now:"
 echo "┋"
 echo "┋    1. Check the documentation, including links and diagrams"
-echo "┋    2. Check that version numbers and branch names were updated as expected"
+echo "┋    2. Check that version numbers and branch names were updated correctly"
 echo "┋"
 echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 echo " "
 
 while
     ask "When ready to continue, type 'release': "
-    [[ "$REPLY" == "release" ]]
+    [[ "${REPLY}" == "release" ]]
 do true; done
 
+
+
 ##############################################################################
-#
-# 7. Commit the docs changes, build the release and publish to Nexus / OSSRH
-#
+# RELEASE PHASE 3 - Commit documentation changes, build the release and
+# publish to Nexus / OSSRH (https://s01.oss.sonatype.org/)
+##############################################################################
+
+
+echo "┏━━━━━━━ PHASE 3 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
+echo "┋ Publishing release..."
 
 mvn -P release-phase-3 \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -P ${GPG_PROFILE} \
-    -Dcactus.families="${FAMILIES_TO_RELEASE}" \
-    -Dcactus.release.branch.prefix="$RELEASE_BRANCH_PREFIX" \
+    -Dcactus.families="${PROJECT_FAMILIES}" \
+    -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
     -Dmaven.test.skip=true \
-        deploy
+        deploy | exit 1
+
+echo "┗━━━━━━━ PHASE 3 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
+
 
 
 ##############################################################################
-#
-# 8. Merge changes back to develop and update released stuff to a new snapshot version
-#
+# RELEASE PHASE 4 - Merge changes back to develop and release/current and
+# update the develop branch to the next snapshot version
+##############################################################################
+
+echo "┏━━━━━━━ PHASE 4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
+echo "┋ Merging release and updating to next snapshot version..."
 
 mvn -P release-phase-4 \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
-    -Dcactus.families="${FAMILIES_TO_RELEASE}" \
+    -Dcactus.families="${PROJECT_FAMILIES}" \
     -Dmaven.test.skip=true \
-    generate-resources
+    generate-resources | exit 1
+
+echo "┗━━━━━━━ PHASE 4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
+
+
+
+##############################################################################
+# END
+##############################################################################
+
+echo "┋"
+echo "┋ Release of ${PROJECT_FAMILIES} complete!"
+echo "┋"
+echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
