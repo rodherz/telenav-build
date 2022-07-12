@@ -243,6 +243,7 @@ mvn -P release-phase-2 \
     -Dcactus.families="${PROJECT_FAMILIES}" \
     -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
     -Dmaven.test.skip=true \
+    -Dcactus.push=true \
         clean \
         install \
         org.apache.maven.plugins:maven-site-plugin:4.0.0-M1:site verify | exit 1
