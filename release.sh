@@ -80,6 +80,7 @@ if [[ ! $root == *"checkout-root: "* ]]; then
 fi
 
 TEMPORARY_WORKSPACE=${root#*checkout-root: }
+cd "${TEMPORARY_WORKSPACE}" || exit 1
 
 echo "┋ Temporary workspace: ${TEMPORARY_WORKSPACE}"
 
