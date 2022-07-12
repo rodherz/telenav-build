@@ -185,8 +185,6 @@ export MAVEN_OPTS="-XX:+UseG1GC \
 
 source "${WORKSPACE}"/bin/telenav-library-functions.sh
 
-echo "┋ Checking tools"
-check_tools
 echo "┋ Cleaning project caches"
 clean_caches
 
