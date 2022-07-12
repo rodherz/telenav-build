@@ -187,7 +187,7 @@ export MAVEN_OPTS="-XX:+UseG1GC \
     --add-opens=java.base/java.lang.reflect=ALL-UNNAMED \
     --add-opens=java.base/java.text=ALL-UNNAMED \
     --add-opens=java.desktop/java.awt.font=ALL-UNNAMED \
-    '-Dcactus.release.branch.prefix=${RELEASE_BRANCH_PREFIX}'"
+    -Dcactus.release.branch.prefix=${RELEASE_BRANCH_PREFIX}"
 
 
 
