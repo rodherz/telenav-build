@@ -13,11 +13,14 @@ unset KIVAKIT_HOME
 unset MESAKIT_HOME
 unset LEXAKAI_HOME
 
+# shellcheck disable=SC2046
 ORIG_WORKSPACE=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
 
 # Version of the Cactus Maven plugin to use, taken from cactus.previous.version in
 # cactus/pom.xml - we can't build cactus against its own current version
-export CACTUS_PLUGIN_VERSION=`cat ${ORIG_WORKSPACE}/cactus/pom.xml | grep -Eow "<cactus\.previous\.version>(.*?)</cactus\.previous\.version>" | sed -E 's/.*>(.*)<.*/\1/'`
+# shellcheck disable=SC2002
+# shellcheck disable=SC2155
+export CACTUS_PLUGIN_VERSION=$(cat "${ORIG_WORKSPACE}"/cactus/pom.xml | grep -Eow "<cactus\.previous\.version>(.*?)</cactus\.previous\.version>" | sed -E 's/.*>(.*)<.*/\1/')
 
 # Set this to whatever profile makes the right GPG keys available, from your ~/.m2/settings.xml
 export GPG_PROFILE=gpg
