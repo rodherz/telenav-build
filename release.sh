@@ -31,26 +31,17 @@ fi
 
 
 ##############################################################################
-# Set variables
+# Find workspace and cactus version
 ##############################################################################
 
-unset MESAKIT_ASSETS_HOME
-unset KIVAKIT_ASSETS_HOME
-unset CACTUS_ASSETS_HOME
-unset LEXAKAI_ASSETS_HOME
-unset CACTUS_HOME
-unset KIVAKIT_HOME
-unset MESAKIT_HOME
-unset LEXAKAI_HOME
+# shellcheck disable=SC2046
+ORIGINAL_WORKSPACE=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
 
 # Version of the Cactus Maven plugin to use, taken from cactus.previous.version in
 # cactus/pom.xml - we can't build cactus against its own current version
 # shellcheck disable=SC2002
 # shellcheck disable=SC2155
 export CACTUS_PLUGIN_VERSION=$(cat "${ORIGINAL_WORKSPACE}"/cactus/pom.xml | grep -Eow "<cactus\.previous\.version>(.*?)</cactus\.previous\.version>" | sed -E 's/.*>(.*)<.*/\1/')
-
-# shellcheck disable=SC2046
-ORIGINAL_WORKSPACE=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
 
 
 
@@ -134,6 +125,15 @@ cd "${WORKSPACE}" || exit 1
 echo "┋ "
 echo "┋━━━━━━━ PHASE 0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┋ Cloning develop branch for release... (this may take a while)"
+
+unset MESAKIT_ASSETS_HOME
+unset KIVAKIT_ASSETS_HOME
+unset CACTUS_ASSETS_HOME
+unset LEXAKAI_ASSETS_HOME
+unset CACTUS_HOME
+unset KIVAKIT_HOME
+unset MESAKIT_HOME
+unset LEXAKAI_HOME
 
 output=$(mvn \
     -P release-phase-0 \
