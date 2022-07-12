@@ -105,7 +105,7 @@ cd "${WORKSPACE}" || exit 1
 
 echo "┋ "
 echo "┋━━━━━━━ PHASE 0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
-echo "Cloning develop branch for release... (this may take a while)"
+echo "┋ Cloning develop branch for release... (this may take a while)"
 
 output=$(mvn \
     -P release-phase-0 \
