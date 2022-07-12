@@ -13,6 +13,15 @@ unset KIVAKIT_HOME
 unset MESAKIT_HOME
 unset LEXAKAI_HOME
 
+# Fixme - need an argument here
+if [ "$1" == "--release" ]; then
+    export REAL_RELASE=true
+else
+    export REAL_RELEASE=false
+fi
+
+REAL_RELEASE="false"
+
 # shellcheck disable=SC2046
 ORIG_WORKSPACE=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
 
@@ -158,7 +167,7 @@ echo "┋ Maven repository: ${MAVEN_REPOSITORY}"
 
 export MAVEN_OPTS="-XX:+UseG1GC \
     -Dcactus.debug=false \
-    -DreleasePush=true \
+    -DreleasePush=$REAL_RELEASE \
     '-Dmaven.repo.local=${MAVEN_REPOSITORY}' \
     --add-opens=java.base/java.util=ALL-UNNAMED \
     --add-opens=java.base/java.lang.reflect=ALL-UNNAMED \
@@ -246,7 +255,8 @@ mvn -P release-phase-2 \
     -Dcactus.families="${PROJECT_FAMILIES}" \
     -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
     -Dmaven.test.skip=true \
-    -Dcactus.push=true \
+    -DreleasePush=$REAL_RELEASE \
+    -Dcactus.push=$REAL_RELEASE \
         clean \
         install \
         org.apache.maven.plugins:maven-site-plugin:4.0.0-M1:site verify | exit 1
