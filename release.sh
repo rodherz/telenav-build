@@ -142,7 +142,7 @@ echo "┋ Temporary workspace: ${TEMPORARY_WORKSPACE}"
 ##############################################################################
 
 export MAVEN_REPOSITORY=/tmp/maven-repository
-rm -rf "${MAVEN_REPOSITORY}" 1> /dev/null
+rm -rf ${MAVEN_REPOSITORY} 1> /dev/null
 
 echo "┋ Maven repository: ${MAVEN_REPOSITORY}"
 
@@ -156,12 +156,12 @@ echo "┋ Maven repository: ${MAVEN_REPOSITORY}"
 export MAVEN_OPTS="-XX:+UseG1GC \
     -Dcactus.debug=false \
     -DreleasePush=true \
-    -Dmaven.repo.local=\"${MAVEN_REPOSITORY}\" \
+    '-Dmaven.repo.local=${MAVEN_REPOSITORY}' \
     --add-opens=java.base/java.util=ALL-UNNAMED \
     --add-opens=java.base/java.lang.reflect=ALL-UNNAMED \
     --add-opens=java.base/java.text=ALL-UNNAMED \
     --add-opens=java.desktop/java.awt.font=ALL-UNNAMED \
-    -Dcactus.release.branch.prefix=\"${RELEASE_BRANCH_PREFIX}\""
+    '-Dcactus.release.branch.prefix=${RELEASE_BRANCH_PREFIX}'"
 
 
 
