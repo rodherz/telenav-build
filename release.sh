@@ -11,8 +11,11 @@ unset CACTUS_HOME
 unset KIVAKIT_HOME
 unset MESAKIT_HOME
 
-# Version of the Cactus Maven plugin to use
-export CACTUS_PLUGIN_VERSION=1.5.8
+ORIG_WORKSPACE=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
+
+# Version of the Cactus Maven plugin to use, taken from cactus.previous.version in
+# cactus/pom.xml - we can't build cactus against its own current version
+export CACTUS_PLUGIN_VERSION=`cat ${ORIG_WORKSPACE}/cactus/pom.xml | grep -Eow "<cactus\.previous\.version>(.*?)</cactus\.previous\.version>" | sed -E 's/.*>(.*)<.*/\1/'`
 
 # Set this to whatever profile makes the right GPG keys available, from your ~/.m2/settings.xml
 export GPG_PROFILE=gpg
