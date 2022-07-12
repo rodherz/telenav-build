@@ -16,8 +16,10 @@ unset LEXAKAI_HOME
 # Fixme - need an argument here
 if [ "$1" == "--release" ]; then
     export REAL_RELASE=true
+    export RELEASE_BRANCH_PREFIX=true
 else
     export REAL_RELEASE=false
+    export RELEASE_BRANCH_PREFIX=`date '+%s'`-test-release
 fi
 
 REAL_RELEASE="false"
