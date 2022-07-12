@@ -13,6 +13,8 @@ export GPG_PROFILE=gpg
 # This should be 'release' when really releasing or something else when testing
 export RELEASE_BRANCH_PREFIX=release
 
+# Project families that can be released
+export VALID_PROJECT_FAMILIES=(kivakit lexakai mesakit cactus)
 
 
 ##############################################################################
@@ -23,12 +25,46 @@ echo " "
 echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Cactus ${CACTUS_PLUGIN_VERSION}"
 echo "┋"
 
-read -r -p "┋ What project families do you want to release [kivakit,lexakai,mesakit]? "
+read -r -p "┋ What project families do you want to release [cactus,kivakit,lexakai,mesakit]? "
 if [[ -z "${REPLY}" ]]; then
-    export PROJECT_FAMILIES='kivakit,lexakai,mesakit'
+    export PROJECT_FAMILIES='cactus,kivakit,lexakai,mesakit'
 else
     export PROJECT_FAMILIES=$REPLY
 fi
+
+majorRevisionFamilies=()
+minorRevisionFamilies=()
+dotRevisionFamilies=()
+
+for family in ${PROJECT_FAMILIES//,/ }
+do
+    # shellcheck disable=SC2076
+    if [[ " ${VALID_PROJECT_FAMILIES[*]} " =~ " ${family} " ]]; then
+        read -r -p "┋ Release type for $family [dot]? "
+        if [[ -z "${REPLY}" ]]; then
+            release_type="dot"
+        else
+            release_type="$REPLY"
+        fi
+        case $release_type in
+        major)
+            majorRevisionFamilies+=("$release_type")
+            ;;
+        minor)
+            minorRevisionFamilies+=("$release_type")
+            ;;
+        dot)
+            dotRevisionFamilies+=("$release_type")
+            ;;
+        *)
+            echo "$release_type is not a valid release type"
+            exit 1
+        esac
+    else
+        echo "$family is not a valid project family"
+        exit 1
+    fi
+done
 
 
 
@@ -154,6 +190,9 @@ mvn --quiet \
     -Denforcer.skip=true \
     -Dcactus.expected.branch=develop \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
+    -Dcactus.major.bump.families="${majorRevisionFamilies[*]}" \
+    -Dcactus.minor.bump.families="${minorRevisionFamilies[*]}" \
+    -Dcactus.dot.bump.families="${dotRevisionFamilies[*]}" \
     -Dcactus.families="${PROJECT_FAMILIES}" \
     -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
     -Dmaven.test.skip=true \
