@@ -5,7 +5,7 @@
 ##############################################################################
 
 # Version of the Cactus Maven plugin to use
-export CACTUS_PLUGIN_VERSION=1.5.8
+export CACTUS_PLUGIN_VERSION=1.5.9
 
 # Set this to whatever profile makes the right GPG keys available, from your ~/.m2/settings.xml
 export GPG_PROFILE=gpg
@@ -32,15 +32,15 @@ else
     export PROJECT_FAMILIES=$REPLY
 fi
 
-majorRevisionFamilies=()
-minorRevisionFamilies=()
-dotRevisionFamilies=()
+MAJOR_REVISION_FAMILIES=()
+MINOR_REVISION_FAMILIES=()
+DOT_REVISION_FAMILIES=()
 
 for family in ${PROJECT_FAMILIES//,/ }
 do
     # shellcheck disable=SC2076
     if [[ " ${VALID_PROJECT_FAMILIES[*]} " =~ " ${family} " ]]; then
-        read -r -p "┋ Release type for $family [dot]? "
+        read -r -p "┋ Release type for $family (dot, minor, major) [dot]? "
         if [[ -z "${REPLY}" ]]; then
             release_type="dot"
         else
@@ -48,13 +48,13 @@ do
         fi
         case $release_type in
         major)
-            majorRevisionFamilies+=("$release_type")
+            MAJOR_REVISION_FAMILIES+=("$family")
             ;;
         minor)
-            minorRevisionFamilies+=("$release_type")
+            MINOR_REVISION_FAMILIES+=("$family")
             ;;
         dot)
-            dotRevisionFamilies+=("$release_type")
+            DOT_REVISION_FAMILIES+=("$family")
             ;;
         *)
             echo "$release_type is not a valid release type"
@@ -77,6 +77,9 @@ WORKSPACE="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
 echo "┋"
 echo "┋ Release project families: ${PROJECT_FAMILIES}"
+echo "┋ Dot releases: ${DOT_REVISION_FAMILIES[*]}"
+echo "┋ Minor releases: ${MINOR_REVISION_FAMILIES[*]}"
+echo "┋ Major releases: ${MAJOR_REVISION_FAMILIES[*]}"
 echo "┋ Release workspace: ${WORKSPACE}"
 echo "┋ Release branch prefix: ${RELEASE_BRANCH_PREFIX}"
 
@@ -190,9 +193,9 @@ mvn --quiet \
     -Denforcer.skip=true \
     -Dcactus.expected.branch=develop \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
-    -Dcactus.major.bump.families="${majorRevisionFamilies[*]}" \
-    -Dcactus.minor.bump.families="${minorRevisionFamilies[*]}" \
-    -Dcactus.dot.bump.families="${dotRevisionFamilies[*]}" \
+    -Dcactus.major.bump.families="${MAJOR_REVISION_FAMILIES[*]}" \
+    -Dcactus.minor.bump.families="${MINOR_REVISION_FAMILIES[*]}" \
+    -Dcactus.dot.bump.families="${DOT_REVISION_FAMILIES[*]}" \
     -Dcactus.families="${PROJECT_FAMILIES}" \
     -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
     -Dmaven.test.skip=true \
