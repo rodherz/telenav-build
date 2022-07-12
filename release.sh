@@ -14,7 +14,7 @@ export GPG_PROFILE=gpg
 export RELEASE_BRANCH_PREFIX=release
 
 # Project families that can be released
-export VALID_PROJECT_FAMILIES=(kivakit lexakai mesakit cactus)
+export VALID_PROJECT_FAMILIES=(kivakit lexakai mesakit)
 
 
 ##############################################################################
@@ -25,9 +25,9 @@ echo " "
 echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Cactus ${CACTUS_PLUGIN_VERSION}"
 echo "┋"
 
-read -r -p "┋ What project families do you want to release [cactus,kivakit,lexakai,mesakit]? "
+read -r -p "┋ What project families do you want to release [kivakit,lexakai,mesakit]? "
 if [[ -z "${REPLY}" ]]; then
-    export PROJECT_FAMILIES='cactus,kivakit,lexakai,mesakit'
+    export PROJECT_FAMILIES='kivakit,lexakai,mesakit'
 else
     export PROJECT_FAMILIES=$REPLY
 fi
