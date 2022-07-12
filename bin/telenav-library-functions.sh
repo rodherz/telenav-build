@@ -243,10 +243,7 @@ check_tools()
     # 1) Parse Java version from output like: openjdk version "17.0.3" 2022-04-19 LTS
     java_version=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}')
 
-    # 2) Parse Maven version from output like: Apache Maven 3.8.5 (3599d3414f046de2324203b78ddcf9b5e4388aa0)
-    maven_version=$(mvn -version 2>&1 | awk -F ' ' '/Apache Maven/ {print $3}')
-
-    # 3) Parse Git version from output like: git version 2.36.1
+    # 2) Parse Git version from output like: git version 2.36.1
     git_version=$(git --version 2>&1 | awk -F' ' '{print $3}')
 
     # Check Java version
@@ -256,15 +253,6 @@ check_tools()
         exit 1
     else
         echo "┋ Java $java_version"
-    fi
-
-    # Check Maven version
-    if [[ ! $maven_version =~ 3\.8\.[5-9][0-9]* ]]; then
-        echo "Telenav Open Source projects require Maven 3.8.5 or higher, but you have Maven $maven_version"
-        echo "To upgrade: https://maven.apache.org/download.cgi"
-        exit 1
-    else
-        echo "┋ Maven $maven_version"
     fi
 
     # Check Git version
