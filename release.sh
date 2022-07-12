@@ -139,7 +139,7 @@ echo "┋ Temporary workspace: ${TEMPORARY_WORKSPACE}"
 # Create temporary maven repository to ensure a clean build
 ##############################################################################
 
-export MAVEN_REPOSITORY="${TEMPORARY_WORKSPACE}"/maven-repository
+export MAVEN_REPOSITORY=/tmp/maven-repository
 rm -rf "${MAVEN_REPOSITORY}" 1> /dev/null
 
 echo "┋ Maven repository: ${MAVEN_REPOSITORY}"
@@ -261,6 +261,8 @@ echo "┋"
 echo "┋    1. Check the documentation, including links and diagrams"
 echo "┋    2. Check that version numbers and branch names were updated correctly"
 echo "┋"
+echo "┋ The release is in"
+echo "┋ ${TEMPORARY_WORKSPACE}"
 echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 echo " "
 
