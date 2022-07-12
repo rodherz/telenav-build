@@ -4,6 +4,13 @@
 # Settings
 ##############################################################################
 
+unset MESAKIT_ASSETS_HOME
+unset KIVAKIT_ASSETS_HOME
+unset CACTUS_ASSETS_HOME
+unset CACTUS_HOME
+unset KIVAKIT_HOME
+unset MESAKIT_HOME
+
 # Version of the Cactus Maven plugin to use
 export CACTUS_PLUGIN_VERSION=1.5.8
 
