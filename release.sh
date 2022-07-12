@@ -5,7 +5,7 @@
 ##############################################################################
 
 # Version of the Cactus Maven plugin to use
-export CACTUS_PLUGIN_VERSION=1.5.9
+export CACTUS_PLUGIN_VERSION=1.5.8
 
 # Set this to whatever profile makes the right GPG keys available, from your ~/.m2/settings.xml
 export GPG_PROFILE=gpg
