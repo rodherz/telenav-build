@@ -19,14 +19,21 @@ export VALID_PROJECT_FAMILIES=(kivakit lexakai mesakit)
 # Check arguments
 ##############################################################################
 
+export PUBLISH_RELEASE=false
 # shellcheck disable=SC2155
-if [ "$1" == "publish" ]; then
-    export PUBLISH_RELEASE=true
-    export RELEASE_BRANCH_PREFIX=true
-else
-    export PUBLISH_RELEASE=false
-    export RELEASE_BRANCH_PREFIX=$(date '+%s')-test-release
-fi
+export RELEASE_BRANCH_PREFIX=$(date '+%s')-test-release
+unset QUIET
+
+for argument in "$@"
+do
+    if [ "$argument" == "publish" ]; then
+        export PUBLISH_RELEASE=true
+        export RELEASE_BRANCH_PREFIX=release
+    fi
+    if [ "$argument" == "quiet" ]; then
+        export QUIET="--quiet"
+    fi
+done
 
 
 
@@ -100,20 +107,18 @@ done
 # Locate the workspace we're releasing based on this script's path
 ##############################################################################
 
-# shellcheck disable=SC2164
-WORKSPACE="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-
 echo "┋"
-echo "┋ Publish release: ${PUBLISH_RELEASE}"
-echo "┋ Release project families: ${PROJECT_FAMILIES}"
+echo "┋ Quiet: $QUIET"
+echo "┋ Publish: ${PUBLISH_RELEASE}"
+echo "┋ Project families: ${PROJECT_FAMILIES}"
 echo "┋ Dot releases: ${DOT_REVISION_FAMILIES[*]}"
 echo "┋ Minor releases: ${MINOR_REVISION_FAMILIES[*]}"
 echo "┋ Major releases: ${MAJOR_REVISION_FAMILIES[*]}"
-echo "┋ Release workspace: ${WORKSPACE}"
+echo "┋ Original workspace: ${WORKSPACE}"
 echo "┋ Release branch prefix: ${RELEASE_BRANCH_PREFIX}"
 echo "┋ "
 
-cd "${WORKSPACE}" || exit 1
+cd "${ORIGINAL_WORKSPACE}" || exit 1
 
 
 
@@ -124,7 +129,17 @@ cd "${WORKSPACE}" || exit 1
 ##############################################################################
 
 echo "┋ Installing superpoms"
-mvn --quiet -f telenav-superpom/pom.xml install | exit 1
+
+echo mvn $QUIET \
+    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
+    -f telenav-superpom/pom.xml \
+    install || exit 1
+
+mvn $QUIET \
+    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
+    -f telenav-superpom/pom.xml \
+    install || exit 1
+
 echo "┋ "
 echo "┋━━━━━━━ PHASE 0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┋ Cloning develop branch for release... (this may take a while)"
@@ -160,7 +175,6 @@ if [[ ! $root == *"checkout-root: "* ]]; then
 fi
 
 TEMPORARY_WORKSPACE=${root#*checkout-root: }
-cd "${TEMPORARY_WORKSPACE}" || exit 1
 
 echo "┋ Temporary workspace: ${TEMPORARY_WORKSPACE}"
 
@@ -198,7 +212,7 @@ export MAVEN_OPTS="-XX:+UseG1GC \
 # Check installed tools and clean out project caches
 ##############################################################################
 
-source "${WORKSPACE}"/bin/telenav-library-functions.sh
+source "${ORIGINAL_WORKSPACE}"/bin/telenav-library-functions.sh
 
 echo "┋ Cleaning project caches"
 clean_caches
@@ -209,11 +223,18 @@ clean_caches
 # Install superpoms and build the workspace without tests enabled
 ##############################################################################
 
+cd "${TEMPORARY_WORKSPACE}" || exit 1
+
 echo "┋ Installing superpoms"
-mvn --quiet -f telenav-superpom/pom.xml install | exit 1
+mvn $QUIET \
+    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
+    -f telenav-superpom/pom.xml install \
+    || exit 1
 
 echo "┋ Checking build (no tests)"
-mvn --quiet -Dmaven.test.skip=true clean install | exit 1
+mvn $QUIET \
+    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
+    -Dmaven.test.skip=true clean install || exit 1
 
 echo "┋━━━━━━━ PHASE 0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
@@ -227,19 +248,18 @@ echo "┋ "
 echo "┋━━━━━━━ PHASE 1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┋ Updating versions and branch references"
 
-mvn --quiet \
+mvn -Dcactus.verbose=true \
+    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -P release-phase-1 \
     -Denforcer.skip=true \
     -Dcactus.expected.branch=develop \
-    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
-    -Dcactus.major.bump.families="${MAJOR_REVISION_FAMILIES[*]}" \
-    -Dcactus.minor.bump.families="${MINOR_REVISION_FAMILIES[*]}" \
-    -Dcactus.dot.bump.families="${DOT_REVISION_FAMILIES[*]}" \
+    -Dcactus.major.bump.families=\""${MAJOR_REVISION_FAMILIES[*]}"\" \
+    -Dcactus.minor.bump.families=\""${MINOR_REVISION_FAMILIES[*]}"\" \
+    -Dcactus.dot.bump.families=\""${DOT_REVISION_FAMILIES[*]}"\" \
     -Dcactus.families="${PROJECT_FAMILIES}" \
     -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
     -Dmaven.test.skip=true \
-        clean validate | exit 1
-
+        clean validate || exit 1
 
 
 ##############################################################################
@@ -247,10 +267,14 @@ mvn --quiet \
 ##############################################################################
 
 echo "┋ Installing superpoms"
-mvn --quiet -f telenav-superpom/pom.xml install | exit 1
+mvn $QUIET \
+    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
+    -f telenav-superpom/pom.xml install || exit 1
 
 echo "┋ Checking build (tests enabled)"
-mvn --quiet clean install | exit 1
+mvn $QUIET \
+    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
+    clean install || exit 1
 
 echo "┋━━━━━━━ PHASE 1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
@@ -265,7 +289,7 @@ echo "┋━━━━━━━ PHASE 2 ━━━━━━━━━━━━━�
 echo "┋ Building documentation"
 
 mvn -P release-phase-2 \
-    --quiet \
+    $QUIET \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -Dcactus.families="${PROJECT_FAMILIES}" \
     -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
@@ -274,7 +298,7 @@ mvn -P release-phase-2 \
     -Dcactus.push=$PUBLISH_RELEASE \
         clean \
         install \
-        org.apache.maven.plugins:maven-site-plugin:4.0.0-M1:site verify | exit 1
+        org.apache.maven.plugins:maven-site-plugin:4.0.0-M1:site verify || exit 1
 
 echo "┗━━━━━━━ PHASE 2 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
@@ -292,8 +316,7 @@ echo "┋"
 echo "┋    1. Check the documentation, including links and diagrams"
 echo "┋    2. Check that version numbers and branch names were updated correctly"
 echo "┋"
-echo "┋ The release is in"
-echo "┋ ${TEMPORARY_WORKSPACE}"
+echo "┋ The release is in ${TEMPORARY_WORKSPACE}"
 echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 echo " "
 
@@ -319,7 +342,7 @@ mvn -P release-phase-3 \
     -Dcactus.families="${PROJECT_FAMILIES}" \
     -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
     -Dmaven.test.skip=true \
-        deploy | exit 1
+        deploy || exit 1
 
 echo "┗━━━━━━━ PHASE 3 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
@@ -337,7 +360,7 @@ mvn -P release-phase-4 \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -Dcactus.families="${PROJECT_FAMILIES}" \
     -Dmaven.test.skip=true \
-    generate-resources | exit 1
+    generate-resources || exit 1
 
 echo "┗━━━━━━━ PHASE 4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
