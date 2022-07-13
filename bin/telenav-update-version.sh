@@ -33,4 +33,4 @@ mvn --quiet \
     -Dcactus.family="$resolved_family" \
     -Dcactus.replacement-version="$replacement_version" \
     -Dcactus.replacement-branch-name="$replacement_branch_name" \
-    com.telenav.cactus:cactus-maven-plugin:1.4.12:replace || exit 1
+    com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":replace || exit 1

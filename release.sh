@@ -4,35 +4,6 @@
 # Settings
 ##############################################################################
 
-unset MESAKIT_ASSETS_HOME
-unset KIVAKIT_ASSETS_HOME
-unset CACTUS_ASSETS_HOME
-unset LEXAKAI_ASSETS_HOME
-unset CACTUS_HOME
-unset KIVAKIT_HOME
-unset MESAKIT_HOME
-unset LEXAKAI_HOME
-
-# Fixme - need an argument here
-if [ "$1" == "--release" ]; then
-    export REAL_RELASE=true
-    export RELEASE_BRANCH_PREFIX=true
-else
-    export REAL_RELEASE=false
-    export RELEASE_BRANCH_PREFIX=`date '+%s'`-test-release
-fi
-
-REAL_RELEASE="false"
-
-# shellcheck disable=SC2046
-ORIG_WORKSPACE=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
-
-# Version of the Cactus Maven plugin to use, taken from cactus.previous.version in
-# cactus/pom.xml - we can't build cactus against its own current version
-# shellcheck disable=SC2002
-# shellcheck disable=SC2155
-export CACTUS_PLUGIN_VERSION=$(cat "${ORIG_WORKSPACE}"/cactus/pom.xml | grep -Eow "<cactus\.previous\.version>(.*?)</cactus\.previous\.version>" | sed -E 's/.*>(.*)<.*/\1/')
-
 # Set this to whatever profile makes the right GPG keys available, from your ~/.m2/settings.xml
 export GPG_PROFILE=gpg
 
@@ -41,6 +12,37 @@ export RELEASE_BRANCH_PREFIX=release
 
 # Project families that can be released
 export VALID_PROJECT_FAMILIES=(kivakit lexakai mesakit)
+
+
+
+##############################################################################
+# Check arguments
+##############################################################################
+
+# shellcheck disable=SC2155
+if [ "$1" == "publish" ]; then
+    export PUBLISH_RELEASE=true
+    export RELEASE_BRANCH_PREFIX=true
+else
+    export PUBLISH_RELEASE=false
+    export RELEASE_BRANCH_PREFIX=$(date '+%s')-test-release
+fi
+
+
+
+##############################################################################
+# Find workspace and cactus version
+##############################################################################
+
+# shellcheck disable=SC2046
+ORIGINAL_WORKSPACE=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
+
+# Version of the Cactus Maven plugin to use, taken from cactus.previous.version in
+# cactus/pom.xml - we can't build cactus against its own current version
+# shellcheck disable=SC2002
+# shellcheck disable=SC2155
+export CACTUS_PLUGIN_VERSION=$(cat "${ORIGINAL_WORKSPACE}"/cactus/pom.xml | grep -Eow "<cactus\.previous\.version>(.*?)</cactus\.previous\.version>" | sed -E 's/.*>(.*)<.*/\1/')
+
 
 
 ##############################################################################
@@ -102,6 +104,7 @@ done
 WORKSPACE="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
 
 echo "┋"
+echo "┋ Publish release: ${PUBLISH_RELEASE}"
 echo "┋ Release project families: ${PROJECT_FAMILIES}"
 echo "┋ Dot releases: ${DOT_REVISION_FAMILIES[*]}"
 echo "┋ Minor releases: ${MINOR_REVISION_FAMILIES[*]}"
@@ -122,6 +125,15 @@ cd "${WORKSPACE}" || exit 1
 echo "┋ "
 echo "┋━━━━━━━ PHASE 0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┋ Cloning develop branch for release... (this may take a while)"
+
+unset MESAKIT_ASSETS_HOME
+unset KIVAKIT_ASSETS_HOME
+unset CACTUS_ASSETS_HOME
+unset LEXAKAI_ASSETS_HOME
+unset CACTUS_HOME
+unset KIVAKIT_HOME
+unset MESAKIT_HOME
+unset LEXAKAI_HOME
 
 output=$(mvn \
     -P release-phase-0 \
@@ -169,13 +181,13 @@ echo "┋ Maven repository: ${MAVEN_REPOSITORY}"
 
 export MAVEN_OPTS="-XX:+UseG1GC \
     -Dcactus.debug=false \
-    -DreleasePush=$REAL_RELEASE \
-    '-Dmaven.repo.local=${MAVEN_REPOSITORY}' \
+    -DreleasePush=$PUBLISH_RELEASE \
+    -Dmaven.repo.local=${MAVEN_REPOSITORY} \
     --add-opens=java.base/java.util=ALL-UNNAMED \
     --add-opens=java.base/java.lang.reflect=ALL-UNNAMED \
     --add-opens=java.base/java.text=ALL-UNNAMED \
     --add-opens=java.desktop/java.awt.font=ALL-UNNAMED \
-    '-Dcactus.release.branch.prefix=${RELEASE_BRANCH_PREFIX}'"
+    -Dcactus.release.branch.prefix=${RELEASE_BRANCH_PREFIX}"
 
 
 
@@ -185,8 +197,6 @@ export MAVEN_OPTS="-XX:+UseG1GC \
 
 source "${WORKSPACE}"/bin/telenav-library-functions.sh
 
-echo "┋ Checking tools"
-check_tools
 echo "┋ Cleaning project caches"
 clean_caches
 
@@ -257,8 +267,8 @@ mvn -P release-phase-2 \
     -Dcactus.families="${PROJECT_FAMILIES}" \
     -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
     -Dmaven.test.skip=true \
-    -DreleasePush=$REAL_RELEASE \
-    -Dcactus.push=$REAL_RELEASE \
+    -DreleasePush=$PUBLISH_RELEASE \
+    -Dcactus.push=$PUBLISH_RELEASE \
         clean \
         install \
         org.apache.maven.plugins:maven-site-plugin:4.0.0-M1:site verify | exit 1

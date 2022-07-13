@@ -40,7 +40,7 @@ lexakai()
         -Dcactus.update-readme=true \
         -Dcactus.lexakai-version=1.0.7 \
         -Dcactus.show-lexakai-output=true \
-        com.telenav.cactus:cactus-maven-plugin:1.4.12:lexakai || exit 1
+        com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":lexakai || exit 1
 }
 
 build_lexakai_documentation()
