@@ -109,8 +109,8 @@ done
 
 echo "┋"
 echo "┋ Quiet: $QUIET"
-echo "┋ Publish release: ${PUBLISH_RELEASE}"
-echo "┋ Release project families: ${PROJECT_FAMILIES}"
+echo "┋ Publish: ${PUBLISH_RELEASE}"
+echo "┋ Project families: ${PROJECT_FAMILIES}"
 echo "┋ Dot releases: ${DOT_REVISION_FAMILIES[*]}"
 echo "┋ Minor releases: ${MINOR_REVISION_FAMILIES[*]}"
 echo "┋ Major releases: ${MAJOR_REVISION_FAMILIES[*]}"
