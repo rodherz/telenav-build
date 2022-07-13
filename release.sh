@@ -130,6 +130,11 @@ cd "${ORIGINAL_WORKSPACE}" || exit 1
 
 echo "┋ Installing superpoms"
 
+echo mvn $QUIET \
+    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
+    -f telenav-superpom/pom.xml \
+    install || exit 1
+
 mvn $QUIET \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -f telenav-superpom/pom.xml \
