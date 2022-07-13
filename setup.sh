@@ -13,8 +13,15 @@ caller=$2
 
 check_tools "$caller"
 
-clean_caches
-clean_maven_repository_telenav
+rm -rf ~/.kivakit/
+rm -rf ~/.mesakit/
+
+if yes_no "┋ Remove entire local Maven repository (recommended)"; then
+
+    rm -rf ~/.m2/repository
+
+fi
+
 
 #
 # Set HOME for continuous integration build

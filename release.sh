@@ -214,8 +214,9 @@ export MAVEN_OPTS="-XX:+UseG1GC \
 
 source "${ORIGINAL_WORKSPACE}"/bin/telenav-library-functions.sh
 
-echo "┋ Cleaning project caches"
-clean_caches
+echo "┋ Removing project caches"
+rm -rf ~/.kivakit/
+rm -rf ~/.mesakit/
 
 
 
