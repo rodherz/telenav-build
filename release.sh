@@ -184,8 +184,8 @@ echo "┋ Maven repository: ${MAVEN_REPOSITORY}"
 
 export MAVEN_OPTS="-XX:+UseG1GC \
     -Dcactus.debug=false \
-    -DreleasePush=$PUBLISH_RELEASE \
-    \"-Dmaven.repo.local=${MAVEN_REPOSITORY}\" \
+    -DreleasePush=${PUBLISH_RELEASE} \
+    -Dmaven.repo.local=${MAVEN_REPOSITORY} \
     --add-opens=java.base/java.util=ALL-UNNAMED \
     --add-opens=java.base/java.lang.reflect=ALL-UNNAMED \
     --add-opens=java.base/java.text=ALL-UNNAMED \
