@@ -247,10 +247,10 @@ mvn --quiet \
 ##############################################################################
 
 echo "┋ Installing superpoms"
-mvn -f telenav-superpom/pom.xml install | exit 1
+mvn --quiet -f telenav-superpom/pom.xml install | exit 1
 
 echo "┋ Checking build (tests enabled)"
-mvn clean install | exit 1
+mvn --quiet clean install | exit 1
 
 echo "┋━━━━━━━ PHASE 1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
