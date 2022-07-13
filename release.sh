@@ -320,10 +320,11 @@ echo "┋ The release is in ${TEMPORARY_WORKSPACE}"
 echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 echo " "
 
-while
-    ask "When ready to continue, type 'release': "
-    [[ "${REPLY}" == "release" ]]
-do true; done
+unset REPLY
+while [[ ! "${REPLY}" == "publish" ]]
+do
+    read -r -p "When ready to publish to Nexus / OSSRH staging for Maven Central, type 'publish': "
+done
 
 
 
