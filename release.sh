@@ -129,7 +129,12 @@ cd "${ORIGINAL_WORKSPACE}" || exit 1
 ##############################################################################
 
 echo "┋ Installing superpoms"
-mvn $QUIET -f telenav-superpom/pom.xml install || exit 1
+
+mvn $QUIET \
+    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
+    -f telenav-superpom/pom.xml \
+    install || exit 1
+
 echo "┋ "
 echo "┋━━━━━━━ PHASE 0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┋ Cloning develop branch for release... (this may take a while)"
@@ -216,10 +221,15 @@ clean_caches
 cd "${TEMPORARY_WORKSPACE}" || exit 1
 
 echo "┋ Installing superpoms"
-mvn $QUIET -f telenav-superpom/pom.xml install || exit 1
+mvn $QUIET \
+    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
+    -f telenav-superpom/pom.xml install \
+    || exit 1
 
 echo "┋ Checking build (no tests)"
-mvn $QUIET -Dmaven.test.skip=true clean install || exit 1
+mvn $QUIET \
+    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
+    -Dmaven.test.skip=true clean install || exit 1
 
 echo "┋━━━━━━━ PHASE 0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
@@ -234,10 +244,10 @@ echo "┋━━━━━━━ PHASE 1 ━━━━━━━━━━━━━�
 echo "┋ Updating versions and branch references"
 
 mvn -Dcactus.verbose=true \
+    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -P release-phase-1 \
     -Denforcer.skip=true \
     -Dcactus.expected.branch=develop \
-    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -Dcactus.major.bump.families=\""${MAJOR_REVISION_FAMILIES[*]}"\" \
     -Dcactus.minor.bump.families=\""${MINOR_REVISION_FAMILIES[*]}"\" \
     -Dcactus.dot.bump.families=\""${DOT_REVISION_FAMILIES[*]}"\" \
@@ -252,10 +262,14 @@ mvn -Dcactus.verbose=true \
 ##############################################################################
 
 echo "┋ Installing superpoms"
-mvn $QUIET -f telenav-superpom/pom.xml install || exit 1
+mvn $QUIET \
+    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
+    -f telenav-superpom/pom.xml install || exit 1
 
 echo "┋ Checking build (tests enabled)"
-mvn $QUIET clean install || exit 1
+mvn $QUIET \
+    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
+    clean install || exit 1
 
 echo "┋━━━━━━━ PHASE 1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
