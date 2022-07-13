@@ -111,6 +111,7 @@ echo "┋ Minor releases: ${MINOR_REVISION_FAMILIES[*]}"
 echo "┋ Major releases: ${MAJOR_REVISION_FAMILIES[*]}"
 echo "┋ Release workspace: ${WORKSPACE}"
 echo "┋ Release branch prefix: ${RELEASE_BRANCH_PREFIX}"
+echo "┋ "
 
 cd "${WORKSPACE}" || exit 1
 
@@ -122,6 +123,8 @@ cd "${WORKSPACE}" || exit 1
 # whose location we parse from the output of the plugin.
 ##############################################################################
 
+echo "┋ Installing superpoms"
+mvn --quiet -f telenav-superpom/pom.xml install | exit 1
 echo "┋ "
 echo "┋━━━━━━━ PHASE 0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┋ Cloning develop branch for release... (this may take a while)"
@@ -181,7 +184,7 @@ echo "┋ Maven repository: ${MAVEN_REPOSITORY}"
 
 export MAVEN_OPTS="-XX:+UseG1GC \
     -Dcactus.debug=false \
-    -DreleasePush=$PUBLISH_RELEASE \
+    -DreleasePush=${PUBLISH_RELEASE} \
     -Dmaven.repo.local=${MAVEN_REPOSITORY} \
     --add-opens=java.base/java.util=ALL-UNNAMED \
     --add-opens=java.base/java.lang.reflect=ALL-UNNAMED \
@@ -244,10 +247,10 @@ mvn --quiet \
 ##############################################################################
 
 echo "┋ Installing superpoms"
-mvn -f telenav-superpom/pom.xml install | exit 1
+mvn --quiet -f telenav-superpom/pom.xml install | exit 1
 
 echo "┋ Checking build (tests enabled)"
-mvn clean install | exit 1
+mvn --quiet clean install | exit 1
 
 echo "┋━━━━━━━ PHASE 1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
