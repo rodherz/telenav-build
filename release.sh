@@ -19,14 +19,21 @@ export VALID_PROJECT_FAMILIES=(kivakit lexakai mesakit)
 # Check arguments
 ##############################################################################
 
+export PUBLISH_RELEASE=false
 # shellcheck disable=SC2155
-if [ "$1" == "publish" ]; then
-    export PUBLISH_RELEASE=true
-    export RELEASE_BRANCH_PREFIX=true
-else
-    export PUBLISH_RELEASE=false
-    export RELEASE_BRANCH_PREFIX=$(date '+%s')-test-release
-fi
+export RELEASE_BRANCH_PREFIX=$(date '+%s')-test-release
+export QUIET=""
+
+for argument in "$@"
+do
+    if [ "$argument" == "publish" ]; then
+        export PUBLISH_RELEASE=true
+        export RELEASE_BRANCH_PREFIX=true
+    fi
+    if [ "$argument" == "quiet" ]; then
+        export QUIET="--quiet"
+    fi
+done
 
 
 
@@ -124,7 +131,7 @@ cd "${WORKSPACE}" || exit 1
 ##############################################################################
 
 echo "┋ Installing superpoms"
-mvn --quiet -f telenav-superpom/pom.xml install | exit 1
+mvn $QUIET -f telenav-superpom/pom.xml install | exit 1
 echo "┋ "
 echo "┋━━━━━━━ PHASE 0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┋ Cloning develop branch for release... (this may take a while)"
@@ -210,10 +217,10 @@ clean_caches
 ##############################################################################
 
 echo "┋ Installing superpoms"
-mvn --quiet -f telenav-superpom/pom.xml install | exit 1
+mvn $QUIET -f telenav-superpom/pom.xml install | exit 1
 
 echo "┋ Checking build (no tests)"
-mvn --quiet -Dmaven.test.skip=true clean install | exit 1
+mvn $QUIET -Dmaven.test.skip=true clean install | exit 1
 
 echo "┋━━━━━━━ PHASE 0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
@@ -227,20 +234,18 @@ echo "┋ "
 echo "┋━━━━━━━ PHASE 1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┋ Updating versions and branch references"
 
-mvn \
-    -Dcactus.verbose=true \
+mvn -Dcactus.verbose=true \
     -P release-phase-1 \
     -Denforcer.skip=true \
     -Dcactus.expected.branch=develop \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
-    -Dcactus.major.bump.families="${MAJOR_REVISION_FAMILIES[*]}" \
-    -Dcactus.minor.bump.families="${MINOR_REVISION_FAMILIES[*]}" \
-    -Dcactus.dot.bump.families="${DOT_REVISION_FAMILIES[*]}" \
+    -Dcactus.major.bump.families=\""${MAJOR_REVISION_FAMILIES[*]}"\" \
+    -Dcactus.minor.bump.families=\""${MINOR_REVISION_FAMILIES[*]}"\" \
+    -Dcactus.dot.bump.families=\""${DOT_REVISION_FAMILIES[*]}"\" \
     -Dcactus.families="${PROJECT_FAMILIES}" \
     -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
     -Dmaven.test.skip=true \
         clean validate | exit 1
-
 
 
 ##############################################################################
@@ -248,10 +253,10 @@ mvn \
 ##############################################################################
 
 echo "┋ Installing superpoms"
-mvn --quiet -f telenav-superpom/pom.xml install | exit 1
+mvn $QUIET -f telenav-superpom/pom.xml install | exit 1
 
 echo "┋ Checking build (tests enabled)"
-mvn --quiet clean install | exit 1
+mvn $QUIET clean install | exit 1
 
 echo "┋━━━━━━━ PHASE 1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
@@ -266,7 +271,7 @@ echo "┋━━━━━━━ PHASE 2 ━━━━━━━━━━━━━�
 echo "┋ Building documentation"
 
 mvn -P release-phase-2 \
-    --quiet \
+    $QUIET \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -Dcactus.families="${PROJECT_FAMILIES}" \
     -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
