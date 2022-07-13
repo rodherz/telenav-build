@@ -22,13 +22,13 @@ export VALID_PROJECT_FAMILIES=(kivakit lexakai mesakit)
 export PUBLISH_RELEASE=false
 # shellcheck disable=SC2155
 export RELEASE_BRANCH_PREFIX=$(date '+%s')-test-release
-export QUIET=""
+unset QUIET
 
 for argument in "$@"
 do
     if [ "$argument" == "publish" ]; then
         export PUBLISH_RELEASE=true
-        export RELEASE_BRANCH_PREFIX=true
+        export RELEASE_BRANCH_PREFIX=release
     fi
     if [ "$argument" == "quiet" ]; then
         export QUIET="--quiet"
@@ -107,20 +107,18 @@ done
 # Locate the workspace we're releasing based on this script's path
 ##############################################################################
 
-# shellcheck disable=SC2164
-WORKSPACE="$( cd -- "$(dirname "$0")" >/dev/null 2>&1 ; pwd -P )"
-
 echo "┋"
+echo "┋ Quiet: $QUIET"
 echo "┋ Publish release: ${PUBLISH_RELEASE}"
 echo "┋ Release project families: ${PROJECT_FAMILIES}"
 echo "┋ Dot releases: ${DOT_REVISION_FAMILIES[*]}"
 echo "┋ Minor releases: ${MINOR_REVISION_FAMILIES[*]}"
 echo "┋ Major releases: ${MAJOR_REVISION_FAMILIES[*]}"
-echo "┋ Release workspace: ${WORKSPACE}"
+echo "┋ Original workspace: ${WORKSPACE}"
 echo "┋ Release branch prefix: ${RELEASE_BRANCH_PREFIX}"
 echo "┋ "
 
-cd "${WORKSPACE}" || exit 1
+cd "${ORIGINAL_WORKSPACE}" || exit 1
 
 
 
@@ -131,7 +129,7 @@ cd "${WORKSPACE}" || exit 1
 ##############################################################################
 
 echo "┋ Installing superpoms"
-mvn $QUIET -f telenav-superpom/pom.xml install | exit 1
+mvn $QUIET -f telenav-superpom/pom.xml install || exit 1
 echo "┋ "
 echo "┋━━━━━━━ PHASE 0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┋ Cloning develop branch for release... (this may take a while)"
@@ -205,7 +203,7 @@ export MAVEN_OPTS="-XX:+UseG1GC \
 # Check installed tools and clean out project caches
 ##############################################################################
 
-source "${WORKSPACE}"/bin/telenav-library-functions.sh
+source "${ORIGINAL_WORKSPACE}"/bin/telenav-library-functions.sh
 
 echo "┋ Cleaning project caches"
 clean_caches
@@ -217,10 +215,10 @@ clean_caches
 ##############################################################################
 
 echo "┋ Installing superpoms"
-mvn $QUIET -f telenav-superpom/pom.xml install | exit 1
+mvn $QUIET -f telenav-superpom/pom.xml install || exit 1
 
 echo "┋ Checking build (no tests)"
-mvn $QUIET -Dmaven.test.skip=true clean install | exit 1
+mvn $QUIET -Dmaven.test.skip=true clean install || exit 1
 
 echo "┋━━━━━━━ PHASE 0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
@@ -245,7 +243,7 @@ mvn -Dcactus.verbose=true \
     -Dcactus.families="${PROJECT_FAMILIES}" \
     -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
     -Dmaven.test.skip=true \
-        clean validate | exit 1
+        clean validate || exit 1
 
 
 ##############################################################################
@@ -253,10 +251,10 @@ mvn -Dcactus.verbose=true \
 ##############################################################################
 
 echo "┋ Installing superpoms"
-mvn $QUIET -f telenav-superpom/pom.xml install | exit 1
+mvn $QUIET -f telenav-superpom/pom.xml install || exit 1
 
 echo "┋ Checking build (tests enabled)"
-mvn $QUIET clean install | exit 1
+mvn $QUIET clean install || exit 1
 
 echo "┋━━━━━━━ PHASE 1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
@@ -280,7 +278,7 @@ mvn -P release-phase-2 \
     -Dcactus.push=$PUBLISH_RELEASE \
         clean \
         install \
-        org.apache.maven.plugins:maven-site-plugin:4.0.0-M1:site verify | exit 1
+        org.apache.maven.plugins:maven-site-plugin:4.0.0-M1:site verify || exit 1
 
 echo "┗━━━━━━━ PHASE 2 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
@@ -324,7 +322,7 @@ mvn -P release-phase-3 \
     -Dcactus.families="${PROJECT_FAMILIES}" \
     -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
     -Dmaven.test.skip=true \
-        deploy | exit 1
+        deploy || exit 1
 
 echo "┗━━━━━━━ PHASE 3 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
@@ -342,7 +340,7 @@ mvn -P release-phase-4 \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -Dcactus.families="${PROJECT_FAMILIES}" \
     -Dmaven.test.skip=true \
-    generate-resources | exit 1
+    generate-resources || exit 1
 
 echo "┗━━━━━━━ PHASE 4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
