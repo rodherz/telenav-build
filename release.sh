@@ -227,7 +227,22 @@ echo "┋ "
 echo "┋━━━━━━━ PHASE 1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┋ Updating versions and branch references"
 
+echo mvn --quiet \
+    -Dcactus.verbose=true \
+    -P release-phase-1 \
+    -Denforcer.skip=true \
+    -Dcactus.expected.branch=develop \
+    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
+    -Dcactus.major.bump.families="${MAJOR_REVISION_FAMILIES[*]}" \
+    -Dcactus.minor.bump.families="${MINOR_REVISION_FAMILIES[*]}" \
+    -Dcactus.dot.bump.families="${DOT_REVISION_FAMILIES[*]}" \
+    -Dcactus.families="${PROJECT_FAMILIES}" \
+    -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
+    -Dmaven.test.skip=true \
+        clean validate | exit 1
+
 mvn --quiet \
+    -Dcactus.verbose=true \
     -P release-phase-1 \
     -Denforcer.skip=true \
     -Dcactus.expected.branch=develop \
