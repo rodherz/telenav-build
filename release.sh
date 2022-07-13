@@ -27,7 +27,7 @@ unset QUIET
 for argument in "$@"
 do
     if [ "$argument" == "publish" ]; then
-#        export PUBLISH_RELEASE=true
+        export PUBLISH_RELEASE=true
         export RELEASE_BRANCH_PREFIX=release
     fi
     if [ "$argument" == "quiet" ]; then
