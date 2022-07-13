@@ -111,6 +111,7 @@ echo "┋ Minor releases: ${MINOR_REVISION_FAMILIES[*]}"
 echo "┋ Major releases: ${MAJOR_REVISION_FAMILIES[*]}"
 echo "┋ Release workspace: ${WORKSPACE}"
 echo "┋ Release branch prefix: ${RELEASE_BRANCH_PREFIX}"
+echo "┋ "
 
 cd "${WORKSPACE}" || exit 1
 
@@ -122,6 +123,8 @@ cd "${WORKSPACE}" || exit 1
 # whose location we parse from the output of the plugin.
 ##############################################################################
 
+echo "┋ Installing superpoms"
+mvn --quiet -f telenav-superpom/pom.xml install | exit 1
 echo "┋ "
 echo "┋━━━━━━━ PHASE 0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┋ Cloning develop branch for release... (this may take a while)"
