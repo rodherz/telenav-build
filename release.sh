@@ -165,7 +165,6 @@ if [[ ! $root == *"checkout-root: "* ]]; then
 fi
 
 TEMPORARY_WORKSPACE=${root#*checkout-root: }
-cd "${TEMPORARY_WORKSPACE}" || exit 1
 
 echo "┋ Temporary workspace: ${TEMPORARY_WORKSPACE}"
 
@@ -213,6 +212,8 @@ clean_caches
 ##############################################################################
 # Install superpoms and build the workspace without tests enabled
 ##############################################################################
+
+cd "${TEMPORARY_WORKSPACE}" || exit 1
 
 echo "┋ Installing superpoms"
 mvn $QUIET -f telenav-superpom/pom.xml install || exit 1
