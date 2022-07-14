@@ -374,7 +374,7 @@ mvn -P release-phase-3 \
     -Dcactus.families="${PROJECT_FAMILIES}" \
     -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
     -Dmaven.test.skip=true \
-        clean deploy || exit 1
+        deploy || exit 1
 
 echo "┗━━━━━━━ PHASE 3 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
