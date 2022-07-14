@@ -84,7 +84,7 @@ fi
 
 
 ##############################################################################
-# Determine the release type (major, minor, dot) for each family
+# Determine the release type (major, minor, dot, none) for each family
 ##############################################################################
 
 MAJOR_REVISION_FAMILIES=()
@@ -95,7 +95,7 @@ for family in ${PROJECT_FAMILIES//,/ }
 do
     # shellcheck disable=SC2076
     if [[ " ${VALID_PROJECT_FAMILIES[*]} " =~ " ${family} " ]]; then
-        read -r -p "┋ Release type for $family (major, minor, dot) [dot]? "
+        read -r -p "┋ Release type for $family (major, minor, dot, none) [dot]? "
         if [[ -z "${REPLY}" ]]; then
             release_type="dot"
         else
@@ -110,6 +110,9 @@ do
             ;;
         dot)
             DOT_REVISION_FAMILIES+=("$family")
+            ;;
+        none)
+            NONE_REVISION_FAMILIES==("$family")
             ;;
         *)
             echo "$release_type is not a valid release type"
@@ -131,6 +134,7 @@ echo "┋"
 echo "┋ Quiet: $QUIET"
 echo "┋ Publish: ${PUBLISH_RELEASE}"
 echo "┋ Project families: ${PROJECT_FAMILIES}"
+echo "┋ None releases: ${NONE_REVISION_FAMILIES[*]}"
 echo "┋ Dot releases: ${DOT_REVISION_FAMILIES[*]}"
 echo "┋ Minor releases: ${MINOR_REVISION_FAMILIES[*]}"
 echo "┋ Major releases: ${MAJOR_REVISION_FAMILIES[*]}"
@@ -246,13 +250,13 @@ rm -rf ~/.mesakit/
 
 cd "${TEMPORARY_WORKSPACE}" || exit 1
 
-echo "┋ Installing superpoms"
+echo '┋ Installing superpoms'
 mvn $QUIET \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -f telenav-superpom/pom.xml install \
     || exit 1
 
-echo "┋ Checking build (no tests)"
+echo '┋ Checking build (no tests)'
 mvn $QUIET \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -Dmaven.test.skip=true clean install || exit 1
@@ -277,7 +281,9 @@ mvn -Dcactus.verbose=true \
     -Dcactus.major.bump.families=\""${MAJOR_REVISION_FAMILIES[*]}"\" \
     -Dcactus.minor.bump.families=\""${MINOR_REVISION_FAMILIES[*]}"\" \
     -Dcactus.dot.bump.families=\""${DOT_REVISION_FAMILIES[*]}"\" \
+    -Dcactus.no.bump.families=\""${NONE_REVISION_FAMILIES[*]}"\" \
     -Dcactus.families="${PROJECT_FAMILIES}" \
+    -Dcactus.version.flavor.change=to-release
     -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
     -Dmaven.test.skip=true \
         clean validate || exit 1
