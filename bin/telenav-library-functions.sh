@@ -98,7 +98,7 @@ function join_by()
 
 cactus_version()
 {
-    echo "1.5.9"
+    echo "1.5.12"
 }
 
 scope=""
