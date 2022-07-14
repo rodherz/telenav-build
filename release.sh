@@ -23,6 +23,7 @@ export PUBLISH_RELEASE=false
 # shellcheck disable=SC2155
 export RELEASE_BRANCH_PREFIX=$(date '+%s')-test-release
 unset QUIET
+unset SKIP_REVIEW
 
 for argument in "$@"
 do
@@ -32,6 +33,15 @@ do
     fi
     if [ "$argument" == "quiet" ]; then
         export QUIET="--quiet"
+    fi
+    if [ "$argument" == "skip-review" ]; then
+        export SKIP_REVIEW=true
+    fi
+    if [ "$argument" == "help" ]; then
+        echo " "
+        echo "release.sh [publish|skip-review|quiet|help]*"
+        echo " "
+        exit 0
     fi
 done
 
@@ -316,26 +326,30 @@ echo "┗━━━━━━━ PHASE 2 ━━━━━━━━━━━━━�
 
 
 ##############################################################################
-# Review the release
+# Review the release (unless skip-review is specified)
 ##############################################################################
 
-echo " "
-echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Review ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
-echo "┋"
-echo "┋ Release is ready for you to review now:"
-echo "┋"
-echo "┋    1. Check the documentation, including links and diagrams"
-echo "┋    2. Check that version numbers and branch names were updated correctly"
-echo "┋"
-echo "┋ The release is in ${TEMPORARY_WORKSPACE}"
-echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
-echo " "
+if [ "$SKIP_REVIEW" == "true" ]; then
 
-unset REPLY
-while [[ ! "${REPLY}" == "publish" ]]
-do
-    read -r -p "When ready to publish to Nexus / OSSRH staging for Maven Central, type 'publish': "
-done
+    echo " "
+    echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Review ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
+    echo "┋"
+    echo "┋ Release is ready for you to review now:"
+    echo "┋"
+    echo "┋    1. Check the documentation, including links and diagrams"
+    echo "┋    2. Check that version numbers and branch names were updated correctly"
+    echo "┋"
+    echo "┋ The release is in ${TEMPORARY_WORKSPACE}"
+    echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
+    echo " "
+
+    unset REPLY
+    while [[ ! "${REPLY}" == "publish" ]]
+    do
+        read -r -p "When ready to publish to Nexus / OSSRH staging for Maven Central, type 'publish': "
+    done
+
+fi
 
 
 
