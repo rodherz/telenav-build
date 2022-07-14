@@ -323,8 +323,10 @@ mvn -P release-phase-2 \
     -Dmaven.test.skip=true \
     -DreleasePush=$PUBLISH_RELEASE \
     -Dcactus.push=$PUBLISH_RELEASE \
-        clean \
         install \
+        javadoc:javadoc \
+        javadoc:aggregate \
+        javadoc:jar \
         org.apache.maven.plugins:maven-site-plugin:4.0.0-M1:site verify || exit 1
 
 echo "┗━━━━━━━ PHASE 2 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
