@@ -283,7 +283,7 @@ mvn -Dcactus.verbose=true \
     -Dcactus.dot.bump.families=\""${DOT_REVISION_FAMILIES[*]}"\" \
     -Dcactus.no.bump.families=\""${NONE_REVISION_FAMILIES[*]}"\" \
     -Dcactus.families="${PROJECT_FAMILIES}" \
-    -Dcactus.version.flavor.change=to-release
+    -Dcactus.version.flavor.change=to-release \
     -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
     -Dmaven.test.skip=true \
         clean validate || exit 1
