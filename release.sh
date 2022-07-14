@@ -16,13 +16,14 @@ export VALID_PROJECT_FAMILIES=(kivakit lexakai mesakit)
 
 
 ##############################################################################
-# Check arguments
+# Check for any arguments (publish, quiet)
 ##############################################################################
 
 export PUBLISH_RELEASE=false
 # shellcheck disable=SC2155
 export RELEASE_BRANCH_PREFIX=$(date '+%s')-test-release
 unset QUIET
+unset SKIP_REVIEW
 
 for argument in "$@"
 do
@@ -33,19 +34,32 @@ do
     if [ "$argument" == "quiet" ]; then
         export QUIET="--quiet"
     fi
+    if [ "$argument" == "skip-review" ]; then
+        export SKIP_REVIEW=true
+    fi
+    if [ "$argument" == "help" ]; then
+        echo " "
+        echo "release.sh [publish|skip-review|quiet|help]*"
+        echo " "
+        exit 0
+    fi
 done
 
 
 
 ##############################################################################
-# Find workspace and cactus version
+# Find original workspace (where this script resides)
 ##############################################################################
 
 # shellcheck disable=SC2046
 ORIGINAL_WORKSPACE=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
 
-# Version of the Cactus Maven plugin to use, taken from cactus.previous.version in
-# cactus/pom.xml - we can't build cactus against its own current version
+
+
+##############################################################################
+# Find the previous cactus version (can't build against the current one)
+##############################################################################
+
 # shellcheck disable=SC2002
 # shellcheck disable=SC2155
 export CACTUS_PLUGIN_VERSION=$(cat "${ORIGINAL_WORKSPACE}"/cactus/pom.xml | grep -Eow "<cactus\.previous\.version>(.*?)</cactus\.previous\.version>" | sed -E 's/.*>(.*)<.*/\1/')
@@ -67,6 +81,12 @@ else
     export PROJECT_FAMILIES=$REPLY
 fi
 
+
+
+##############################################################################
+# Determine the release type (major, minor, dot) for each family
+##############################################################################
+
 MAJOR_REVISION_FAMILIES=()
 MINOR_REVISION_FAMILIES=()
 DOT_REVISION_FAMILIES=()
@@ -75,7 +95,7 @@ for family in ${PROJECT_FAMILIES//,/ }
 do
     # shellcheck disable=SC2076
     if [[ " ${VALID_PROJECT_FAMILIES[*]} " =~ " ${family} " ]]; then
-        read -r -p "┋ Release type for $family (dot, minor, major) [dot]? "
+        read -r -p "┋ Release type for $family (major, minor, dot) [dot]? "
         if [[ -z "${REPLY}" ]]; then
             release_type="dot"
         else
@@ -104,7 +124,7 @@ done
 
 
 ##############################################################################
-# Locate the workspace we're releasing based on this script's path
+# Show settings before we start building
 ##############################################################################
 
 echo "┋"
@@ -118,8 +138,6 @@ echo "┋ Original workspace: ${WORKSPACE}"
 echo "┋ Release branch prefix: ${RELEASE_BRANCH_PREFIX}"
 echo "┋ "
 
-cd "${ORIGINAL_WORKSPACE}" || exit 1
-
 
 
 ##############################################################################
@@ -129,6 +147,8 @@ cd "${ORIGINAL_WORKSPACE}" || exit 1
 ##############################################################################
 
 echo "┋ Installing superpoms"
+
+cd "${ORIGINAL_WORKSPACE}" || exit 1
 
 echo mvn $QUIET \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
@@ -306,26 +326,30 @@ echo "┗━━━━━━━ PHASE 2 ━━━━━━━━━━━━━�
 
 
 ##############################################################################
-# Review the release
+# Review the release (unless skip-review is specified)
 ##############################################################################
 
-echo " "
-echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Review ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
-echo "┋"
-echo "┋ Release is ready for you to review now:"
-echo "┋"
-echo "┋    1. Check the documentation, including links and diagrams"
-echo "┋    2. Check that version numbers and branch names were updated correctly"
-echo "┋"
-echo "┋ The release is in ${TEMPORARY_WORKSPACE}"
-echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
-echo " "
+if [ "$SKIP_REVIEW" == "true" ]; then
 
-unset REPLY
-while [[ ! "${REPLY}" == "publish" ]]
-do
-    read -r -p "When ready to publish to Nexus / OSSRH staging for Maven Central, type 'publish': "
-done
+    echo " "
+    echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Review ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
+    echo "┋"
+    echo "┋ Release is ready for you to review now:"
+    echo "┋"
+    echo "┋    1. Check the documentation, including links and diagrams"
+    echo "┋    2. Check that version numbers and branch names were updated correctly"
+    echo "┋"
+    echo "┋ The release is in ${TEMPORARY_WORKSPACE}"
+    echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
+    echo " "
+
+    unset REPLY
+    while [[ ! "${REPLY}" == "publish" ]]
+    do
+        read -r -p "When ready to publish to Nexus / OSSRH staging for Maven Central, type 'publish': "
+    done
+
+fi
 
 
 
