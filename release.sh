@@ -402,6 +402,7 @@ mvn $QUIET $FAST \
     -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
     -Dmaven.test.skip=true \
         install \
+        verify \
         gpg:sign \
         deploy \
         || exit 1
