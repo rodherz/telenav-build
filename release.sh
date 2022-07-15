@@ -160,11 +160,6 @@ cd "${ORIGINAL_WORKSPACE}" || exit 1
 
 MAVEN_ARGUMENTS="$QUIET $FAST"
 
-echo mvn "${MAVEN_ARGUMENTS}" \
-    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
-    -f telenav-superpom/pom.xml \
-    install || exit 1
-
 mvn "${MAVEN_ARGUMENTS}" \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -f telenav-superpom/pom.xml \
