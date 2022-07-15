@@ -304,7 +304,8 @@ echo "┋ Installing superpoms"
 # shellcheck disable=SC2086
 mvn $QUIET $FAST \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
-    -f telenav-superpom/pom.xml clean install || exit 1
+    -f telenav-superpom/pom.xml \
+    clean install || exit 1
 
 echo "┋ Checking build (tests enabled)"
 
@@ -409,7 +410,7 @@ mvn $QUIET $FAST \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -Dcactus.families="${PROJECT_FAMILIES}" \
     -Dmaven.test.skip=true \
-    generate-resources || exit 1
+    clean generate-resources || exit 1
 
 echo "┗━━━━━━━ PHASE 4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
