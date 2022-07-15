@@ -160,8 +160,9 @@ echo "┋ Installing superpoms"
 
 cd "${ORIGINAL_WORKSPACE}" || exit 1
 
-mvn $QUIET "$FAST" \
-    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
+# shellcheck disable=SC2086
+mvn $QUIET $FAST \
+    -Dcactus.version="${CACTUS_PLUGIN_VERSION}" \
     -f telenav-superpom/pom.xml \
     install || exit 1
 
@@ -250,13 +251,17 @@ rm -rf ~/.mesakit/
 cd "${TEMPORARY_WORKSPACE}" || exit 1
 
 echo '┋ Installing superpoms'
-mvn $QUIET "$FAST" \
+
+# shellcheck disable=SC2086
+mvn $QUIET $FAST \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -f telenav-superpom/pom.xml install \
     || exit 1
 
 echo '┋ Checking build (no tests)'
-mvn $QUIET "$FAST" \
+
+# shellcheck disable=SC2086
+mvn $QUIET $FAST \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -Dmaven.test.skip=true clean install || exit 1
 
@@ -272,7 +277,8 @@ echo "┋ "
 echo "┋━━━━━━━ PHASE 1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┋ Updating versions and branch references"
 
-mvn $QUIET "$FAST" \
+# shellcheck disable=SC2086
+mvn $QUIET $FAST \
     -Dcactus.verbose=true \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -P release-phase-1 \
@@ -294,12 +300,16 @@ mvn $QUIET "$FAST" \
 ##############################################################################
 
 echo "┋ Installing superpoms"
-mvn $QUIET "$FAST" \
+
+# shellcheck disable=SC2086
+mvn $QUIET $FAST \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
-    -f telenav-superpom/pom.xml install || exit 1
+    -f telenav-superpom/pom.xml clean install || exit 1
 
 echo "┋ Checking build (tests enabled)"
-mvn $QUIET "$FAST" \
+
+# shellcheck disable=SC2086
+mvn $QUIET $FAST \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     clean install || exit 1
 
@@ -328,7 +338,7 @@ mvn $QUIET $FAST \
         javadoc:javadoc \
         javadoc:aggregate \
         javadoc:jar \
-        org.apache.maven.plugins:maven-site-plugin:4.0.0-M1:site verify || exit 1
+        clean org.apache.maven.plugins:maven-site-plugin:4.0.0-M1:site verify || exit 1
 
 echo "┗━━━━━━━ PHASE 2 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
@@ -371,14 +381,15 @@ fi
 echo "┏━━━━━━━ PHASE 3 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┋ Publishing release..."
 
-mvn $QUIET "$FAST" \
+# shellcheck disable=SC2086
+mvn $QUIET $FAST \
     -P release-phase-3 \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -P ${GPG_PROFILE} \
     -Dcactus.families="${PROJECT_FAMILIES}" \
     -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
     -Dmaven.test.skip=true \
-        deploy || exit 1
+        clean deploy || exit 1
 
 echo "┗━━━━━━━ PHASE 3 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
@@ -392,7 +403,8 @@ echo "┗━━━━━━━ PHASE 3 ━━━━━━━━━━━━━�
 echo "┏━━━━━━━ PHASE 4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┋ Merging release and updating to next snapshot version..."
 
-mvn $QUIET "$FAST" \
+# shellcheck disable=SC2086
+mvn $QUIET $FAST \
     -P release-phase-4 \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -Dcactus.families="${PROJECT_FAMILIES}" \
