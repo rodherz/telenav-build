@@ -58,6 +58,8 @@ done
 # shellcheck disable=SC2046
 ORIGINAL_WORKSPACE=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
 
+source "${ORIGINAL_WORKSPACE}"/bin/telenav-library-functions.sh
+
 
 
 ##############################################################################
@@ -236,8 +238,6 @@ export MAVEN_OPTS="-XX:+UseG1GC \
 ##############################################################################
 # Check installed tools and clean out project caches
 ##############################################################################
-
-source "${ORIGINAL_WORKSPACE}"/bin/telenav-library-functions.sh
 
 echo "┋ Removing project caches"
 rm -rf ~/.kivakit/
