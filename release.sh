@@ -160,9 +160,7 @@ echo "┋ Installing superpoms"
 
 cd "${ORIGINAL_WORKSPACE}" || exit 1
 
-MAVEN_ARGUMENTS="$QUIET $FAST"
-
-mvn "${MAVEN_ARGUMENTS}" \
+mvn $QUIET "$FAST" \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -f telenav-superpom/pom.xml \
     install || exit 1
@@ -252,13 +250,13 @@ rm -rf ~/.mesakit/
 cd "${TEMPORARY_WORKSPACE}" || exit 1
 
 echo '┋ Installing superpoms'
-mvn "${MAVEN_ARGUMENTS}" \
+mvn $QUIET "$FAST" \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -f telenav-superpom/pom.xml install \
     || exit 1
 
 echo '┋ Checking build (no tests)'
-mvn "${MAVEN_ARGUMENTS}" \
+mvn $QUIET "$FAST" \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -Dmaven.test.skip=true clean install || exit 1
 
@@ -274,7 +272,8 @@ echo "┋ "
 echo "┋━━━━━━━ PHASE 1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┋ Updating versions and branch references"
 
-mvn -Dcactus.verbose=true \
+mvn $QUIET "$FAST" \
+    -Dcactus.verbose=true \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -P release-phase-1 \
     -Denforcer.skip=true \
@@ -295,12 +294,12 @@ mvn -Dcactus.verbose=true \
 ##############################################################################
 
 echo "┋ Installing superpoms"
-mvn "${MAVEN_ARGUMENTS}" \
+mvn $QUIET "$FAST" \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -f telenav-superpom/pom.xml install || exit 1
 
 echo "┋ Checking build (tests enabled)"
-mvn "${MAVEN_ARGUMENTS}" \
+mvn $QUIET "$FAST" \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     clean install || exit 1
 
@@ -317,8 +316,8 @@ echo "┋━━━━━━━ PHASE 2 ━━━━━━━━━━━━━�
 echo "┋ Building documentation"
 
 # shellcheck disable=SC2086
-mvn -P release-phase-2 \
-    ${MAVEN_ARGUMENTS} \
+mvn $QUIET $FAST \
+    -P release-phase-2 \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -Dcactus.families="${PROJECT_FAMILIES}" \
     -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
@@ -372,7 +371,8 @@ fi
 echo "┏━━━━━━━ PHASE 3 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┋ Publishing release..."
 
-mvn -P release-phase-3 \
+mvn $QUIET "$FAST" \
+    -P release-phase-3 \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -P ${GPG_PROFILE} \
     -Dcactus.families="${PROJECT_FAMILIES}" \
@@ -392,7 +392,8 @@ echo "┗━━━━━━━ PHASE 3 ━━━━━━━━━━━━━�
 echo "┏━━━━━━━ PHASE 4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┋ Merging release and updating to next snapshot version..."
 
-mvn -P release-phase-4 \
+mvn $QUIET "$FAST" \
+    -P release-phase-4 \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -Dcactus.families="${PROJECT_FAMILIES}" \
     -Dmaven.test.skip=true \
