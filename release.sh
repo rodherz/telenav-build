@@ -347,6 +347,7 @@ mvn $QUIET $FAST \
         javadoc:javadoc \
         javadoc:aggregate \
         javadoc:jar \
+        gpg:sign \
         org.apache.maven.plugins:maven-site-plugin:4.0.0-M1:site \
         verify \
         || exit 1
