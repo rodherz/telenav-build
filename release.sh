@@ -164,7 +164,8 @@ cd "${ORIGINAL_WORKSPACE}" || exit 1
 mvn $QUIET $FAST \
     -Dcactus.version="${CACTUS_PLUGIN_VERSION}" \
     -f telenav-superpom/pom.xml \
-    install || exit 1
+        clean install \
+        || exit 1
 
 echo "┋ "
 echo "┋━━━━━━━ PHASE 0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
@@ -255,15 +256,18 @@ echo '┋ Installing superpoms'
 # shellcheck disable=SC2086
 mvn $QUIET $FAST \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
-    -f telenav-superpom/pom.xml install \
-    || exit 1
+    -f telenav-superpom/pom.xml \
+        clean install \
+        || exit 1
 
 echo '┋ Checking build (no tests)'
 
 # shellcheck disable=SC2086
 mvn $QUIET $FAST \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
-    -Dmaven.test.skip=true clean install || exit 1
+    -Dmaven.test.skip=true \
+        clean install \
+        || exit 1
 
 echo "┋━━━━━━━ PHASE 0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
@@ -292,7 +296,8 @@ mvn $QUIET $FAST \
     -Dcactus.version.flavor.change=to-release \
     -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
     -Dmaven.test.skip=true \
-        clean validate || exit 1
+        clean validate \
+        || exit 1
 
 
 ##############################################################################
@@ -305,14 +310,16 @@ echo "┋ Installing superpoms"
 mvn $QUIET $FAST \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -f telenav-superpom/pom.xml \
-    clean install || exit 1
+        clean install \
+        || exit 1
 
 echo "┋ Checking build (tests enabled)"
 
 # shellcheck disable=SC2086
 mvn $QUIET $FAST \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
-    clean install || exit 1
+        clean install \
+        || exit 1
 
 echo "┋━━━━━━━ PHASE 1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
@@ -335,11 +342,14 @@ mvn $QUIET $FAST \
     -Dmaven.test.skip=true \
     -DreleasePush=$PUBLISH_RELEASE \
     -Dcactus.push=$PUBLISH_RELEASE \
+        clean \
         install \
         javadoc:javadoc \
         javadoc:aggregate \
         javadoc:jar \
-        clean org.apache.maven.plugins:maven-site-plugin:4.0.0-M1:site verify || exit 1
+        org.apache.maven.plugins:maven-site-plugin:4.0.0-M1:site \
+        verify \
+        || exit 1
 
 echo "┗━━━━━━━ PHASE 2 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
@@ -390,7 +400,8 @@ mvn $QUIET $FAST \
     -Dcactus.families="${PROJECT_FAMILIES}" \
     -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
     -Dmaven.test.skip=true \
-        clean deploy || exit 1
+        clean deploy \
+        || exit 1
 
 echo "┗━━━━━━━ PHASE 3 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
@@ -410,7 +421,8 @@ mvn $QUIET $FAST \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -Dcactus.families="${PROJECT_FAMILIES}" \
     -Dmaven.test.skip=true \
-    clean generate-resources || exit 1
+        clean generate-resources \
+        || exit 1
 
 echo "┗━━━━━━━ PHASE 4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
