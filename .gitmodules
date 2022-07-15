@@ -1,11 +1,11 @@
 [submodule "lexakai-annotations"]
 	path = lexakai-annotations
 	url = https://github.com/Telenav/lexakai-annotations.git
-	branch = feature/relative-to-bug
+	branch = release/current
 [submodule "kivakit"]
 	path = kivakit
 	url = https://github.com/Telenav/kivakit.git
-	branch = feature/relative-to-bug
+	branch = release/current
 [submodule "kivakit-extensions"]
 	path = kivakit-extensions
 	url = https://github.com/Telenav/kivakit-extensions.git
@@ -21,7 +21,7 @@
 [submodule "lexakai"]
 	path = lexakai
 	url = https://github.com/Telenav/lexakai.git
-	branch = feature/relative-to-bug
+	branch = release/current
 [submodule "mesakit"]
 	path = mesakit
 	url = https://github.com/Telenav/mesakit.git
@@ -41,7 +41,7 @@
 [submodule "telenav-superpom"]
 	path = telenav-superpom
 	url = https://github.com/Telenav/telenav-superpom.git
-	branch = feature/relative-to-bug
+	branch = release/current
 [submodule "mesakit-assets"]
 	path = mesakit-assets
 	url = https://github.com/Telenav/mesakit-assets.git
