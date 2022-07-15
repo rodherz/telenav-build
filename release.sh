@@ -99,9 +99,9 @@ for family in ${PROJECT_FAMILIES//,/ }
 do
     # shellcheck disable=SC2076
     if [[ " ${VALID_PROJECT_FAMILIES[*]} " =~ " ${family} " ]]; then
-        read -r -p "┋ Release type for $family (major, minor, dot, none) [dot]? "
+        read -r -p "┋ Release type for $family (major, minor, dot, none) [none]? "
         if [[ -z "${REPLY}" ]]; then
-            release_type="dot"
+            release_type="none"
         else
             release_type="$REPLY"
         fi
