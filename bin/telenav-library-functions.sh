@@ -98,7 +98,8 @@ function join_by()
 
 cactus_version()
 {
-    echo "1.5.12"
+    # shellcheck disable=SC2002
+    cat "${TELENAV_WORKSPACE}"/cactus/pom.xml | grep -Eow "<cactus\.previous\.version>(.*?)</cactus\.previous\.version>" | sed -E 's/.*>(.*)<.*/\1/'
 }
 
 scope=""
