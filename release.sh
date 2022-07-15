@@ -24,6 +24,7 @@ export PUBLISH_RELEASE=false
 export RELEASE_BRANCH_PREFIX=$(date '+%s')-test-release
 unset QUIET
 unset SKIP_REVIEW
+unset FAST
 
 for argument in "$@"
 do
@@ -37,9 +38,12 @@ do
     if [ "$argument" == "skip-review" ]; then
         export SKIP_REVIEW=true
     fi
+    if [ "$argument" == "fast" ]; then
+        export FAST="--threads 12"
+    fi
     if [ "$argument" == "help" ]; then
         echo " "
-        echo "release.sh [publish|skip-review|quiet|help]*"
+        echo "release.sh [publish|skip-review|quiet|fast|help]*"
         echo " "
         exit 0
     fi
@@ -112,7 +116,7 @@ do
             DOT_REVISION_FAMILIES+=("$family")
             ;;
         none)
-            NONE_REVISION_FAMILIES==("$family")
+            NONE_REVISION_FAMILIES+=("$family")
             ;;
         *)
             echo "$release_type is not a valid release type"
@@ -154,12 +158,14 @@ echo "┋ Installing superpoms"
 
 cd "${ORIGINAL_WORKSPACE}" || exit 1
 
-echo mvn $QUIET \
+MAVEN_ARGUMENTS="$QUIET $FAST"
+
+echo mvn "${MAVEN_ARGUMENTS}" \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -f telenav-superpom/pom.xml \
     install || exit 1
 
-mvn $QUIET \
+mvn "${MAVEN_ARGUMENTS}" \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -f telenav-superpom/pom.xml \
     install || exit 1
@@ -251,13 +257,13 @@ rm -rf ~/.mesakit/
 cd "${TEMPORARY_WORKSPACE}" || exit 1
 
 echo '┋ Installing superpoms'
-mvn $QUIET \
+mvn "${MAVEN_ARGUMENTS}" \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -f telenav-superpom/pom.xml install \
     || exit 1
 
 echo '┋ Checking build (no tests)'
-mvn $QUIET \
+mvn "${MAVEN_ARGUMENTS}" \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -Dmaven.test.skip=true clean install || exit 1
 
@@ -294,12 +300,12 @@ mvn -Dcactus.verbose=true \
 ##############################################################################
 
 echo "┋ Installing superpoms"
-mvn $QUIET \
+mvn "${MAVEN_ARGUMENTS}" \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -f telenav-superpom/pom.xml install || exit 1
 
 echo "┋ Checking build (tests enabled)"
-mvn $QUIET \
+mvn "${MAVEN_ARGUMENTS}" \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     clean install || exit 1
 
@@ -315,8 +321,9 @@ echo "┋ "
 echo "┋━━━━━━━ PHASE 2 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┋ Building documentation"
 
+# shellcheck disable=SC2086
 mvn -P release-phase-2 \
-    $QUIET \
+    ${MAVEN_ARGUMENTS} \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -Dcactus.families="${PROJECT_FAMILIES}" \
     -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
