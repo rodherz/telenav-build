@@ -9,27 +9,25 @@
 
 source telenav-library-functions.sh
 
-#
-# telenav-git-commit.sh [message]?
-#
+if [[ "$#" -eq 1 ]]; then
 
-#
-# Get message
-#
+    scope="all-project-families"
+    message=$1
 
-message=$1
+elif [[ "$#" -eq 2 ]]; then
 
-if [[ "$message" == "" ]]; then
+    scope=$1
+    message=$2
 
-    read -p "Commit message? " -r
-    message=$REPLY
+else
+
+    echo "$(script) [scope]? [message]"
 
 fi
 
-#
-# Commit
-#
-
 cd_workspace
-scope=$(scope)
-echo mvn --quiet "$scope" -Dcactus.commit-message=\""$message"\" -Dcactus.update-root=true com.telenav.cactus:cactus-maven-plugin:commit || exit 1
+mvn --quiet \
+    "$(resolve_scope_switches "$scope")" \
+    -Dcactus.commit-message=\""$message"\" \
+    -Dcactus.update-root=true \
+    com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":commit || exit 1

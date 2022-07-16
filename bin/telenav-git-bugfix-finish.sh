@@ -9,10 +9,14 @@
 
 source telenav-library-functions.sh
 
+branch=""
 scope=""
-get_scope_argument "$@"
+get_scope_and_branch_arguments "$@"
 
 cd_workspace
 mvn --quiet \
     "$(resolve_scope_switches "$scope")" \
-    com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":is-dirty || exit 1
+    -Dcactus.operation=finish \
+    -Dcactus.branch-type=bugfix \
+    -Dcactus.branch="$branch" \
+    com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":git-flow || exit 1

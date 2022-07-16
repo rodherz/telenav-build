@@ -9,7 +9,10 @@
 
 source telenav-library-functions.sh
 
-scope=$(resolve_scope "$1")
+scope=""
+get_scope_argument "$@"
 
 cd_workspace
-mvn --quiet "$scope" com.telenav.cactus:cactus-maven-plugin:pull || exit 1
+mvn --quiet \
+    "$(resolve_scope_switches "$scope")" \
+    com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":pull || exit 1

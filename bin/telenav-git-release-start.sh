@@ -7,16 +7,17 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+scope=""
+branch=""
+type="release"
+
 source telenav-library-functions.sh
 
-if [[ ! "$#" -eq 2 ]]; then
+get_scope_and_branch_arguments "$@"
 
-    echo "telenav-git-finish-hotfix.sh [scope] [branch-name]"
-
+if [[ ! $(git_check_branch_name "$scope" develop)  ]]; then
+    echo "Must be on 'develop' branch to start a $type"
+    exit 1
 fi
 
-scope=$(resolve_scope "$1")
-branch_name=$2
-
-cd_workspace
-mvn --quiet "$scope" -Dcactus.operation=finish -Dcactus.branch=hotfix -Dcactus.branch="$branch_name" com.telenav.cactus:cactus-maven-plugin:git-flow || exit 1
+git_checkout_branch "$scope" "$type/$branch" true || exit 1

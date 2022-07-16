@@ -7,28 +7,34 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+family=""
+version=""
+scope=""
+resolved_scope=""
+
 source telenav-library-functions.sh
+source telenav-release-library-functions.sh
 
-if [[ ! "$#" -eq 2 || "$1" == "all" ]]; then
+#
+# 1. Build and publish the release
+#
 
-    echo "telenav-release-finish.sh [project-family-name] [version]"
-    exit 1
+echo "Building $family $version release"
 
-fi
+telenav-build.sh "$resolved_scope" release || exit 1
 
-scope=$(resolve_scope "$1")
-version=$2
+#
+# 2. Finish the release branch
+#
 
-cd_workspace
+telenav-git-release-finish.sh "$scope" "release/$version"
 
-telenav-build.sh "$scope" release || exit 1
-
-# shellcheck disable=SC2086
-mvn --quiet $scope -Dcactus.operation=finish -Dcactus.branch-type=release -Dcactus.branch="$version" com.telenav.cactus:cactus-maven-plugin:git-flow || exit 1
+#
+# 3. Show final step
+#
 
 echo " "
 echo "Next Steps:"
 echo " "
-echo "  1. Sign into [OSSRH](http://s01.oss.sonatype.org) and push the build to Maven Central."
-echo "  2. Done."
+echo "  - Sign into [OSSRH](http://s01.oss.sonatype.org) and push the build to Maven Central."
 echo " "

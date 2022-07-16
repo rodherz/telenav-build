@@ -1,6 +1,6 @@
 <!--suppress HtmlUnknownTarget, HtmlRequiredAltAttribute -->
 
-Telenav Build
+Telenav Build &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/gears-40.png" srcset="https://telenav.github.io/telenav-assets/images/icons/gears-40-2x.png 2x"/>
 =============
 
 This project combines all Telenav Open Source projects into a single parent repository 

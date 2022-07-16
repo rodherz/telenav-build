@@ -61,7 +61,10 @@ show_workspace()
     echo " "
 }
 
-scoped_folders()
+resolved_folders=()
+export resolved_folders
+
+resolve_scoped_folders()
 {
     pattern=$1
 
@@ -70,41 +73,155 @@ scoped_folders()
     fi
 
     cd_workspace
-    folders=()
+    resolved_folders=()
     for folder in */; do
         if [[ "$folder" =~ $pattern ]]; then
             if [[ ! "$folder" == *"-assets"* ]]; then
-                folders+=("$folder")
+                resolved_folders+=("$TELENAV_WORKSPACE/$folder")
             fi
         fi
     done
+}
+
+resolved_scope=""
+resolved_families=()
+export resolved_scope
+export resolved_families
+
+function join_by()
+{
+    local d=${1-} f=${2-}
+    if shift 2; then
+        printf %s "$f" "${@/#/$d}"
+    fi
+}
+
+cactus_version()
+{
+    # shellcheck disable=SC2002
+    cat "${TELENAV_WORKSPACE}"/cactus/pom.xml | grep -Eow "<cactus\.previous\.version>(.*?)</cactus\.previous\.version>" | sed -E 's/.*>(.*)<.*/\1/'
+}
+
+scope=""
+branch=""
+export scope
+export branch
+
+get_scope_and_branch_arguments()
+{
+    arguments=("$@")
+
+    # If there is only one argument
+    if [[ ${#arguments[@]} -eq 1 ]]; then
+
+        # switch all project families to the given branch,
+        scope="all-project-families"
+        branch=${arguments[0]}
+
+    # and if there are two arguments,
+    elif [[ ${#arguments[@]} -eq 2 ]]; then
+
+        # switch the scoped project families to the given branch,
+        scope=${arguments[0]}
+        branch=${arguments[1]}
+
+    else
+
+        # otherwise, exit with usage.
+        echo "$(script) [scope]? [branch-name]"
+        exit 1
+
+    fi
+}
+
+get_scope_argument()
+{
+    arguments=("$@")
+
+    # If there is only one argument
+    if [[ ${#arguments[@]} -eq 1 ]]; then
+
+        # that is the scope,
+        scope=${arguments[0]}
+
+    else
+
+        # otherwise, exit with usage.
+        echo "$(script) [scope]"
+        exit 1
+
+    fi
+}
+
+resolved_scope_switches=()
+export resolved_scope_switches
+
+resolve_scope_switches()
+{
+    scope=$1
+
+    resolve_scope "$scope"
+
+    families=$(join_by , "${resolved_families[@]}")
+
+    if [[ ${#resolved_families[@]} == 1 ]]; then
+
+        resolved_scope_switches=(-Dcactus.scope="$resolved_scope" -Dcactus.family="$families")
+
+    else
+
+        resolved_scope_switches=(-Dcactus.scope="$resolved_scope" -Dcactus.families="$families")
+
+    fi
 }
 
 resolve_scope()
 {
     scope=$1
 
+    resolved_families=()
+
     case "${scope}" in
 
+    "all")
+        resolved_scope="all"
+        ;;
+
     "all-project-families")
-        echo "-Dcactus.scope=all-project-families"
+        resolved_scope="all-project-families"
         ;;
 
     "this")
-        echo "-Dcactus.scope=just-this"
+        resolved_scope="just-this"
+        ;;
+
+    "just-this")
+        resolved_scope="just-this"
         ;;
 
     *)
         if [[ "${scope}" == "" ]]; then
 
             if [[ "${TELENAV_SCOPE}" == "" ]]; then
-                echo "-Dcactus.scope=all"
+
+                resolved_scope="all-project-families"
+
             else
-                echo "$TELENAV_SCOPE"
+
+                resolved_scope="$TELENAV_SCOPE"
+                resolved_families=("$TELENAV_FAMILY")
+
             fi
 
         else
-            echo "-Dcactus.scope=FAMILY -Dcactus.family=${scope}"
+
+            resolved_scope="family"
+
+            IFS=',' read -ra ARRAY <<< "$scope"
+            for family in "${ARRAY[@]}"; do
+                resolved_families+=("$family")
+            done
+
         fi
         ;;
 
@@ -127,16 +244,8 @@ check_tools()
     # 1) Parse Java version from output like: openjdk version "17.0.3" 2022-04-19 LTS
     java_version=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}')
 
-    # 2) Parse Maven version from output like: Apache Maven 3.8.5 (3599d3414f046de2324203b78ddcf9b5e4388aa0)
-    maven_version=$(mvn -version 2>&1 | awk -F ' ' '/Apache Maven/ {print $3}')
-
-    # 3) Parse Git version from output like: git version 2.36.1
+    # 2) Parse Git version from output like: git version 2.36.1
     git_version=$(git --version 2>&1 | awk -F' ' '{print $3}')
-
-    # 4) Parse Git flow version from output like: 1.12.3 (AVH Edition)
-    if [[ ! "$caller" == "ci-build" ]]; then
-        git_flow_version=$(git flow version)
-    fi
 
     # Check Java version
     if [[ ! "$java_version" == "17."* ]]; then
@@ -144,16 +253,7 @@ check_tools()
         echo "To install: https://jdk.java.net/archive/"
         exit 1
     else
-        echo "Java $java_version"
-    fi
-
-    # Check Maven version
-    if [[ ! $maven_version =~ 3\.8\.[5-9][0-9]* ]]; then
-        echo "Telenav Open Source projects require Maven 3.8.5 or higher"
-        echo "To install: https://maven.apache.org/download.cgi"
-        exit 1
-    else
-        echo "Maven $maven_version"
+        echo "┋ Java $java_version"
     fi
 
     # Check Git version
@@ -161,19 +261,7 @@ check_tools()
         echo "Telenav Open Source projects require Git version 2.30 or higher"
         exit 1
     else
-        echo "Git $git_version"
-    fi
-
-    # Check Git Flow version
-
-    if [[ ! "$caller" == "ci-build" ]]; then
-        if [[ ! $git_flow_version =~ 1.1[2-9]\..*\(AVH\ Edition\) ]]; then
-            echo "Telenav Open Source projects require Git Flow (AVH Edition) version 1.12 or higher"
-            echo "To install on macOS: brew install git-flow-avh"
-            exit 1
-        else
-            echo "Git Flow $git_flow_version"
-        fi
+        echo "┋ Git $git_version"
     fi
 }
 
@@ -295,7 +383,9 @@ clean_maven_repository_telenav()
         if [[ -d "$HOME/.m2/repository/com/telenav" ]]; then
 
             if yes_no "┋ Remove all Telenav artifacts from $HOME/.m2/repository"; then
+
                 rm -rf "$HOME/.m2/repository/com/telenav"
+
             fi
 
         fi
@@ -310,8 +400,8 @@ clean_temporary_files()
 
         if yes_no "┋ Remove transient files from $project_home tree"; then
 
-        # shellcheck disable=SC2038
-        find "$project_home" \( -name \.DS_Store -o -name \.metadata -o -name \.classpath -o -name \.project -o -name \*\.hprof -o -name \*~ \) | xargs rm
+            # shellcheck disable=SC2038
+            find "$project_home" \( -name \.DS_Store -o -name \.metadata -o -name \.classpath -o -name \.project -o -name \*\.hprof -o -name \*~ \) | xargs rm
 
         fi
     fi
@@ -341,6 +431,65 @@ git_branch_name()
     cd "$project_home" || exit
     branch_name=$(git rev-parse --abbrev-ref HEAD)
     echo "$branch_name"
+}
+
+update_version_and_checkout()
+{
+    arguments=("$@")
+
+    family=$1
+    version=$2
+
+    mvn -Dcactus.create.release.branch=true \
+        -Dcactus.scope="family" \
+        -Dcactus.family="$family" \
+        -Dcactus.commit-changes=true \
+        -Dcactus.explicit.version="$version" \
+        com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":bump-version
+}
+
+git_check_branch_name()
+{
+    arguments=("$@")
+
+    scope=$1
+    branch=$2
+
+    resolve_scope_switches "$scope"
+
+    cd_workspace
+    mvn "${resolved_scope_switches[@]}" \
+        -Dcactus.expected.branch="$branch" \
+        com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":check
+}
+
+git_checkout_branch()
+{
+    arguments=("$@")
+
+    scope=$1
+    branch=$2
+    create=$3
+
+    resolve_scope_switches "$scope"
+
+    cd_workspace
+    mvn --quiet \
+        "${resolved_scope_switches[@]}" \
+        -Dcactus.target-branch="$branch" \
+        -Dcactus.update-root=true \
+        -Dcactus.create-branches="$create" \
+        -Dcactus.push=false \
+        -Dcactus.permit-local-changes=true \
+        com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":checkout || exit 1
+}
+
+git_repository_initialize()
+{
+    echo "Git pull fast-forward"
+    git config pull.ff false || exit 1
+    # shellcheck disable=SC2016
+    git submodule foreach 'git config pull.ff false && echo "Configuring $name"' || exit 1
 }
 
 ################ UTILITY ################################################################################################
@@ -482,14 +631,22 @@ bracket()
 
 }
 
+ask()
+{
+    prompt=$1
+
+    read -r -p "$prompt? "
+    printf "\n"
+}
+
 yes_no()
 {
     if [ -z "${NO_PROMPT}" ]; then
 
         prompt=$1
 
-        echo " "
         read -p "$prompt (y/n)? " -n 1 -r
+        printf "\n"
 
         if [[ $REPLY =~ ^[Yy]$ ]]; then
             true

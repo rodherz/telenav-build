@@ -9,14 +9,14 @@
 
 source telenav-library-functions.sh
 
-if [[ ! "$#" -eq 2 ]]; then
-
-    echo "telenav-git-start-hotfix.sh [scope] [branch-name]"
-
-fi
-
-scope=$(resolve_scope "$1")
-branch_name=$2
+branch=""
+scope=""
+get_scope_and_branch_arguments "$@"
 
 cd_workspace
-mvn --quiet "$scope" -Dcactus.operation=start -Dcactus.branch-type=hotfix -Dcactus.branch="$branch_name" com.telenav.cactus:cactus-maven-plugin:git-flow || exit 1
+mvn --quiet \
+    "$(resolve_scope_switches "$scope")" \
+    -Dcactus.operation=finish \
+    -Dcactus.branch-type=hotfix \
+    -Dcactus.branch="$branch" \
+    com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":git-flow || exit 1

@@ -7,12 +7,17 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+scope=""
+branch=""
+type="bugfix"
+
 source telenav-library-functions.sh
 
-scope=""
-get_scope_argument "$@"
+get_scope_and_branch_arguments "$@"
 
-cd_workspace
-mvn --quiet \
-    "$(resolve_scope_switches "$scope")" \
-    com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":is-dirty || exit 1
+if [[ ! $(git_check_branch_name "$scope" develop)  ]]; then
+    echo "Must be on 'develop' branch to start a $type"
+    exit 1
+fi
+
+git_checkout_branch "$scope" "$type/$branch" true || exit 1

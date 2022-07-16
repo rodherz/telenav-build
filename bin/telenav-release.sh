@@ -7,36 +7,63 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+# set -x
+
+family=""
+version=""
+
 source telenav-library-functions.sh
+source telenav-release-library-functions.sh
 
-if [[ ! "$#" -eq 2 || "$1" == "all" ]]; then
+echo "Releasing $family $version"
 
-    echo "telenav-release.sh [project-family-name] [version]"
-    exit 1
+#
+# 1. Check that the project family is on the 'develop' branch
+#
 
+echo " - Checking project branches"
+
+if [[ ! $(git_check_branch_name "$family" develop)  ]]; then
+    echo "Must be on 'develop' branch to start a release"
+    usage
 fi
 
-scope=$(resolve_scope "$1")
-version=$2
+#
+# 2. Check that the change log has been updated
+#
 
-cd_workspace
+echo " - Checking change log"
 
-branch_name=$(git_branch_name "$1")
-if [[ ! "$branch_name" == "develop" ]]; then
-    echo "Must be on develop branch to start a release"
-    exit 1
+if ! grep -q "## Version $version" "$family/change-log.md"; then
+    echo "Please update $family/change-log.md before releasing"
+    usage
 fi
 
+#
+# 3. Update version on 'develop' then start a release branch (which moves the changes to the new branch)
+#
 
-# shellcheck disable=SC2086
-mvn --quiet $scope -Dcactus.include-root=false -Dcactus.operation=start -Dcactus.branch-type=release -Dcactus.branch="$version" com.telenav.cactus:cactus-maven-plugin:git-flow || exit 1
+echo " - Updating version and creating release branch 'release/$version'"
 
-telenav-update-version.sh "$1" "release/$version" || exit 1
+update_version_and_checkout "$family" "$version" || exit 1
+
+#
+# 4. Build the release into the local repository
+#
+
+echo " - Building local release"
+
+telenav-build.sh "$family" "release-local" || exit 1
+
+echo " - Local release built successfully"
+
+#
+# 5. Describe the next steps to take
+#
 
 echo " "
 echo "Next Steps:"
 echo " "
-echo "  1. Update change-log.md"
-echo "  2. Build the release branch: telenav-build [project-family] release-local"
-echo "  3. Complete the release branch: telenav-release-finish.sh [project-family] [project-version]"
+echo "  - Check the release carefully"
+echo "  - Run \"telenav-release-finish.sh $family $version\""
 echo " "

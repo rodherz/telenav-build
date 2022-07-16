@@ -18,9 +18,6 @@ maven_version=$(mvn -version 2>&1 | awk -F ' ' '/Apache Maven/ {print $3}')
 # 3) Parse Git version from output like: git version 2.36.1
 git_version=$(git --version 2>&1 | awk -F' ' '{print $3}')
 
-# 4) Parse Git flow version from output like: 1.12.3 (AVH Edition)
-git_flow_version=$(git flow version)
-
 if [[ -d $KIVAKIT_HOME ]]; then
 
     kivakit_version=$(project_version "$KIVAKIT_HOME")
@@ -43,7 +40,7 @@ fi
 
 
 echo " "
-echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Versions ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
+echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Versions ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┋"
 echo "┋  Repositories:"
 echo "┋"
@@ -55,7 +52,6 @@ echo "┋"
 echo "┋             Java: $java_version"
 echo "┋            Maven: $maven_version"
 echo "┋              Git: $git_version"
-echo "┋         Git Flow: $git_flow_version"
 echo "┋"
 echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 echo " "

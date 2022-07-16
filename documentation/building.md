@@ -4,9 +4,9 @@
 
 > **IMPORTANT NOTE**: Please follow the [Initial Setup Instructions](initial-setup-instructions.md) before proceeding
 
-To build all projects in the Telenav workspace, simply use Apache Maven. For example: `mvn clean install`
+To build all projects in the Telenav workspace, use Apache Maven: `mvn clean install`
 
-> **DEVELOPERS**: For convenient build scripts, see [Developing](developing.md).
+> **DEVELOPERS**: For convenient build, source control, and release scripts, see [Developing](developing.md).
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
 

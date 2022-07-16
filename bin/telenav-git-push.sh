@@ -9,14 +9,10 @@
 
 source telenav-library-functions.sh
 
-if [[ ! "$#" -eq 2 ]]; then
-
-    echo "telenav-git-start-feature.sh [scope] [branch-name]"
-
-fi
-
-scope=$(resolve_scope "$1")
-branch_name=$2
+scope=""
+get_scope_argument "$@"
 
 cd_workspace
-mvn --quiet "$scope" -Doperation=telenav.start -Dcactus.branch-type=feature -Dcactus.branch="$branch_name" com.telenav.cactus:cactus-maven-plugin:git-flow || exit 1
+mvn --quiet \
+    "$(resolve_scope_switches "$scope")" \
+    com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":push || exit 1
