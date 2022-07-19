@@ -7,9 +7,11 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-allowed_scopes=(all this telenav-superpom kivakit mesakit lexakai cactus)
+source "${TELENAV_WORKSPACE}/bin/telenav-library-functions.sh"
+
+allowed_scopes=(all this telenav-superpom kivakit mesakit lexakai)
 allowed_build_types=(compile release release-local tools dmg javadoc lexakai-documentation help)
-allowed_build_modifiers=(attach-jars clean clean-all clean-sparkling debug debug-tests dry-run no-javadoc no-tests quick-tests quiet verbose single-threaded tests)
+allowed_build_modifiers=(attach-jars clean clean-forced clean-sparkling debug debug-tests dry-run no-javadoc no-tests quick-tests quiet verbose single-threaded tests)
 
 telenav_build_check_prerequisites()
 {
@@ -23,36 +25,61 @@ telenav_resolve_build_folders()
     case "${build_scope}" in
 
         "all")
-            build_folders=("$TELENAV_WORKSPACE/telenav-superpom" "$TELENAV_WORKSPACE/cactus" "$TELENAV_WORKSPACE/kivakit" "$TELENAV_WORKSPACE/lexakai" "$TELENAV_WORKSPACE"/mesakit)
+            build_folders=("$TELENAV_WORKSPACE/telenav-superpom" "$TELENAV_WORKSPACE/kivakit" "$TELENAV_WORKSPACE/lexakai" "$TELENAV_WORKSPACE/mesakit")
             ;;
 
         "this")
-            build_folders=("$TELENAV_WORKSPACE/telenav-superpom" "$TELENAV_WORKSPACE/cactus" .)
+            build_folders=("$TELENAV_WORKSPACE/telenav-superpom" .)
             ;;
 
         *)
             # shellcheck disable=SC2034
-            build_folders=("$TELENAV_WORKSPACE/telenav-superpom" "$TELENAV_WORKSPACE/cactus" "$TELENAV_WORKSPACE/${build_scope}")
+            build_folders=("$TELENAV_WORKSPACE/telenav-superpom" "$TELENAV_WORKSPACE/${build_scope}")
             ;;
 
     esac
 }
 
-
-telenav_run_maven_build()
+telenav_end_build()
 {
-    folder="$1"
+    echo "┋"
+    echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Built $build"
+    echo " "
+}
 
-    echo "┋ Building $folder"
-    cd "$folder" || exit 1
+telenav_start_build()
+{
+    build=$(project_build)
 
-    # shellcheck disable=SC2086
-    "$M2_HOME/bin/mvn" "$(resolve_scope $build_scope)" ${maven_switches[*]} ${build_arguments[*]} 2>&1
+    folder_list=""
+    for folder in "${build_folders[@]}"
+    do
+        :
+        folder_list="$folder_list\n┋              -"
+        folder_list="$folder_list $folder"
+    done
 
-    if [ "${PIPESTATUS[0]}" -ne "0" ]; then
-        echo "Build failed."
-        exit 1
-    fi
+    echo " "
+    echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Building $build"
+    echo "┋"
+    # shellcheck disable=SC2154
+    echo "┋            Build Scope: ${build_scope}"
+    echo "┋             Build Type: ${build_types[*]}"
+    echo "┋        Build Modifiers: ${build_modifiers[*]}"
+    echo "┋"
+    # shellcheck disable=SC2154
+    echo -e "┋          Build Folders:\n┋$folder_list"
+    echo "┋"
+    echo "┋         Build Switches: ${build_switches[*]}"
+    # shellcheck disable=SC2154
+    echo "┋   Build Scope Switches: ${resolved_scope_switches[*]}"
+    echo "┋        Build Arguments: ${build_arguments[*]}"
+    echo "┋"
+    echo "┋              Workspace: $TELENAV_WORKSPACE"
+    echo "┋"
+    # shellcheck disable=SC2154
+    echo "┋     mvn ${resolved_scope_switches[*]} ${build_switches[*]} ${build_arguments[*]}"
+    echo "┋"
 }
 
 telenav_build_parse_build_modifiers()
@@ -67,32 +94,40 @@ telenav_build_parse_build_modifiers()
                 ;;
 
             "clean")
-                clean_script="kivakit-clean.sh"
+                clean_script="telenav-clean.sh"
+                ;;
+
+            "clean-forced")
+                clean_script="telenav-clean-forced.sh"
+                ;;
+
+            "clean-force")
+                clean_script="telenav-clean-forced.sh"
                 ;;
 
             "clean-sparkling")
                 # shellcheck disable=SC2034
-                clean_script="kivakit-clean-sparkling.sh"
+                clean_script="telenav-clean-sparkling.sh"
                 ;;
 
             "debug")
-                maven_switches+=(--debug)
+                build_switches+=(--debug)
                 ;;
 
             "debug-tests")
-                maven_switches+=(-Dmaven.surefire.debug)
+                build_switches+=(-Dmaven.surefire.debug)
                 ;;
 
             "dmg")
-                maven_switches+=(-P dmg)
+                build_switches+=(-P dmg)
                 ;;
 
             "docker")
-                maven_switches+=(-P docker)
+                build_switches+=(-P docker)
                 ;;
 
             "documentation")
-                maven_switches+=(-P release)
+                build_switches+=(-P release)
                 ;;
 
             "dry-run")
@@ -113,19 +148,19 @@ telenav_build_parse_build_modifiers()
                 ;;
 
             "no-javadoc")
-                maven_switches+=("-Dmaven.javadoc.skip=true")
+                build_switches+=("-Dmaven.javadoc.skip=true")
                 ;;
 
             "no-tests")
-                maven_switches+=("-Dmaven.test.skip=true")
+                build_switches+=("-Dmaven.test.skip=true")
                 ;;
 
             "quick-tests")
-                maven_switches+=(-P test-quick)
+                build_switches+=(-P test-quick)
                 ;;
 
             "quiet")
-                maven_switches+=(--quiet "-Dsurefire.printSummary=false" "-DKIVAKIT_LOG_LEVEL=Warning")
+                build_switches+=(--quiet "-Dsurefire.printSummary=false" "-DKIVAKIT_LOG_LEVEL=Warning")
                 ;;
 
             "sign-artifacts")
@@ -141,7 +176,7 @@ telenav_build_parse_build_modifiers()
                 ;;
 
             "tools")
-                maven_switches+=(-P tools)
+                build_switches+=(-P tools)
                 ;;
 
             "verbose")
@@ -277,8 +312,8 @@ telenav_build_usage()
     echo "  BUILD MODIFIERS"
     echo " "
     echo "         attach-jars - attach source and javadoc jars to maven artifacts"
-    echo "               clean - prompt to remove cached and temporary files"
-    echo "           clean-all - prompt to remove cached and temporary files and kivakit artifacts from ~/.m2"
+    echo "               clean - prompt to remove cached and temporary files and telenav artifacts from ~/.m2"
+    echo "        clean-forced - remove cached and temporary files and telenav artifacts from ~/.m2"
     echo "     clean-sparkling - prompt to remove entire .m2 repository and all cached and temporary files"
     echo "               debug - turn maven debug mode on"
     echo "         debug-tests - stop in debugger on surefire tests"
@@ -292,4 +327,146 @@ telenav_build_usage()
     echo "               tests - run all tests"
     echo " "
     exit 1
+}
+
+################ CLEAN ################################################################################################
+
+allow_cleaning()
+{
+    if [ -z "$ALLOW_CLEANING" ]; then
+
+        ALLOW_CLEANING=true
+
+    fi
+
+    if [ "$ALLOW_CLEANING" == "true" ]; then
+
+        return 0
+
+    else
+
+        return 1
+
+    fi
+}
+
+telenav_clean_caches()
+{
+    if allow_cleaning; then
+
+        KIVAKIT_VERSION=$(project_version kivakit)
+        telenav_clean_cache "$HOME/.kivakit/$KIVAKIT_VERSION"
+
+        MESAKIT_VERSION=$(project_version mesakit)
+        telenav_clean_cache "$HOME/.mesakit/$MESAKIT_VERSION"
+
+    fi
+}
+
+telenav_clean_caches_forced()
+{
+    if allow_cleaning; then
+
+        KIVAKIT_VERSION=$(project_version kivakit)
+        telenav_clean_cache_forced "$HOME/.kivakit/$KIVAKIT_VERSION"
+
+        MESAKIT_VERSION=$(project_version mesakit)
+        telenav_clean_cache_forced "$HOME/.mesakit/$MESAKIT_VERSION"
+
+    fi
+}
+
+telenav_clean_cache()
+{
+    cache=$1
+
+    if [ -d "$cache" ]; then
+
+        if yes_no "┋ Remove ALL cached files in $cache"; then
+
+            telenav_clean_cache_forced "$cache"
+
+        fi
+    fi
+}
+
+telenav_clean_cache_forced()
+{
+    cache=$1
+    rm -rf "$cache"
+}
+
+telenav_clean_maven_repository()
+{
+    if allow_cleaning; then
+
+        project_home=$1
+        name=$(basename -- "$project_home")
+
+        if yes_no "┋ Remove all $name artifacts from $HOME/.m2/repository"; then
+
+            telenav_clean_maven_repository_forced "$name"
+
+        fi
+
+    fi
+}
+
+telenav_clean_maven_repository_forced()
+{
+    name=$1
+    rm -rf "$HOME/.m2/repository/com/telenav/$name"
+}
+
+telenav_clean_maven_repository_telenav()
+{
+    if allow_cleaning; then
+
+        if [[ -d "$HOME/.m2/repository/com/telenav" ]]; then
+
+            if yes_no "┋ Remove all Telenav artifacts from $HOME/.m2/repository"; then
+
+                rm -rf "$HOME/.m2/repository/com/telenav"
+
+            fi
+
+        fi
+    fi
+}
+
+telenav_clean_temporary_files()
+{
+    project_home=$1
+
+    if allow_cleaning; then
+
+        if yes_no "┋ Remove transient files from $project_home tree"; then
+
+            telenav_clean_temporary_files_forced "$project_home"
+
+        fi
+    fi
+}
+
+telenav_clean_temporary_files_forced()
+{
+    project_home=$1
+
+    # shellcheck disable=SC2038
+    find "$project_home" \( -name \.DS_Store -o -name \.metadata -o -name \.classpath -o -name \.project -o -name \*\.hprof -o -name \*~ \) | xargs rm
+}
+
+remove_maven_repository()
+{
+    if allow_cleaning; then
+
+        if [ -d "$HOME/.m2/repository" ]; then
+
+            if yes_no "┋ Remove ALL artifacts in $HOME/.m2/repository"; then
+
+                rm -rf "$HOME/.m2/repository"
+
+            fi
+        fi
+    fi
 }

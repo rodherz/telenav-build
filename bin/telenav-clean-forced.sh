@@ -9,6 +9,6 @@
 
 source "${TELENAV_WORKSPACE}/bin/telenav-build-library-functions.sh"
 
-telenav_clean_caches
-telenav_clean_maven_repository_telenav
-telenav_clean_temporary_files "$TELENAV_WORKSPACE"
+telenav_clean_caches_forced
+telenav_clean_maven_repository_forced
+telenav_clean_temporary_files_forced "$TELENAV_WORKSPACE"

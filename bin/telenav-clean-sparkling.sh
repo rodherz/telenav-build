@@ -7,8 +7,7 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-source telenav-library-functions.sh
+source "${TELENAV_WORKSPACE}/bin/telenav-build-library-functions.sh"
 
 remove_maven_repository
-
-bash telenav-clean.sh sparkling
+bash telenav-clean.sh

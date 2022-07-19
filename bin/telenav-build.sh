@@ -7,52 +7,40 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-source "${TELENAV_WORKSPACE}/bin/telenav-library-functions.sh"
 source "${TELENAV_WORKSPACE}/bin/telenav-build-library-functions.sh"
 
-telenav_build_check_prerequisites
-
-cd_workspace
+threads="12"
+build_javadoc=false
 
 build_types=()
 build_modifiers=()
-
-telenav_build_parse_arguments "$@"
-
-maven_switches=(--no-transfer-progress)
 build_arguments=()
-build_modifiers+=(quiet)
-threads="12"
+build_switches=(--no-transfer-progress)
+build_modifiers=(quiet)
+build_scope="all"
 
+resolved_scope_switches=()
+
+export build_types
+export build_modifiers
+
+cd_workspace
+
+telenav_build_check_prerequisites
+telenav_build_parse_arguments "$@"
 telenav_build_parse_build_types
-
-build_javadoc=false
-
 telenav_build_parse_build_modifiers
+
+resolve_scope_switches "$build_scope"
 
 if [ -z "$KIVAKIT_DEBUG" ]; then
     KIVAKIT_DEBUG="\!Debug"
 fi
 
-maven_switches+=(-DKIVAKIT_DEBUG=\""$KIVAKIT_DEBUG"\")
-maven_switches+=(--threads "$threads")
+build_switches+=(-DKIVAKIT_DEBUG=\""$KIVAKIT_DEBUG"\")
+build_switches+=(--threads "$threads")
 
-build=$(project_build)
-
-telenav_resolve_build_folders
-
-echo " "
-echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Building $build"
-echo "┋"
-# shellcheck disable=SC2154
-echo "┋          Build-Scope: ${build_scope}"
-# shellcheck disable=SC2154
-echo "┋        Build-Folders: ${build_folders[*]}"
-echo "┋           Build-Type: ${build_types[0]}"
-echo "┋      Build-Modifiers: ${build_modifiers[*]}"
-echo "┋   Maven Command Line: mvn  ${maven_switches[*]} ${build_arguments[*]}"
-echo "┋            Workspace: $TELENAV_WORKSPACE"
-echo "┋"
+telenav_start_build
 
 if [[ "$build_javadoc" == "true" ]]; then
     bash telenav-build-javadoc.sh "${build_scope}"
@@ -64,20 +52,18 @@ if [ -z "$dry_run" ]; then
         bash "$clean_script"
     fi
 
+    echo "┋ Building"
+
+    mvn --quiet -f telenav-superpom/pom.xml clean install
+
     # shellcheck disable=SC2086
-    if [[ ${#build_arguments[@]} -gt 0 ]]; then
-
-        # shellcheck disable=SC2154
-        for folder in "${build_folders[@]}"
-        do
-            :
-            telenav_run_maven_build "$folder"
-        done
-
+    # shellcheck disable=SC2154
+    mvn ${resolved_scope_switches[*]} ${build_switches[*]} ${build_arguments[*]} 2>&1
+    if [ "${PIPESTATUS[0]}" -ne "0" ]; then
+        echo "Build failed."
+        exit 1
     fi
 
 fi
 
-echo "┋"
-echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Built $build"
-echo " "
+telenav_end_build
