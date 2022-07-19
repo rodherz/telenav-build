@@ -86,6 +86,7 @@ if [[ -z "${REPLY}" ]]; then
 else
     export PROJECT_FAMILIES=$REPLY
 fi
+echo "┋"
 
 
 
@@ -96,12 +97,13 @@ fi
 MAJOR_REVISION_FAMILIES=()
 MINOR_REVISION_FAMILIES=()
 DOT_REVISION_FAMILIES=()
+NONE_REVISION_FAMILIES=()
 
 for family in ${PROJECT_FAMILIES//,/ }
 do
     # shellcheck disable=SC2076
     if [[ " ${VALID_PROJECT_FAMILIES[*]} " =~ " ${family} " ]]; then
-        read -r -p "┋ Release type for $family (major, minor, dot, none) [none]? "
+        read -r -p "┋    - $family release should be the next (major, minor, dot) version or the current version [current]? "
         if [[ -z "${REPLY}" ]]; then
             release_type="none"
         else
@@ -118,6 +120,9 @@ do
             DOT_REVISION_FAMILIES+=("$family")
             ;;
         none)
+            NONE_REVISION_FAMILIES+=("$family")
+            ;;
+        current)
             NONE_REVISION_FAMILIES+=("$family")
             ;;
         *)
@@ -140,11 +145,10 @@ echo "┋"
 echo "┋ Quiet: $QUIET"
 echo "┋ Publish: ${PUBLISH_RELEASE}"
 echo "┋ Project families: ${PROJECT_FAMILIES}"
-echo "┋ None releases: ${NONE_REVISION_FAMILIES[*]}"
-echo "┋ Dot releases: ${DOT_REVISION_FAMILIES[*]}"
-echo "┋ Minor releases: ${MINOR_REVISION_FAMILIES[*]}"
-echo "┋ Major releases: ${MAJOR_REVISION_FAMILIES[*]}"
-echo "┋ Original workspace: ${WORKSPACE}"
+echo "┋ Release current version: ${NONE_REVISION_FAMILIES[*]}"
+echo "┋ Release next minor version: ${MINOR_REVISION_FAMILIES[*]}"
+echo "┋ Release next major version: ${MAJOR_REVISION_FAMILIES[*]}"
+echo "┋ Original workspace: ${ORIGINAL_WORKSPACE}"
 echo "┋ Release branch prefix: ${RELEASE_BRANCH_PREFIX}"
 echo "┋ "
 
@@ -367,7 +371,7 @@ if [ ! "$SKIP_REVIEW" == "true" ]; then
     echo "┋"
     echo "┋ Release is ready for you to review now:"
     echo "┋"
-    echo "┋    1. Check the documentation, including links and diagrams"
+    echo "┋    1. Check the documentation on Github, including links and diagrams"
     echo "┋    2. Check that version numbers and branch names were updated correctly"
     echo "┋"
     echo "┋ The release is in ${TEMPORARY_WORKSPACE}"

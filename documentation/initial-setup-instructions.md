@@ -10,14 +10,14 @@ This article explains how to get set up to build Telenav Open Source projects, i
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
 
-## 1. Installing Required Tools &nbsp; <a name = "install-tools"></a>  <img src="https://telenav.github.io/telenav-assets/images/icons/toolbox-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/toolbox-32-2x.png 2x"/>
+## 1. Required Tools &nbsp; <a name = "install-tools"></a>  <img src="https://telenav.github.io/telenav-assets/images/icons/toolbox-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/toolbox-32-2x.png 2x"/>
 
 - Bash
 - Git 2.30+
 
-- [Java](https://adoptopenjdk.net/?variant=openjdk17&jvmVariant=hotspot) 17.0.2 or later
+- [Java](https://adoptopenjdk.net/?variant=openjdk17&jvmVariant=hotspot) 17.0.2+
 
-- [Maven](https://maven.apache.org/download.cgi) 3.8.5 or later
+- [Maven](https://maven.apache.org/download.cgi) 3.8.5+
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
@@ -25,21 +25,17 @@ This article explains how to get set up to build Telenav Open Source projects, i
 
 To check out, configure and build all Telenav Open Source projects for the first time:
 
-    mkdir ~/Workspaces
-    cd ~/Workspaces
     git clone https://github.com/Telenav/telenav-build.git
     cd telenav-build
-    ./setup.sh [branch-name]?
+    ./setup.sh
     
-Where `branch-name` is one of:
+Optionally, `setup.sh` can take a `branch-name` argument, where `branch-name` is one of:
 
  - `master` (latest release)
- - `develop` (development code)
+ - `develop` (development, default)
  - `feature/*` (feature branch)
  - `hotfix/*` (fix branch)
 
-If `branch-name` is omitted the default branch will be set up.
-    
 When the checkout and build process completes, you should have a project tree like this:
 
     └── Workspaces
@@ -75,17 +71,16 @@ You can either `cp setup/profile ~/.profile`, or you can modify your existing pr
 The resulting `.profile` should include steps similar to this:
 
     export TELENAV_WORKSPACE=$HOME/Workspaces/telenav-build
-    
     export JAVA_HOME=/Users/jonathan/Developer/amazon-corretto-17.jdk/Contents/Home
     export M2_HOME=/Users/jonathan/Developer/apache-maven-3.8.5
 
-    mkdir -p $TELENAV_WORKSPACE    
     cd $TELENAV_WORKSPACE
     source source-me
     
-> WARNING: Be sure to restart your terminal program entirely after making this change!
+> WARNING: Be sure to shut down your terminal program and restart it after making this change
 
-> NOTE: On Windows, install [Git for Windows](https://gitforwindows.org/), which will provide both git, and a bash shell.
+> NOTE: On Windows, install [Git for Windows](https://gitforwindows.org/), which will provide 
+> both git, and a bash shell.
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
 
