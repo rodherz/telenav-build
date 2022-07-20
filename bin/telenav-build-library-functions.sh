@@ -202,7 +202,11 @@ telenav_build_parse_arguments()
     for argument in "${arguments[@]}"
     do
         if [[ " ${allowed_scopes[*]} " =~ ${argument} ]]; then
-            build_scope=$argument
+            if [[ "$build_scope" == "" ]]; then
+                build_scope=$argument
+            else
+                build_scope="$build_scope",$argument
+            fi
         elif [[ " ${allowed_build_types[*]} " =~ ${argument} ]]; then
             build_types+=("$argument")
         elif [[ " ${allowed_build_modifiers[*]} " =~ ${argument} ]]; then
@@ -288,7 +292,7 @@ telenav_build_parse_build_types()
 telenav_build_usage()
 {
     echo " "
-    echo "Usage: telenav-build.sh [build-scope] [build-type] [build-modifiers]*"
+    echo "Usage: telenav-build.sh [build-scope|build-type|build-modifiers]*"
     echo " "
     echo "  BUILD SCOPES"
     echo " "

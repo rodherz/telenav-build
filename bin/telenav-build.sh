@@ -17,7 +17,7 @@ build_modifiers=()
 build_arguments=()
 build_switches=(--no-transfer-progress)
 build_modifiers=(quiet)
-build_scope="all"
+build_scope=""
 
 resolved_scope_switches=()
 
