@@ -1,8 +1,0 @@
-
-export TELENAV_WORKSPACE=$HOME/Workspaces/telenav-build
-
-export JAVA_HOME=/Users/jonathan/Developer/amazon-corretto-17.jdk/Contents/Home
-export M2_HOME=/Users/jonathan/Developer/apache-maven-3.8.5
-
-cd $TELENAV_WORKSPACE
-source source-me
