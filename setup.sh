@@ -144,8 +144,9 @@ fi
 # Install cactus scripts
 #
 
-mkdir ~/bin
-mvn --batch-mode -quiet com.telenav.cactus:cactus-maven-plugin:install-scripts
+echo "Installing cactus scripts"
+mkdir -p ~/bin
+mvn --batch-mode -quiet com.telenav.cactus:cactus-maven-plugin:install-scripts > /dev/null || exit 1
 
 #
 # Build
