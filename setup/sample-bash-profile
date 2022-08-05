@@ -1,0 +1,38 @@
+
+###########################################################################
+#
+# SAMPLE BASH PROFILE FOR TO SET UP A BUILD SHELL
+#
+# 1. Adjust the paths below to point to your own workspace and tools
+# 2. Add the resulting lines to ~/.profile
+# 3. Shutdown your shell program and restart it
+#
+
+#
+# Location of telenav-build workspace (this checkout)
+#
+
+export TELENAV_WORKSPACE=$HOME/Workspaces/telenav-build
+
+#
+# Required tools (Java and Maven)
+#
+
+export JAVA_HOME=$HOME/Developer/amazon-corretto-17.jdk/Contents/Home
+export M2_HOME=$HOME/Developer/apache-maven-3.8.5
+
+#
+# Add cactus tools to path
+#
+
+export PATH=$HOME/bin:$PATH
+
+#
+# Configure build environment
+#
+
+cd $TELENAV_WORKSPACE
+source source-me
+
+###########################################################################
+
