@@ -101,8 +101,8 @@ fi
 # Install superpoms
 #
 
-echo "Installing superpom"
-mvn --batch-mode --quiet -f telenav-superpom/pom.xml clean install || exit 1
+echo "Installing superpoms"
+mvn --batch-mode -quiet -DKIVAKIT_LOG_LEVEL=Warning -f telenav-superpom/pom.xml clean install || exit 1
 
 #
 # Configure environment
@@ -136,14 +136,29 @@ if [[ -d cactus ]]; then
 
     echo " "
     echo "Building cactus"
-    mvn --batch-mode --quiet -Dmaven.javadoc.skip=true -f cactus clean install || exit 1
+    mvn --batch-mode -quiet -DKIVAKIT_LOG_LEVEL=Warning -Dmaven.javadoc.skip=true -f cactus clean install || exit 1
 
 fi
+
+#
+# Install cactus scripts
+#
+
+echo "Installing cactus scripts"
+mkdir -p ~/bin
+mvn --batch-mode -quiet com.telenav.cactus:cactus-maven-plugin:install-scripts > /dev/null || exit 1
 
 #
 # Build
 #
 
 echo "Building"
-mvn --batch-mode --quiet clean install || exit 1
+mvn --batch-mode -quiet -DKIVAKIT_LOG_LEVEL=Warning clean install || exit 1
 echo "Done."
+
+#
+# Show sample Bash profile
+#
+
+cat $TELENAV_WORKSPACE/setup/sample-bash-profile
+
