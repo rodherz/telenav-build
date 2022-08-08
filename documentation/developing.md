@@ -10,9 +10,7 @@ If you are helping to develop Telenav Open Source projects this page will help y
 
 1. Follow the [Initial Setup Instructions](initial-setup-instructions.md).
 
-
 2. Download and install [IntelliJ](https://www.jetbrains.com/idea/download/) or [Netbeans](https://netbeans.apache.org/download/index.html)
-
 
 3. In IntelliJ, use `File` / `Manage IDE Settings` / `Import Settings` to import `setup/intellij/telenav-all-settings.zip`
 
@@ -39,6 +37,17 @@ into arguments for Git and Maven. Since all scripts have an equivalent Git or Ma
 they are *not required*, merely convenient.
 
 > **HINT**: To see what scripts are available, type `telenav-` in a bash shell and hit `TAB`. 
+
+<img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
+
+## Typical Workflow for a Feature
+
+1. Set `TELENAV_GIT_AUTHENTICATION_TOKEN`
+2. `telenav-start-feature.sh #87-hover-mode`
+3. Complete the feature branch
+4. `telenav-pull-request.sh "added hovering" "added spacecraft hover mode"`
+5. Build and review on Github
+6. `telenav-merge-pull-request.sh`
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
