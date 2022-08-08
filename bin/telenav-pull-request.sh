@@ -28,4 +28,5 @@ body=$2
 cactus_all git-pull-request \
     -Dcactus.authentication-token="$TELENAV_GIT_AUTHENTICATION_TOKEN" \
     -Dcactus.title="$title" \
-    -Dcactus.body="$body" || exit 1
+    -Dcactus.body="$body" \
+    -Dcactus.reviewers="rodherz,sunshine-syz,timboudreau,wenjuanj,jonathanl-telenav,haifeng-z" || exit 1
