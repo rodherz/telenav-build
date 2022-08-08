@@ -266,10 +266,11 @@ cactus_all()
     shift
 
     cd_workspace
-    echo mvn --quiet \
-        "-Dcactus.scope=all" \
+    command="mvn -Dcactus.scope=all \
         "${*}" \
-        com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":"${command}" || exit 1
+        com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":"${command}""
+    echo "$command"
+    eval "$command" || exit 1
 }
 
 ################ LEXAKAI ###############################################################################################
