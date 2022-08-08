@@ -9,10 +9,12 @@
 
 source telenav-library-functions.sh
 
-scope=""
-get_scope_argument "$@"
+branch_type=feature
+branch_name=$(get_optional_argument "Branch name? " "$@")
 
-cd_workspace
-mvn --quiet \
-    "$(resolve_scope_switches "$scope")" \
-    com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":push || exit 1
+if [[ -z "$branch_name" ]]; then
+    usage "[branch_name]"
+else
+    cd_workspace
+    cbranch --new "$branch_type/$branch_name" || exit 1
+fi

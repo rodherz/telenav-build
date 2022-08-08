@@ -7,10 +7,14 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-scope=""
-branch=""
-
 source telenav-library-functions.sh
 
-get_scope_and_branch_arguments "$@"
-git_checkout_branch "$scope" "$branch" false || exit 1
+branch_type=hotfix
+branch_name=$(get_optional_argument "Branch name? " "$@")
+
+if [[ -z "$branch_name" ]]; then
+    usage "[branch_name]"
+else
+    cd_workspace
+    cbranch --new "$branch_type/$branch_name" || exit 1
+fi

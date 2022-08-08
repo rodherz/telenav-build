@@ -7,17 +7,14 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-scope=""
-branch=""
-type="hotfix"
-
 source telenav-library-functions.sh
 
-get_scope_and_branch_arguments "$@"
+branch_type=bugfix
+branch_name=$(get_optional_argument "Branch name? " "$@")
 
-if [[ ! $(git_check_branch_name "$scope" develop)  ]]; then
-    echo "Must be on 'develop' branch to start a $type"
-    exit 1
+if [[ -z "$branch_name" ]]; then
+    usage "[branch_name]"
+else
+    cd_workspace
+    cbranch --new "$branch_type/$branch_name" || exit 1
 fi
-
-git_checkout_branch "$scope" "$type/$branch" true || exit 1

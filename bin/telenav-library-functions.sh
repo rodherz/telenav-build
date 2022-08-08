@@ -4,14 +4,12 @@ export NORMAL='\033[0m'
 export ATTENTION='\033[1;32m'
 
 if [[ "$OSTYPE" == "darwin"* ]]; then
-
     export HISTCONTROL=ignoreboth:erasedups
-
 fi
 
-################ BUILD ##################################################################################################
+################ WORKSPACE ################################################################################################
 
-cd_workspace()
+function cd_workspace()
 {
     if [[ "$TELENAV_WORKSPACE" == "" ]]; then
         echo "TELENAV_WORKSPACE must be defined"
@@ -21,7 +19,7 @@ cd_workspace()
     cd "$TELENAV_WORKSPACE" || exit 1
 }
 
-show_workspace()
+function show_workspace()
 {
     echo " "
     echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Telenav Workspace ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
@@ -61,99 +59,53 @@ show_workspace()
     echo " "
 }
 
-resolved_folders=()
-export resolved_folders
+################ PROJECTS ############################################################################################
 
-resolve_scoped_folders()
+project_version()
 {
-    pattern=$1
+    project_home=$1
 
-    if [[ $pattern == "all" ]]; then
-        pattern="kivakit|mesakit|cactus|lexakai"
-    fi
-
-    cd_workspace
-    resolved_folders=()
-    for folder in */; do
-        if [[ "$folder" =~ $pattern ]]; then
-            if [[ ! "$folder" == *"-assets"* ]]; then
-                resolved_folders+=("$TELENAV_WORKSPACE/$folder")
-            fi
-        fi
-    done
+    pushd "$project_home" 1>/dev/null || exit 1
+    mvn -q -DforceStdout org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version || exit 1
+    popd 1>/dev/null || exit 1
 }
+
+project_name()
+{
+    project_home=$1
+
+    # shellcheck disable=SC2046
+    # shellcheck disable=SC2005
+    echo $(basename -- "$project_home")
+}
+
+project_build()
+{
+    project_home=$1
+
+    build_properties="$KIVAKIT_HOME/kivakit-core/target/classes/build.properties"
+
+    if [ -e "$build_properties" ]; then
+
+        build_name=$(property_value "$build_properties" build-name)
+        build_number=$(property_value "$build_properties" build-number)
+        build_date=$(property_value "$build_properties" build-date)
+
+        branch_name=$(git_branch_name "$project_home")
+
+        echo "$branch_name build #$build_number [$build_name] on $build_date"
+
+    fi
+}
+
+################ SCOPES ################################################################################################
 
 resolved_scope=""
+resolved_scope_switches=()
 resolved_families=()
+
 export resolved_scope
 export resolved_families
-
-function join_by()
-{
-    local d=${1-} f=${2-}
-    if shift 2; then
-        printf %s "$f" "${@/#/$d}"
-    fi
-}
-
-cactus_version()
-{
-    # shellcheck disable=SC2002
-    cat "${TELENAV_WORKSPACE}"/cactus/pom.xml | grep -Eow "<cactus\.previous\.version>(.*?)</cactus\.previous\.version>" | sed -E 's/.*>(.*)<.*/\1/'
-}
-
-scope=""
-branch=""
-export scope
-export branch
-
-get_scope_and_branch_arguments()
-{
-    arguments=("$@")
-
-    # If there is only one argument
-    if [[ ${#arguments[@]} -eq 1 ]]; then
-
-        # switch all project families to the given branch,
-        scope="all-project-families"
-        branch=${arguments[0]}
-
-    # and if there are two arguments,
-    elif [[ ${#arguments[@]} -eq 2 ]]; then
-
-        # switch the scoped project families to the given branch,
-        scope=${arguments[0]}
-        branch=${arguments[1]}
-
-    else
-
-        # otherwise, exit with usage.
-        echo "$(script) [scope]? [branch-name]"
-        exit 1
-
-    fi
-}
-
-get_scope_argument()
-{
-    arguments=("$@")
-
-    # If there is only one argument
-    if [[ ${#arguments[@]} -eq 1 ]]; then
-
-        # that is the scope,
-        scope=${arguments[0]}
-
-    else
-
-        # otherwise, exit with usage.
-        echo "$(script) [scope]"
-        exit 1
-
-    fi
-}
-
-resolved_scope_switches=()
 export resolved_scope_switches
 
 resolve_scope_switches()
@@ -173,6 +125,7 @@ resolve_scope_switches()
         resolved_scope_switches=(-Dcactus.scope="$resolved_scope" -Dcactus.families="$families")
 
     fi
+
 }
 
 resolve_scope()
@@ -228,6 +181,8 @@ resolve_scope()
     esac
 }
 
+################ TOOLS ################################################################################################
+
 check_tools()
 {
     caller=$1
@@ -265,54 +220,15 @@ check_tools()
     fi
 }
 
-project_version()
-{
-    project_home=$1
-
-    pushd "$project_home" 1>/dev/null || exit 1
-    mvn -q -DforceStdout org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version || exit 1
-    popd 1>/dev/null || exit 1
-}
-
-project_name()
-{
-    project_home=$1
-
-    # shellcheck disable=SC2046
-    # shellcheck disable=SC2005
-    echo $(basename -- "$project_home")
-}
-
-project_build()
-{
-    project_home=$1
-
-    build_properties="$KIVAKIT_HOME/kivakit-core/target/classes/build.properties"
-
-    if [ -e "$build_properties" ]; then
-
-        build_name=$(property_value "$build_properties" build-name)
-        build_number=$(property_value "$build_properties" build-number)
-        build_date=$(property_value "$build_properties" build-date)
-
-        branch_name=$(git_branch_name "$project_home")
-
-        echo "$branch_name build #$build_number [$build_name] on $build_date"
-
-    fi
-}
-
-show_version()
-{
-    project_home=$1
-    project_name=$(project_name "$project_home")
-    project_version=$(project_version "$project_home")
-
-    echo -e "${ATTENTION}$project_name $project_version $(project_build "$project_home")${NORMAL}"
-}
-
-
 ################ GIT ################################################################################################
+
+git_repository_initialize()
+{
+    echo "Git pull fast-forward"
+    git config pull.ff false || exit 1
+    # shellcheck disable=SC2016
+    git submodule foreach 'git config pull.ff false && echo "Configuring $name"' || exit 1
+}
 
 git_branch_name()
 {
@@ -323,25 +239,16 @@ git_branch_name()
     echo "$branch_name"
 }
 
-update_version_and_checkout()
+################ CACTUS ##############################################################################################
+
+cactus_version()
 {
-    arguments=("$@")
-
-    family=$1
-    version=$2
-
-    mvn -Dcactus.create.release.branch=true \
-        -Dcactus.scope="family" \
-        -Dcactus.family="$family" \
-        -Dcactus.commit-changes=true \
-        -Dcactus.explicit.version="$version" \
-        com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":bump-version
+    # shellcheck disable=SC2002
+    cat "${TELENAV_WORKSPACE}"/cactus/pom.xml | grep -Eow "<cactus\.previous\.version>(.*?)</cactus\.previous\.version>" | sed -E 's/.*>(.*)<.*/\1/'
 }
 
-git_check_branch_name()
+cactus_check_branch()
 {
-    arguments=("$@")
-
     scope=$1
     branch=$2
 
@@ -353,118 +260,19 @@ git_check_branch_name()
         com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":check
 }
 
-git_checkout_branch()
+cactus_all()
 {
-    arguments=("$@")
-
-    scope=$1
-    branch=$2
-    create=$3
-
-    resolve_scope_switches "$scope"
+    command=$1
+    shift
 
     cd_workspace
-    mvn --quiet \
-        "${resolved_scope_switches[@]}" \
-        -Dcactus.target-branch="$branch" \
-        -Dcactus.update-root=true \
-        -Dcactus.create-branches="$create" \
-        -Dcactus.push=false \
-        -Dcactus.permit-local-changes=true \
-        com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":checkout || exit 1
+    echo mvn --quiet \
+        "-Dcactus.scope=all" \
+        "${*}" \
+        com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":"${command}" || exit 1
 }
 
-git_repository_initialize()
-{
-    echo "Git pull fast-forward"
-    git config pull.ff false || exit 1
-    # shellcheck disable=SC2016
-    git submodule foreach 'git config pull.ff false && echo "Configuring $name"' || exit 1
-}
-
-################ UTILITY ################################################################################################
-
-script()
-{
-    # shellcheck disable=SC2046
-    # shellcheck disable=SC2005
-    echo $(basename -- "$0")
-}
-
-usage()
-{
-    argument_help=$1
-
-    echo "Usage: $(script) $argument_help"
-    exit 1
-}
-
-require_variable()
-{
-    variable=$1
-    argument_help=$2
-
-    if [[ -z "${!variable}" ]]; then
-
-        if [[ "$argument_help" == *"["* ]]; then
-            usage "$argument_help"
-        else
-            echo "$argument_help"
-        fi
-
-        exit 1
-
-    fi
-}
-
-require_folder()
-{
-    variable=$1
-    argument_help=$2
-
-    if [[ ! -e "${!variable}" ]]; then
-
-        echo "Folder '${!variable}' does not exist"
-        exit 1
-
-    fi
-}
-
-append_path()
-{
-    export PATH="$PATH:$1"
-}
-
-prepend_path()
-{
-    export PATH="$1:$PATH"
-}
-
-system_variable()
-{
-    variable=$1
-    value=$2
-    temporary="${TMPDIR}export.txt"
-
-    echo "export $variable=\"$value\"" >"$temporary"
-    # shellcheck disable=SC1090
-    source "$temporary"
-
-    if is_mac; then
-
-        launchctl setenv "$variable" "$value"
-
-    fi
-}
-
-is_mac()
-{
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        true
-    else
-        false
-    fi
-}
+################ LEXAKAI ###############################################################################################
 
 lexakai()
 {
@@ -503,6 +311,103 @@ lexakai()
     java -jar "$lexakai_jar" $@
 }
 
+################ ARGUMENTS ################################################################################################
+
+function script()
+{
+    # shellcheck disable=SC2046
+    # shellcheck disable=SC2005
+    echo $(basename -- "$0")
+}
+
+function get_optional_argument()
+{
+    prompt=$1
+    shift
+
+    if [[ "$#" -eq 0 ]]; then
+        read -r -p "$prompt"
+        argument=$REPLY
+    elif [[ "$#" -eq 1 ]]; then
+        argument=$1
+    else
+        argument=""
+    fi
+    echo "$argument"
+}
+
+usage()
+{
+    argument_help=$1
+
+    echo "Usage: $(script) $argument_help"
+    exit 1
+}
+
+################ REQUIRE ################################################################################################
+
+require_variable()
+{
+    variable=$1
+    argument_help=$2
+
+    if [[ -z "${!variable}" ]]; then
+
+        if [[ "$argument_help" == *"["* ]]; then
+            usage "$argument_help"
+        else
+            echo "$argument_help"
+        fi
+
+        exit 1
+
+    fi
+}
+
+require_folder()
+{
+    variable=$1
+    argument_help=$2
+
+    if [[ ! -e "${!variable}" ]]; then
+
+        echo "Folder '${!variable}' does not exist"
+        exit 1
+
+    fi
+}
+
+################ PATH ################################################################################################
+
+append_path()
+{
+    export PATH="$PATH:$1"
+}
+
+prepend_path()
+{
+    export PATH="$1:$PATH"
+}
+
+################ UTILITY ################################################################################################
+
+function join_by()
+{
+    local d=${1-} f=${2-}
+    if shift 2; then
+        printf %s "$f" "${@/#/$d}"
+    fi
+}
+
+is_mac()
+{
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        true
+    else
+        false
+    fi
+}
+
 property_value()
 {
     file=$1
@@ -510,23 +415,6 @@ property_value()
 
     # shellcheck disable=SC2002
     cat "$file" | grep "$key" | cut -d'=' -f2 | xargs echo
-}
-
-bracket()
-{
-    name=$1
-    shift
-
-    echo " " && echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ \$name && $*" && echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━" && echo " "
-
-}
-
-ask()
-{
-    prompt=$1
-
-    read -r -p "$prompt? "
-    printf "\n"
 }
 
 yes_no()

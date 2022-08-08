@@ -7,17 +7,14 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-scope=""
-branch=""
-type="feature"
-
 source telenav-library-functions.sh
 
-get_scope_and_branch_arguments "$@"
+message=$(get_optional_argument "Commit message? " "$@")
 
-if [[ ! $(git_check_branch_name "$scope" develop)  ]]; then
-    echo "Must be on 'develop' branch to start a $type"
-    exit 1
+if [[ -z "$message" ]]; then
+    usage "[message]"
 fi
 
-git_checkout_branch "$scope" "$type/$branch" true || exit 1
+cactus_all commit \
+    -Dcactus.commit-message=\""$message"\" \
+    -Dcactus.update-root=true

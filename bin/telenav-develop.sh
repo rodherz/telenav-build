@@ -9,10 +9,5 @@
 
 source telenav-library-functions.sh
 
-scope=""
-get_scope_argument "$@"
-
 cd_workspace
-mvn --quiet \
-    "$(resolve_scope_switches "$scope")" \
-    com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":is-dirty || exit 1
+cactus-development-preparation || exit 1

@@ -9,22 +9,23 @@
 
 source telenav-library-functions.sh
 
-if [[ ! "$#" -eq 4 ]]; then
+if [[ -z "$TELENAV_GIT_AUTHENTICATION_TOKEN" ]]; then
 
-    echo "telenav-git-pull-request.sh [scope] [authentication-token] [title] [body]"
+    echo "Must set TELENAV_GIT_AUTHENTICATION_TOKEN environment variable to create pull requests"
     exit 1
 
 fi
 
-scope=$1
-authentication_token=$2
-title=$3
-body=$4
+if [[ ! "$#" -eq 2 ]]; then
 
-cd_workspace
-mvn --quiet \
-    "$(resolve_scope_switches "$scope")" \
-    -Dcactus.authentication-token="$authentication_token" \
+    usage "[title] [body]"
+
+fi
+
+title=$1
+body=$2
+
+cactus_all git-pull-request \
+    -Dcactus.authentication-token="$TELENAV_GIT_AUTHENTICATION_TOKEN" \
     -Dcactus.title="$title" \
-    -Dcactus.body="$body" \
-    com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":git-pull-request || exit 1
+    -Dcactus.body="$body" || exit 1
