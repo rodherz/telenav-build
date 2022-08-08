@@ -195,32 +195,27 @@ This model specifies the following branch naming convention:
 ### Git Operations
 
 After following the [Initial Setup Instructions](initial-setup-instructions.md), the scripts below will be available.
+These scripts work on all projects in the workspace, which is the primary use case for developers. For more 
+granular work using scopes, see [Cactus](https://github.com/Telenav/cactus).
 
-| Script                                                                           | Purpose                                                   |
-|----------------------------------------------------------------------------------|-----------------------------------------------------------|
-| `telenav-git-checkout.sh` `scope`**?** `branch-name`                             | Checks out the given branch for the scoped repositories   |
-| `telenav-git-commit.sh` `scope`**?** `message`                                   | Commits to the scoped repositories with the given message |
-| `telenav-git-hard-reset.sh`                                                      | Resets the current repository, losing all changes         |
-| `telenav-git-is-dirty.sh` `scope`**?**                                           | Shows which scoped repositories are dirty                 |
-| `telenav-git-pull.sh` `scope`**?**                                               | Pulls from all scoped repositories                        |
-| `telenav-git-pull-request.sh` `scope`**?** `authentication-token` `title` `body` | Pulls from all scoped repositories                        |
-| `telenav-git-push.sh` `scope`**?**                                               | Pushes staged changes from all scoped repositories        |
-| `telenav-git-status.sh`                                                          | Shows the status of all repositories in the workspace     |
-| `telenav-git-[branch-type]-start.sh` `branch-name`                               | Starts a branch of the given git-flow type                |
-| `telenav-git-[branch-type]-finish.sh` `branch-name`                              | Ends a branch of the given git-flow type                  |
 
-Where `scope` is one of:
- 
- - `all` - All repositories in the TELENAV_WORKSPACE
- - `this` - The project in the current folder
- - `[family-name]` - A family of repositories, such as `kivakit`, `mesakit` or `lexakai`
+| Script                                                            | Purpose                                                                          |
+|-------------------------------------------------------------------|----------------------------------------------------------------------------------|
+| `telenav-checkout.sh` `branch-name`                               | Checks out the given branch of all repositories in the workspace                 |
+| `telenav-commit.sh` `message`                                     | Commits all workspace changes with the given message                             |
+| `telenav-reset.sh`                                                | Resets the workspace, losing all changes                                         |
+| `telenav-is-dirty.sh`                                             | Shows which repositories in the workspace are dirty                              |
+| `telenav-pull.sh`                                                 | Pulls from all repositories in the workspace                                     |
+| `telenav-pull-request.sh` `authentication-token` `title` `body`   | Creates a pull request for all repositories in the workspace                     |
+| `telenav-push.sh`                                                 | Pushes all changes in the workspace                                              |
+| `telenav-status.sh`                                               | Shows the status of all repositories in the workspace                            |
+| `telenav-start-[branch-type].sh` `branch-name`                    | Starts a branch of the given git-flow type for all repositories in the workspace |
 
-and branch-type is one of:
+Here, `branch-type` must be one of:
 
  - `bugfix`
  - `feature`
  - `hotfix`
- - `release`
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
 
