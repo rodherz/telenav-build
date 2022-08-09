@@ -11,14 +11,14 @@ source telenav-library-functions.sh
 
 if [[ -z "$TELENAV_GIT_AUTHENTICATION_TOKEN" ]]; then
 
-    echo "Must set TELENAV_GIT_AUTHENTICATION_TOKEN environment variable to create pull requests"
+    echo "Must set TELENAV_GIT_AUTHENTICATION_TOKEN environment variable to merge pull requests"
     exit 1
 
 fi
 
 if [[ "$#" -eq 0 ]]; then
 
-    branch_name=$(branch_name "$KIVAKIT_HOME")
+    branch_name=$(branch_name "$TELENAV_WORKSPACE/kivakit")
 
 elif [[ "$#" -eq 1 ]]; then
 
