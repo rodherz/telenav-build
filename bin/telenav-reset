@@ -7,7 +7,10 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-source "${TELENAV_WORKSPACE}/bin/telenav-build-library-functions.sh"
+source telenav-library-functions
 
-remove_maven_repository
-bash telenav-clean.sh
+if yes_no "WARNING: A git hard reset is NOT recoverable. Proceed? "; then
+
+    git reset --hard HEAD && git clean -f -d
+
+fi

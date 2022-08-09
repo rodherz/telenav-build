@@ -7,7 +7,7 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-source telenav-library-functions.sh
+source telenav-library-functions
 
 branch_type=hotfix
 branch_name=$(get_optional_argument "Branch name? " "$@")

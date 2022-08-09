@@ -7,7 +7,7 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-source "${TELENAV_WORKSPACE}/bin/telenav-build-library-functions.sh"
+source "${TELENAV_WORKSPACE}/bin/telenav-build-library-functions"
 
 threads="12"
 build_javadoc=false
@@ -43,7 +43,7 @@ build_switches+=(--threads "$threads")
 telenav_start_build
 
 if [[ "$build_javadoc" == "true" ]]; then
-    bash telenav-build-javadoc.sh "${build_scope}"
+    bash telenav-build-javadoc "${build_scope}"
 fi
 
 if [ -z "$dry_run" ]; then
