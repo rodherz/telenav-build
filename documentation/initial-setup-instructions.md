@@ -27,9 +27,9 @@ To check out, configure and build all Telenav Open Source projects for the first
 
     git clone https://github.com/Telenav/telenav-build.git
     cd telenav-build
-    ./setup.sh
+    ./setup
     
-Optionally, `setup.sh` can take a `branch-name` argument, where `branch-name` is one of:
+Optionally, `setup` can take a `branch-name` argument, where `branch-name` is one of:
 
  - `master` (latest release)
  - `develop` (development, default)
@@ -60,7 +60,7 @@ When the checkout and build process completes, you should have a project tree li
             ├── pom.xml
             ├── README.md
             ├── source-me
-            └── setup.sh
+            └── setup
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 

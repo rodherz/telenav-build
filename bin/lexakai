@@ -7,14 +7,6 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-source telenav-library-functions.sh
+source telenav-library-functions
 
-message=$(get_optional_argument "Commit message? " "$@")
-
-if [[ -z "$message" ]]; then
-    usage "[message]"
-fi
-
-cactus_all commit \
-    -Dcactus.commit-message=\""$message"\" \
-    -Dcactus.update-root=true
+lexakai "$@"

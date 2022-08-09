@@ -7,6 +7,7 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-source telenav-library-functions.sh
+source "${TELENAV_WORKSPACE}/bin/telenav-build-library-functions"
 
-cactus_all is-dirty || exit 1
+remove_maven_repository
+bash telenav-clean

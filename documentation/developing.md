@@ -43,17 +43,17 @@ they are *not required*, merely convenient.
 ## Typical Workflow for a Feature
 
 1. Set `TELENAV_GIT_AUTHENTICATION_TOKEN`
-2. `telenav-start-feature.sh #87-hover-mode`
+2. `telenav-start-feature #87-hover-mode`
 3. Complete the feature branch
-4. `telenav-pull-request.sh "added hovering" "added spacecraft hover mode"`
+4. `telenav-pull-request "added hovering" "added spacecraft hover mode"`
 5. Build and review on Github
-6. `telenav-merge-pull-request.sh`
+6. `telenav-merge-pull-request`
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
 ## Workspace Information
 
-To get the versions of tools, and repository families in the Telenav workspace, run `telenav-version.sh`:
+To get the versions of tools, and repository families in the Telenav workspace, run `telenav-version`:
 
     ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Versions ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┋
@@ -70,7 +70,7 @@ To get the versions of tools, and repository families in the Telenav workspace, 
     ┋
     ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛
 
-To get information about the projects in the Telenav workspace, run `telenav-workspace.sh`:
+To get information about the projects in the Telenav workspace, run `telenav-workspace`:
 
     ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Telenav Workspace ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓
     ┋
@@ -109,33 +109,33 @@ To get information about the projects in the Telenav workspace, run `telenav-wor
 
 ## Building &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/command-line-24.png" srcset="https://telenav.github.io/telenav-assets/images/icons/command-line-24-2x.png 2x"/>
 
-The `telenav-build.sh` script helps to compose Maven commands. It takes an optional `build-scope`,
+The `telenav-build` script helps to compose Maven commands. It takes an optional `build-scope`,
 zero or more `build-modifiers`, and a `build-type`:
 
-`telenav-build.sh` `[build-scope]`**?** `[build-modifier]`**&ast;** `[build-type]`
+`telenav-build` `[build-scope]`**?** `[build-modifier]`**&ast;** `[build-type]`
 
 ### Examples &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/books-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/books-32-2x.png 2x"/>
 
-For example, `telenav-build.sh kivakit release` builds a release of the KivaKit project family and uploads
+For example, `telenav-build kivakit release` builds a release of the KivaKit project family and uploads
 it to OSSRH (Maven Central staging). Some more examples:
 
 | Example Command                          | Purpose                                                                                            |
 |------------------------------------------|----------------------------------------------------------------------------------------------------|
-| `telenav-build.sh`                       | Build all projects and run tests                                                                   |
-| `telenav-build.sh help`                  | Show script help                                                                                   |
-| `telenav-build.sh kivakit release`       | Build a release for the kivakit project family and upload it to OSSRH (Maven Central staging)      |
- | `telenav-build.sh mesakit release-local` | Build a release for the mesakit project family but don't upload it                                 |
- | `telenav-build.sh compile`               | Compile the code in all repositories                                                               |
- | `telenav-build.sh clean`                 | Build all projects after removing cached and temporary files, and all Telenav repository artifacts |
-| `telenav-build.sh clean-sparkling`       | Build completely from scratch after removing the entire local Maven repository                     |
-| `telenav-build.sh javadoc`               | Build javadoc documentation for all project families                                               |
-| `telenav-build.sh javadoc lexakai`       | Build javadoc and lexakai documentation for all project families                                   |
-| `telenav-build.sh single-threaded`       | Build all projects with only one thread (12 is the default)                                        |
+| `telenav-build`                       | Build all projects and run tests                                                                   |
+| `telenav-build help`                  | Show script help                                                                                   |
+| `telenav-build kivakit release`       | Build a release for the kivakit project family and upload it to OSSRH (Maven Central staging)      |
+ | `telenav-build mesakit release-local` | Build a release for the mesakit project family but don't upload it                                 |
+ | `telenav-build compile`               | Compile the code in all repositories                                                               |
+ | `telenav-build clean`                 | Build all projects after removing cached and temporary files, and all Telenav repository artifacts |
+| `telenav-build clean-sparkling`       | Build completely from scratch after removing the entire local Maven repository                     |
+| `telenav-build javadoc`               | Build javadoc documentation for all project families                                               |
+| `telenav-build javadoc lexakai`       | Build javadoc and lexakai documentation for all project families                                   |
+| `telenav-build single-threaded`       | Build all projects with only one thread (12 is the default)                                        |
 
 ### Build Scopes
 
 The `telenav-build` workspace can contain any set of Telenav Open Source projects.
-To allow `telenav-build.sh` to build different subsets of these projects, an optional
+To allow `telenav-build` to build different subsets of these projects, an optional
 project `build-scope` specifier is accepted, which must be one of:
 
 | Build Scope                           | Purpose                                                                                             | 
@@ -208,17 +208,17 @@ These scripts work on all projects in the workspace, which is the primary use ca
 granular work using scopes, see [Cactus](https://github.com/Telenav/cactus).
 
 
-| Script                                                            | Purpose                                                                          |
-|-------------------------------------------------------------------|----------------------------------------------------------------------------------|
-| `telenav-checkout.sh` `branch-name`                               | Checks out the given branch of all repositories in the workspace                 |
-| `telenav-commit.sh` `message`                                     | Commits all workspace changes with the given message                             |
-| `telenav-reset.sh`                                                | Resets the workspace, losing all changes                                         |
-| `telenav-is-dirty.sh`                                             | Shows which repositories in the workspace are dirty                              |
-| `telenav-pull.sh`                                                 | Pulls from all repositories in the workspace                                     |
-| `telenav-pull-request.sh` `authentication-token` `title` `body`   | Creates a pull request for all repositories in the workspace                     |
-| `telenav-push.sh`                                                 | Pushes all changes in the workspace                                              |
-| `telenav-status.sh`                                               | Shows the status of all repositories in the workspace                            |
-| `telenav-start-[branch-type].sh` `branch-name`                    | Starts a branch of the given git-flow type for all repositories in the workspace |
+| Script                                                       | Purpose                                                                          |
+|--------------------------------------------------------------|----------------------------------------------------------------------------------|
+| `telenav-checkout` `branch-name`                             | Checks out the given branch of all repositories in the workspace                 |
+| `telenav-commit` `message`                                   | Commits all workspace changes with the given message                             |
+| `telenav-reset`                                              | Resets the workspace, losing all changes                                         |
+| `telenav-is-dirty`                                           | Shows which repositories in the workspace are dirty                              |
+| `telenav-pull`                                               | Pulls from all repositories in the workspace                                     |
+| `telenav-pull-request` `authentication-token` `title` `body` | Creates a pull request for all repositories in the workspace                     |
+| `telenav-push`                                               | Pushes all changes in the workspace                                              |
+| `telenav-status`                                             | Shows the status of all repositories in the workspace                            |
+| `telenav-start-[branch-type]` `branch-name`                  | Starts a branch of the given git-flow type for all repositories in the workspace |
 
 Here, `branch-type` must be one of:
 

@@ -7,7 +7,10 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-source telenav-library-functions.sh
+source telenav-library-functions
 
+echo " "
 cd_workspace
-cactus-push-all-submodules || exit 1
+git status --short || exit 1
+git submodule --quiet foreach "git status --short" || exit 1
+echo " "

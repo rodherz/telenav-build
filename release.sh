@@ -43,7 +43,7 @@ do
     fi
     if [ "$argument" == "help" ]; then
         echo " "
-        echo "release.sh [publish|skip-review|quiet|fast|help]*"
+        echo "release [publish|skip-review|quiet|fast|help]*"
         echo " "
         exit 0
     fi
@@ -58,7 +58,7 @@ done
 # shellcheck disable=SC2046
 ORIGINAL_WORKSPACE=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)
 
-source "${ORIGINAL_WORKSPACE}"/bin/telenav-library-functions.sh
+source "${ORIGINAL_WORKSPACE}"/bin/telenav-library-functions
 
 
 

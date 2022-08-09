@@ -7,7 +7,7 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-source "${TELENAV_WORKSPACE}/bin/telenav-library-functions.sh"
+source "${TELENAV_WORKSPACE}/bin/telenav-library-functions"
 
 allowed_scopes=(all this telenav-superpom kivakit mesakit lexakai)
 allowed_build_types=(compile release release-local tools dmg javadoc lexakai-documentation help)
@@ -94,20 +94,20 @@ telenav_build_parse_build_modifiers()
                 ;;
 
             "clean")
-                clean_script="telenav-clean.sh"
+                clean_script="telenav-clean"
                 ;;
 
             "clean-forced")
-                clean_script="telenav-clean-forced.sh"
+                clean_script="telenav-clean-forced"
                 ;;
 
             "clean-force")
-                clean_script="telenav-clean-forced.sh"
+                clean_script="telenav-clean-forced"
                 ;;
 
             "clean-sparkling")
                 # shellcheck disable=SC2034
-                clean_script="telenav-clean-sparkling.sh"
+                clean_script="telenav-clean-sparkling"
                 ;;
 
             "debug")
@@ -292,7 +292,7 @@ telenav_build_parse_build_types()
 telenav_build_usage()
 {
     echo " "
-    echo "Usage: telenav-build.sh [build-scope|build-type|build-modifiers]*"
+    echo "Usage: telenav-build [build-scope|build-type|build-modifiers]*"
     echo " "
     echo "  BUILD SCOPES"
     echo " "
