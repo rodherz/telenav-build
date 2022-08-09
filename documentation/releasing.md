@@ -37,13 +37,13 @@ To begin the release process:
 From the root of our `telenav-build` workspace we execute:
 
 ```
-./release.sh
+./release
 ```
 
-To create a release and publish it to Maven Central, we pass `publish` as an argument to `release.sh`:
+To create a release and publish it to Maven Central, we pass `publish` as an argument to `release`:
 
 ```
-./release.sh publish
+./release publish
 ``` 
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
@@ -91,7 +91,7 @@ For example, if the workspace is at 2.5.9-SNAPSHOT and 'minor' is selected, the 
 
 ### 1.4 Release Options
 
-The following options can be passed to the `release.sh` script:
+The following options can be passed to the `release` script:
 
 | Option      | Description                                                      |
 |-------------|------------------------------------------------------------------|
@@ -117,7 +117,7 @@ to prepare the release:
 
 ### 1.6 Documentation Review
 
-If the `skip-review` option is not passed to `release.sh`, the release process will pause
+If the `skip-review` option is not passed to `release`, the release process will pause
 to allow review of the documentation on Github:
 
 ```

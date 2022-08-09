@@ -7,9 +7,9 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-source telenav-library-functions.sh
+source telenav-library-functions
 
-branch_type=bugfix
+branch_type=feature
 branch_name=$(get_optional_argument "Branch name? " "$@")
 
 if [[ -z "$branch_name" ]]; then

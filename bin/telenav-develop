@@ -7,8 +7,7 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-source "${TELENAV_WORKSPACE}/bin/telenav-build-library-functions.sh"
+source telenav-library-functions
 
-telenav_clean_caches_forced
-telenav_clean_maven_repository_forced
-telenav_clean_temporary_files_forced "$TELENAV_WORKSPACE"
+cd_workspace
+cactus-development-preparation || exit 1

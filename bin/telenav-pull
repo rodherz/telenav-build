@@ -7,7 +7,7 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-source telenav-library-functions.sh
+source telenav-library-functions
 
 cd_workspace
-cactus-development-preparation || exit 1
+cactus-pull-all-submodules || exit 1

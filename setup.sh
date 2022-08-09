@@ -6,7 +6,7 @@ if [[ -z "$TELENAV_WORKSPACE" ]]; then
     export TELENAV_WORKSPACE=$SCRIPT_PATH
 fi
 
-source "$TELENAV_WORKSPACE"/bin/telenav-library-functions.sh
+source "$TELENAV_WORKSPACE"/bin/telenav-library-functions
 
 branch_name=$1
 caller=$2
@@ -161,4 +161,3 @@ echo "Done."
 #
 
 cat $TELENAV_WORKSPACE/setup/sample-bash-profile
-
