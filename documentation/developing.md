@@ -42,12 +42,11 @@ they are *not required*, merely convenient.
 
 ## Typical Workflow for a Feature
 
-1. Set `TELENAV_GIT_AUTHENTICATION_TOKEN`
-2. `telenav-start-feature #87-hover-mode`
-3. Complete the feature branch
-4. `telenav-pull-request "added hovering" "added spacecraft hover mode"`
-5. Build and review on Github
-6. `telenav-merge-pull-request`
+1. `telenav-start-feature #87-hover-mode`
+2. Complete the feature branch
+3. `telenav-pull-request "added hovering" "added spacecraft hover mode"`
+4. Build and review on Github
+5. `telenav-merge-pull-request`
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 

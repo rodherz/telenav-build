@@ -9,9 +9,9 @@
 
 source telenav-library-functions
 
-if [[ -z "$TELENAV_GIT_AUTHENTICATION_TOKEN" ]]; then
+if [[ -z "$TELENAV_GITHUB_PERSONAL_ACCESS_TOKEN" ]]; then
 
-    echo "Must set TELENAV_GIT_AUTHENTICATION_TOKEN environment variable to merge pull requests"
+    echo "Must set TELENAV_GITHUB_PERSONAL_ACCESS_TOKEN environment variable to merge pull requests"
     exit 1
 
 fi
@@ -31,5 +31,5 @@ else
 fi
 
 cactus_all git-merge-pull-request \
-    -Dcactus.authentication-token="$TELENAV_GIT_AUTHENTICATION_TOKEN" \
+    -Dcactus.authentication-token="$TELENAV_GITHUB_PERSONAL_ACCESS_TOKEN" \
     -Dcactus.branch-name="$branch_name" || exit 1
