@@ -160,4 +160,4 @@ echo "Done."
 # Show sample Bash profile
 #
 
-cat $TELENAV_WORKSPACE/setup/sample-bash-profile
+cat "$TELENAV_WORKSPACE"/setup-resources/sample-bash-profile
