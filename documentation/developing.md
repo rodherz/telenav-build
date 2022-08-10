@@ -207,17 +207,17 @@ These scripts work on all projects in the workspace, which is the primary use ca
 granular work using scopes, see [Cactus](https://github.com/Telenav/cactus).
 
 
-| Script                                                       | Purpose                                                                          |
-|--------------------------------------------------------------|----------------------------------------------------------------------------------|
-| `telenav-checkout` `branch-name`                             | Checks out the given branch of all repositories in the workspace                 |
-| `telenav-commit` `message`                                   | Commits all workspace changes with the given message                             |
-| `telenav-reset`                                              | Resets the workspace, losing all changes                                         |
-| `telenav-is-dirty`                                           | Shows which repositories in the workspace are dirty                              |
-| `telenav-pull`                                               | Pulls from all repositories in the workspace                                     |
-| `telenav-pull-request` `authentication-token` `title` `body` | Creates a pull request for all repositories in the workspace                     |
-| `telenav-push`                                               | Pushes all changes in the workspace                                              |
-| `telenav-status`                                             | Shows the status of all repositories in the workspace                            |
-| `telenav-start-[branch-type]` `branch-name`                  | Starts a branch of the given git-flow type for all repositories in the workspace |
+| Script                                      | Purpose                                                                          |
+|---------------------------------------------|----------------------------------------------------------------------------------|
+| `telenav-checkout` `branch-name`            | Checks out the given branch of all repositories in the workspace                 |
+| `telenav-commit` `message`                  | Commits all workspace changes with the given message                             |
+| `telenav-reset`                             | Resets the workspace, losing all changes                                         |
+| `telenav-is-dirty`                          | Shows which repositories in the workspace are dirty                              |
+| `telenav-pull`                              | Pulls from all repositories in the workspace                                     |
+| `telenav-pull-request` `title` `body`       | Creates a pull request for all repositories in the workspace                     |
+| `telenav-push`                              | Pushes all changes in the workspace                                              |
+| `telenav-status`                            | Shows the status of all repositories in the workspace                            |
+| `telenav-start-[branch-type]` `branch-name` | Starts a branch of the given git-flow type for all repositories in the workspace |
 
 Here, `branch-type` must be one of:
 
