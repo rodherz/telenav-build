@@ -40,13 +40,16 @@ they are *not required*, merely convenient.
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
-## Typical Workflow for a Feature
+## Workflow for Developing a Feature
 
-1. `telenav-start-feature #87-hover-mode`
-2. Complete the feature branch
-3. `telenav-pull-request "added hovering" "added spacecraft hover mode"`
-4. Build and review on Github
-5. `telenav-merge-pull-request`
+1. `telenav-develop`--switch all projects to the `develop` branch
+2. `telenav-start-feature hover-mode-#87`--create and switch all projects in the workspace to the feature/hover-mode#87branch
+3. [coding]
+4. `telenav-push`--push all relevant branches to Github
+5. `telenav-pull-request`--create a pull request for the branch
+6. [code review]
+7. `telenav-merge-pull-request`--merge all pull requests at once into the `develop` branch and delete the feature branch
+8. `telenav-develop`--switch all projects back to the `develop` branch
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
