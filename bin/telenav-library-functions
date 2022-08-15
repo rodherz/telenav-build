@@ -295,7 +295,7 @@ maven()
 
     log_level="${MAVEN_LOG_LEVEL:-info}"
     temporary_folder="${TMPDIR:-/tmp}"
-    log_file=$temporary_folder/maven-$(date '+%s')-$(basename "$0").log
+    log_file=$temporary_folder/maven-$(date '+%s')-$(script).log
 
     # shellcheck disable=SC2086
     mvn \
