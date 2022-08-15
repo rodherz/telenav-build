@@ -7,10 +7,8 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-source telenav-library-functions.sh
+source "${TELENAV_WORKSPACE}/bin/telenav-build-library-functions"
 
-echo " "
-cd_workspace
-git status --short || exit 1
-git submodule --quiet foreach "git status --short" || exit 1
-echo " "
+telenav_clean_caches
+telenav_clean_maven_repository_telenav
+telenav_clean_temporary_files "$TELENAV_WORKSPACE"

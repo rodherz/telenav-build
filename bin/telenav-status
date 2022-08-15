@@ -7,12 +7,10 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-source telenav-library-functions.sh
+source telenav-library-functions
 
-scope=""
-get_scope_argument "$@"
-
+echo " "
 cd_workspace
-mvn --quiet \
-    "$(resolve_scope_switches "$scope")" \
-    com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":is-dirty || exit 1
+git status --short || exit 1
+git submodule --quiet foreach "git status --short" || exit 1
+echo " "

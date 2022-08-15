@@ -1,7 +1,7 @@
 
 export TELENAV_WORKSPACE=$PWD
 
-source "$TELENAV_WORKSPACE"/bin/telenav-library-functions.sh
+source "$TELENAV_WORKSPACE"/bin/telenav-library-functions
 
 export CACTUS_HOME=$PWD/cactus
 export KIVAKIT_HOME=$PWD/kivakit
@@ -50,4 +50,4 @@ if [[ -d "$MESAKIT_HOME" ]]; then
 
 fi
 
-telenav-workspace.sh
+telenav-workspace

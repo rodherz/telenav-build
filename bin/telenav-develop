@@ -7,16 +7,7 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-source telenav-library-functions.sh
-
-branch=""
-scope=""
-get_scope_and_branch_arguments "$@"
+source telenav-library-functions
 
 cd_workspace
-mvn --quiet \
-    "$(resolve_scope_switches "$scope")" \
-    -Dcactus.operation=finish \
-    -Dcactus.branch-type=hotfix \
-    -Dcactus.branch="$branch" \
-    com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":git-flow || exit 1
+cactus-development-preparation || exit 1

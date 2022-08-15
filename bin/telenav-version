@@ -7,7 +7,7 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-source telenav-library-functions.sh
+source telenav-library-functions
 
 # 1) Parse Java version from output like: openjdk version "17.0.3" 2022-04-19 LTS
 java_version=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}')
