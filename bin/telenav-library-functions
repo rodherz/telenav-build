@@ -277,7 +277,7 @@ cactus_all()
     cd_workspace
     maven -Dcactus.scope=all \
         "${*}" \
-        com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":"${command}" || exit 1
+        com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":"${command}" validate || exit 1
 }
 
 ################ MAVEN ###############################################################################################
@@ -300,7 +300,7 @@ maven()
       -Dorg.slf4j.simpleLogger.logFile="${log_file}" \
       -Dorg.slf4j.simpleLogger.defaultLogLevel="${log_level}" \
       -Dorg.slf4j.simpleLogger.cacheOutputStream=false \
-      "${arguments[*]}" || exit 1 2>&1 | grep -v "SLF4J: "
+      ${arguments[*]} || exit 1 2>&1 | grep -v "SLF4J: "
 
     last_log_link=$temporary_folder/maven-last.log
     exit_code=$?
