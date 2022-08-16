@@ -1,4 +1,4 @@
-#/usr/bin/perl
+#!/usr/bin/perl
 
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #
@@ -14,8 +14,8 @@ use warnings;
 # Retrieve environment variables
 #
 
-my $workspace = $ENV{'TELENAV_WORKSPACE'};
-my $kivakit_debug = $ENV{'KIVAKIT_DEBUG'};
+our $workspace = $ENV{'TELENAV_WORKSPACE'};
+our $kivakit_debug = $ENV{'KIVAKIT_DEBUG'};
 if ($kivakit_debug eq "")
 {
     $kivakit_debug = "!Debug";
@@ -25,25 +25,25 @@ if ($kivakit_debug eq "")
 # Global variables populated during parsing of arguments
 #
 
-my @build_scopes = ();
-my @build_types = ();
-my @build_modifiers = ("quiet");
-my @build_folders = ();
-my $build_threads = 12;
-my $build_javadoc = 0;
-my $build_dry_run = 0;
-my $build_clean_script = "";
+our @build_scopes = ();
+our @build_types = ();
+our @build_modifiers = ("quiet");
+our @build_folders = ();
+our $build_threads = 12;
+our $build_javadoc = 0;
+our $build_dry_run = 0;
+our $build_clean_script = "";
 
-my $resolved_scope = "";
-my @resolved_families = ();
+our $resolved_scope = "";
+our @resolved_families = ();
 
-my @maven_scope_switches = ();
-my @maven_arguments = ();
-my @maven_switches = ();
+our @maven_scope_switches = ();
+our @maven_arguments = ();
+our @maven_switches = ();
 
-my @allowed_scopes = ("all", "this", "kivakit", "mesakit", "lexakai");
-my @allowed_build_types = ("compile", "release", "release-local", "tools", "dmg", "javadoc", "lexakai-documentation", "help");
-my @allowed_build_modifiers = ("attach-jars", "clean", "clean-forced", "clean-sparkling", "debug", "debug-tests", "dry-run", "no-javadoc", "no-tests", "quick-tests", "quiet", "verbose", "single-threaded", "tests");
+our @allowed_scopes = ("all", "this", "kivakit", "mesakit", "lexakai");
+our @allowed_build_types = ("compile", "release", "release-local", "tools", "dmg", "javadoc", "lexakai-documentation", "help");
+our @allowed_build_modifiers = ("attach-jars", "clean", "clean-forced", "clean-sparkling", "debug", "debug-tests", "dry-run", "no-javadoc", "no-tests", "quick-tests", "quiet", "verbose", "single-threaded", "tests");
 
 #
 # Check build prerequisites
@@ -60,20 +60,20 @@ require_variable("TELENAV_WORKSPACE", "Must set TELENAV_WORKSPACE");
 #   3. For each build modifier, translate it into maven arguments and switches
 #
 
-parse_arguments @_;
-parse_build_types
-parse_build_modifiers;
-parse_build_scopes;
+parse_arguments(@_);
+parse_build_types();
+parse_build_modifiers();
+parse_build_scopes();
 
-@maven_switches += ("-DKIVAKIT_DEBUG=\"$kivakit_debug\"");
-@maven_switches += ("--threads", "$build_threads");
+push(@maven_switches, "-DKIVAKIT_DEBUG=\"$kivakit_debug\"");
+push(@maven_switches, "--threads", "$build_threads");
 
 build;
 
 sub build()
 {
     chdir $workspace;
-    start_build;
+    start_build();
 
     if ($build_dry_run == 1)
     {
@@ -81,10 +81,16 @@ sub build()
         {
             system $build_clean_script;
         }
-        system("maven --quiet -f telenav-superpom/pom.xml clean install") == 0 or fail "Build failed";
-        system("maven @maven_scope_switches @maven_switches @maven_arguments") == 0 or fail "Build failed";
+        if (system("maven --quiet -f telenav-superpom/pom.xml clean install") != 0)
+        {
+            fail("Unable to install superpoms");
+        }
+        if (system("maven @maven_scope_switches @maven_switches @maven_arguments") != 0)
+        {
+            fail("Build failed");
+        }
     }
-    end_build
+    end_build();
 }
 
 sub check_tools()
@@ -102,37 +108,33 @@ sub check_tools()
     my ($java_major_version) = $java_version =~ /(\d+)\./;
     if ($java_major_version < 17)
     {
-        fail <<~EOF;
-            Telenav Open Source projects require Java 17
-            To install: https://jdk.java.net/archive/
-        EOF
+        fail(qq!
+Telenav Open Source projects require Java 17
+To install: https://jdk.java.net/archive/
+!);
     }
     else
     {
-        say "Java $java_version"
+        say("Java $java_version");
     }
 
     # Check Git version
     my ($git_major_version, $git_minor_version) = $git_version =~ /(\d+)\.(\d+)/;
     if ($git_major_version < 2 || $git_minor_version < 30)
     {
-        fail "Telenav Open Source projects require Git version 2.30 or higher";
+        fail("Telenav Open Source projects require Git version 2.30 or higher");
     }
     else
     {
-        say "Git $git_version"
+        say("Git $git_version");
     }
 }
 
 sub parse_build_modifiers()
 {
-    foreach my $modifier (@build_modifiers)
+    if (grep(/^verbose$/, @build_modifiers))
     {
-        given ($modifier)
-        {
-            when ("verbose")
-            { @build_modifiers = grep { !/quiet/ } @build_modifiers; }
-        }
+        @build_modifiers = grep(!/^quiet$/, @build_modifiers);
     }
 
     foreach my $modifier (@build_modifiers)
@@ -182,16 +184,16 @@ sub parse_build_modifiers()
             when ("tools")
             { @maven_switches += ("-P", "tools") }
             default
-            { usage "Build modifier $modifier is not recognized" }
+            { usage("Build modifier $modifier is not recognized") }
         }
     }
 }
 
 sub parse_build_types()
 {
-    foreach my $type (@build_types)
+    foreach my $build_type (@build_types)
     {
-        given ($type)
+        given ($build_type)
         {
             when ("compile")
             {
@@ -210,7 +212,7 @@ sub parse_build_types()
             }
             when ("help")
             {
-                usage
+                usage();
             }
             when ("javadoc")
             {
@@ -242,7 +244,7 @@ sub parse_build_types()
             }
             default
             {
-                usage "Unrecognized build type: $type";
+                usage("Unrecognized build type: $build_type");
             }
         }
     }
