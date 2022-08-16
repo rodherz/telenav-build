@@ -7,8 +7,12 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+use 5.018;
 use strict;
 use warnings;
+
+use feature qw( switch );
+no warnings qw( experimental::smartmatch );
 
 #
 # Retrieve environment variables
@@ -16,7 +20,7 @@ use warnings;
 
 our $workspace = $ENV{'TELENAV_WORKSPACE'};
 our $kivakit_debug = $ENV{'KIVAKIT_DEBUG'};
-if ($kivakit_debug eq "")
+if (! defined $kivakit_debug)
 {
     $kivakit_debug = "!Debug";
 }
@@ -45,41 +49,16 @@ our @allowed_scopes = ("all", "this", "kivakit", "mesakit", "lexakai");
 our @allowed_build_types = ("compile", "release", "release-local", "tools", "dmg", "javadoc", "lexakai-documentation", "help");
 our @allowed_build_modifiers = ("attach-jars", "clean", "clean-forced", "clean-sparkling", "debug", "debug-tests", "dry-run", "no-javadoc", "no-tests", "quick-tests", "quiet", "verbose", "single-threaded", "tests");
 
-#
-# Check build prerequisites
-#
-
-check_tools
-require_variable("TELENAV_WORKSPACE", "Must set TELENAV_WORKSPACE");
-
-#
-# Parse arguments in four phases:
-#
-#   1. For each argument, put it in the appropriate array based on whether it is a scope, a build type, or a build modifier
-#   2. For each build type, translate it into one or more build modifiers
-#   3. For each build modifier, translate it into maven arguments and switches
-#
-
-parse_arguments(@_);
-parse_build_types();
-parse_build_modifiers();
-parse_build_scopes();
-
-push(@maven_switches, "-DKIVAKIT_DEBUG=\"$kivakit_debug\"");
-push(@maven_switches, "--threads", "$build_threads");
-
-build;
-
-sub build()
+sub build
 {
     chdir $workspace;
     start_build();
 
-    if ($build_dry_run == 1)
+    if ($build_dry_run == 0)
     {
         if ($build_clean_script ne "")
         {
-            system $build_clean_script;
+            system($build_clean_script);
         }
         if (system("maven --quiet -f telenav-superpom/pom.xml clean install") != 0)
         {
@@ -90,47 +69,59 @@ sub build()
             fail("Build failed");
         }
     }
+
     end_build();
 }
 
-sub check_tools()
+sub check_tools
 {
-    require_variable($ENV{"M2_HOME"}, "Must set M2_HOME");
-    require_variable($ENV{"JAVA_HOME"}, "Must set JAVA_HOME");
-
     # Parse Java version from output like: openjdk version "17.0.3" 2022-04-19 LTS
-    my $java_version = `java -version 2>&1 | awk -F '"' '/version/ {print $2}'`;
+    my $java_output = `java -version 2>&1`;
+    if ($java_output =~ /(\d+\.\d+\.\d+)/)
+    {
+        # Check Java version
+        my $java_version = $1;
+        my ($java_major_version) = $java_version =~ /(\d+)\./;
+        if ($java_major_version < 17)
+        {
+            fail(qq!
+    Telenav Open Source projects require Java 17
+    To install: https://jdk.java.net/archive/
+    !);
+        }
+        else
+        {
+            say("\nJava $java_version");
+        }
+    }
+    else
+    {
+        fail("Couldn't find Java version in:\n$java_output");
+    }
 
     # Parse Git version from output like: git version 2.36.1
-    my $git_version = `git --version 2>&1 | awk -F' ' '{print $3}'`;
-
-    # Check Java version
-    my ($java_major_version) = $java_version =~ /(\d+)\./;
-    if ($java_major_version < 17)
+    my $git_output = `git --version 2>&1`;
+    if ($git_output =~ /(\d+\.\d+\.\d+)/)
     {
-        fail(qq!
-Telenav Open Source projects require Java 17
-To install: https://jdk.java.net/archive/
-!);
+        # Check Git version
+        my $git_version = $1;
+        my ($git_major_version, $git_minor_version) = $git_version =~ /(\d+)\.(\d+)/;
+        if ($git_major_version < 2 || $git_minor_version < 30)
+        {
+            fail("Telenav Open Source projects require Git version 2.30 or higher");
+        }
+        else
+        {
+            say("Git $git_version\n");
+        }
     }
     else
     {
-        say("Java $java_version");
-    }
-
-    # Check Git version
-    my ($git_major_version, $git_minor_version) = $git_version =~ /(\d+)\.(\d+)/;
-    if ($git_major_version < 2 || $git_minor_version < 30)
-    {
-        fail("Telenav Open Source projects require Git version 2.30 or higher");
-    }
-    else
-    {
-        say("Git $git_version");
+        fail("Couldn't find Git version in:\n$git_output");
     }
 }
 
-sub parse_build_modifiers()
+sub parse_build_modifiers
 {
     if (grep(/^verbose$/, @build_modifiers))
     {
@@ -142,7 +133,7 @@ sub parse_build_modifiers()
         given ($modifier)
         {
             when ("attach-jars")
-            { @maven_arguments += ("-P", "attach-jars") }
+            { push(@maven_arguments, "-P", "attach-jars") }
             when ("clean")
             { $build_clean_script = "telenav-clean" }
             when ("clean-forced")
@@ -150,46 +141,46 @@ sub parse_build_modifiers()
             when ("clean-sparkling")
             { $build_clean_script = "telenav-clean-sparkling" }
             when ("debug")
-            { @maven_switches += ("--debug") }
+            { push(@maven_switches, "--debug") }
             when ("debug-tests")
-            { @maven_switches += ("-Dmaven.surefire.debug") }
+            { push(@maven_switches, "-Dmaven.surefire.debug") }
             when ("dmg")
-            { @maven_switches += ("-P", "dmg") }
+            { push(@maven_switches, "-P", "dmg") }
             when ("docker")
-            { @maven_switches += ("-P", "docker") }
+            { push(@maven_switches, "-P", "docker") }
             when ("documentation")
-            { @maven_switches += ("-P", "release") }
+            { push(@maven_switches, "-P", "release") }
             when ("dry-run")
             { $build_dry_run = 1 }
             when ("javadoc")
             { $build_javadoc = 1 }
             when ("lexakai-documentation")
-            { @maven_arguments += ("com.telenav.cactus:cactus-maven-plugin:lexakai") }
+            { push(@maven_arguments, "com.telenav.cactus:cactus-maven-plugin:lexakai") }
             when ("multi-threaded")
             {}
             when ("no-javadoc")
-            { @maven_switches += ("-Dmaven.javadoc.skip=true") }
+            { push(@maven_switches, "-Dmaven.javadoc.skip=true") }
             when ("no-tests")
-            { @maven_switches += ("-Dmaven.test.skip=true") }
+            { push(@maven_switches, "-Dmaven.test.skip=true") }
             when ("quick-tests")
-            { @maven_switches += ("-P", "test-quick") }
+            { push(@maven_switches, "-P", "test-quick") }
             when ("quiet")
-            { @maven_switches += ("--quiet", "-Dsurefire.printSummary=false", "-DKIVAKIT_LOG_LEVEL=Warning") }
+            { push(@maven_switches, "--quiet", "-Dsurefire.printSummary=false", "-DKIVAKIT_LOG_LEVEL=Warning") }
             when ("sign-artifacts")
-            { @maven_switches += ("-P", "sign-artifacts") }
+            { push(@maven_switches, "-P", "sign-artifacts") }
             when ("single-threaded")
             { $build_threads = 1 }
             when ("tests")
             {}
             when ("tools")
-            { @maven_switches += ("-P", "tools") }
+            { push(@maven_switches, "-P", "tools") }
             default
             { usage("Build modifier $modifier is not recognized") }
         }
     }
 }
 
-sub parse_build_types()
+sub parse_build_types
 {
     foreach my $build_type (@build_types)
     {
@@ -197,18 +188,18 @@ sub parse_build_types()
         {
             when ("compile")
             {
-                @maven_arguments += ("clean", "compile");
-                @build_modifiers += ("multi-threaded", "no-tests", "no-javadoc");
+                push(@maven_arguments, "clean", "compile");
+                push(@build_modifiers, "multi-threaded", "no-tests", "no-javadoc");
             }
             when ("default")
             {
-                @maven_arguments += ("clean", "install");
-                @build_modifiers += ("multi-threaded", "tests", "no-javadoc");
+                push(@maven_arguments, "clean", "install");
+                push(@build_modifiers, "multi-threaded", "tests", "no-javadoc");
             }
             when ("dmg")
             {
-                @maven_arguments += ("clean", "install");
-                @build_modifiers += ("multi-threaded", "tests", "tools", "dmg", "no-javadoc");
+                push(@maven_arguments, "clean", "install");
+                push(@build_modifiers, "multi-threaded", "tests", "tools", "dmg", "no-javadoc");
             }
             when ("help")
             {
@@ -216,31 +207,31 @@ sub parse_build_types()
             }
             when ("javadoc")
             {
-                @build_modifiers += ("multi-threaded", "no-tests", "javadoc")
+                push(@build_modifiers, "multi-threaded", "no-tests", "javadoc")
             }
             when ("lexakai-documentation")
             {
-                @build_modifiers += ("lexakai-documentation");
+                push(@build_modifiers, "lexakai-documentation");
             }
             when ("release")
             {
-                @maven_arguments += ("clean", "install", "com.telenav.cactus:cactus-maven-plugin:check-published", "nexus-staging:deploy");
-                @build_modifiers += ("single-threaded", "clean-sparkling", "documentation", "attach-jars", "sign-artifacts")
+                push(@maven_arguments, "clean", "install", "com.telenav.cactus:cactus-maven-plugin:check-published", "nexus-staging:deploy");
+                push(@build_modifiers, "single-threaded", "clean-sparkling", "documentation", "attach-jars", "sign-artifacts")
             }
             when ("release-local")
             {
-                @maven_arguments += ("clean", "install");
-                @build_modifiers += ("single-threaded", "clean-sparkling", "documentation", "tests", "attach-jars", "sign-artifacts")
+                push(@maven_arguments, "clean", "install");
+                push(@build_modifiers, "single-threaded", "clean-sparkling", "documentation", "tests", "attach-jars", "sign-artifacts")
             }
             when ("test")
             {
-                @maven_arguments += ("clean", "install");
-                @build_modifiers += ("single-threaded", "tests", "no-javadoc");
+                push(@maven_arguments, "clean", "install");
+                push(@build_modifiers, "single-threaded", "tests", "no-javadoc");
             }
             when ("tools")
             {
-                @maven_arguments += ("clean", "install");
-                @build_modifiers += ("multi-threaded", "tests", "tools", "no-javadoc");
+                push(@maven_arguments, "clean", "install");
+                push(@build_modifiers, "multi-threaded", "tests", "tools", "no-javadoc");
             }
             default
             {
@@ -250,7 +241,7 @@ sub parse_build_types()
     }
 }
 
-sub parse_arguments()
+sub parse_arguments
 {
     my @arguments = @_;
 
@@ -258,19 +249,19 @@ sub parse_arguments()
     {
         if (grep(/^$argument$/, @allowed_scopes))
         {
-            @build_scopes += ($argument);
+            push(@build_scopes, $argument);
         }
         elsif (grep(/^$argument$/, @allowed_build_types))
         {
-            @build_types += ($argument);
+            push(@build_types, $argument);
         }
         elsif (grep(/^$argument$/, @allowed_build_modifiers))
         {
-            @build_modifiers += ($argument);
+            push(@build_modifiers, $argument);
         }
         else
         {
-            usage "Invalid argument: $argument"
+            usage("Invalid argument: $argument");
         }
     }
 
@@ -284,11 +275,11 @@ sub parse_arguments()
     }
     if (@build_types > 1)
     {
-        usage "No more than one of these build types is allowed: @build_types"
+        usage("No more than one of these build types is allowed: @build_types");
     }
 }
 
-sub resolve_build_folders()
+sub resolve_build_folders
 {
     foreach my $scope (@build_scopes)
     {
@@ -310,16 +301,16 @@ sub resolve_build_folders()
     }
 }
 
-sub parse_build_scopes()
+sub parse_build_scopes
 {
     resolve_scope_switches(join(",", @build_scopes));
 }
 
-sub resolve_scope_switches()
+sub resolve_scope_switches
 {
     my $scope = shift;
 
-    resolve_scope $scope;
+    resolve_scope($scope);
 
     my $families = join(",", @resolved_families);
 
@@ -333,7 +324,7 @@ sub resolve_scope_switches()
     }
 }
 
-sub resolve_scope()
+sub resolve_scope
 {
     my $scope = shift;
 
@@ -368,46 +359,46 @@ sub resolve_scope()
     }
 }
 
-sub say()
+sub say
 {
     my ($text) = @_;
-    println "┋ $text";
+    println("┋ $text");
 }
 
-sub println()
+sub println
 {
     my ($text) = @_;
     print "$text\n";
 }
 
-sub fail()
+sub fail
 {
     my ($text) = @_;
     print $text;
     exit 1;
 }
 
-sub require_variable()
+sub require_variable
 {
     my ($variable, $help) = @_;
-    if ($ENV{$variable} eq "")
+    if (! defined $ENV{$variable})
     {
-        usage $help
+        usage($help);
     }
 }
 
-sub say_block()
+sub say_block
 {
-    my $text = @_;
+    my ($text) = @_;
     print "\n$text\n\n";
 }
 
-sub usage()
+sub usage
 {
-    my $problem = @_;
+    my ($problem) = @_;
     if ($problem ne "")
     {
-        say_block $problem
+        say_block($problem);
     }
 
     print q#
@@ -448,10 +439,12 @@ Usage: telenav-build [build-scope|build-type|build-modifiers]*
                  verbose - build with full output
          single-threaded - build with only one thread
                    tests - run all tests
+
 #;
+    die;
 }
 
-sub start_build()
+sub start_build
 {
     my $folders = join("\n┋              -", @build_folders);
 
@@ -475,10 +468,37 @@ sub start_build()
     EOF
 }
 
-sub end_build()
+sub end_build
 {
     print <<~EOF;
     ┋
     ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Built
     EOF
 }
+
+#
+# Check build prerequisites
+#
+
+require_variable("M2_HOME", "Must set M2_HOME");
+require_variable("JAVA_HOME", "Must set JAVA_HOME");
+require_variable("TELENAV_WORKSPACE", "Must set TELENAV_WORKSPACE");
+check_tools();
+
+#
+# Parse arguments in four phases:
+#
+#   1. For each argument, put it in the appropriate array based on whether it is a scope, a build type, or a build modifier
+#   2. For each build type, translate it into one or more build modifiers
+#   3. For each build modifier, translate it into maven arguments and switches
+#
+
+parse_arguments(@_);
+parse_build_types();
+parse_build_modifiers();
+parse_build_scopes();
+
+push(@maven_switches, "-DKIVAKIT_DEBUG=\"$kivakit_debug\"");
+push(@maven_switches, "--threads", "$build_threads");
+
+build();
