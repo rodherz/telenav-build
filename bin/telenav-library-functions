@@ -75,7 +75,7 @@ project_version()
     project_home=$1
 
     pushd "$project_home" 1>/dev/null || exit 1
-    mvn -q -DforceStdout org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate -Dexpression=project.version || exit 1
+    maven --quiet -DforceStdout -Dexpression=project.version org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate validate || exit 1
     popd 1>/dev/null || exit 1
 }
 
@@ -264,9 +264,9 @@ cactus_check_branch()
     resolve_scope_switches "$scope"
 
     cd_workspace
-    mvn "${resolved_scope_switches[@]}" \
+    maven "${resolved_scope_switches[@]}" \
         -Dcactus.expected.branch="$branch" \
-        com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":check
+        com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":check validate || exit 1
 }
 
 cactus_all()
@@ -275,11 +275,52 @@ cactus_all()
     shift
 
     cd_workspace
-    command="mvn -Dcactus.scope=all \
-        "${*}" \
-        com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":"${command}""
-    echo "$command"
-    eval "$command" || exit 1
+    # shellcheck disable=SC2086
+    maven -Dcactus.scope=all \
+        ${*} \
+        com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":"${command}" validate || exit 1
+}
+
+################ MAVEN ###############################################################################################
+
+maven()
+{
+    local arguments=("$@")
+
+    local log_file
+    local log_level
+    local temporary_folder
+    local exit_code
+    local last_log_link
+
+    log_level="${MAVEN_LOG_LEVEL:-info}"
+    temporary_folder="${TMPDIR:-/tmp}"
+    log_file=$temporary_folder/maven-$(date '+%s')-$(script).log
+
+    # shellcheck disable=SC2086
+    mvn \
+      -Dorg.slf4j.simpleLogger.logFile="${log_file}" \
+      -Dorg.slf4j.simpleLogger.defaultLogLevel="${log_level}" \
+      -Dorg.slf4j.simpleLogger.cacheOutputStream=false \
+      ${arguments[*]} || exit 1 2>&1 | grep -v "SLF4J: "
+
+    last_log_link=$temporary_folder/maven-last.log
+    exit_code=$?
+
+    rm -f "$last_log_link"
+    ln -s "$log_file" "$last_log_link"
+
+    if [ $exit_code -ne 0 ]; then
+        echo " " 1>&2
+        echo "mvn ${arguments[*]}" 1>&2
+        echo " " 1>&2
+        echo "Maven execution failed with exit code ${exit_code}" 1>&2
+        echo "A complete log is in ${log_file}" 1>&2
+        echo "The last maven log is always linked as maven-last.log in the system temp folder $temporary_folder" 1>&2
+        exit $exit_code
+    fi
+
+    return $exit_code
 }
 
 ################ LEXAKAI ###############################################################################################

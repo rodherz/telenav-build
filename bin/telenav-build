@@ -54,11 +54,11 @@ if [ -z "$dry_run" ]; then
 
     echo "┋ Building"
 
-    mvn --quiet -f telenav-superpom/pom.xml clean install
+    maven --quiet -f telenav-superpom/pom.xml clean install
 
     # shellcheck disable=SC2086
     # shellcheck disable=SC2154
-    mvn ${resolved_scope_switches[*]} ${build_switches[*]} ${build_arguments[*]} 2>&1
+    maven ${resolved_scope_switches[*]} ${build_switches[*]} ${build_arguments[*]} 2>&1
     if [ "${PIPESTATUS[0]}" -ne "0" ]; then
         echo "Build failed."
         exit 1
