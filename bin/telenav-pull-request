@@ -30,9 +30,9 @@ else
 
 fi
 
-read -p -r "Title? "
+read -r -p "Title? "
 title=$REPLY
-read -p -r "Body? "
+read -r -p "Body? "
 body=$REPLY
 
 cactus_all git-pull-request \
