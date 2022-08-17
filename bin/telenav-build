@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #
@@ -10,9 +10,9 @@
 use 5.018;
 use strict;
 use warnings;
-
-use feature qw( switch );
-no warnings qw( experimental::smartmatch );
+use File::Basename;
+use feature qw(switch);
+no warnings qw(experimental::smartmatch);
 
 #
 # Retrieve environment variables
@@ -20,7 +20,7 @@ no warnings qw( experimental::smartmatch );
 
 our $workspace = $ENV{'TELENAV_WORKSPACE'};
 our $kivakit_debug = $ENV{'KIVAKIT_DEBUG'};
-if (! defined $kivakit_debug)
+if (!defined $kivakit_debug)
 {
     $kivakit_debug = "!Debug";
 }
@@ -51,26 +51,46 @@ our @allowed_build_modifiers = ("attach-jars", "clean", "clean-forced", "clean-s
 
 sub build
 {
-    chdir $workspace;
-    start_build();
+    show_start_build();
+    check_tools();
 
-    if ($build_dry_run == 0)
+    chdir $workspace;
+
+    say_it("");
+
+    if ($build_clean_script ne "")
     {
-        if ($build_clean_script ne "")
+        say_it("Cleaning with $build_clean_script");
+        if ($build_dry_run == 0)
         {
             system($build_clean_script);
         }
-        if (system("maven --quiet -f telenav-superpom/pom.xml clean install") != 0)
-        {
-            fail("Unable to install superpoms");
-        }
-        if (system("maven @maven_scope_switches @maven_switches @maven_arguments") != 0)
-        {
-            fail("Build failed");
-        }
+        say_it("Cleaned")
     }
 
-    end_build();
+    say_it("Installing superpoms");
+    my $install_output = maven("--quiet", "-f", "telenav-superpom/pom.xml", "clean", "install");
+    if ($? != 0)
+    {
+        fail("Unable to install superpoms:\n\n$install_output\n");
+    }
+    say_it("Superpoms installed");
+
+    say_it("Building");
+    for my $folder (@build_folders)
+    {
+        chdir $folder || die;
+        my $project = basename("$folder");
+        say_it("Building project $project");
+        my $build_output = maven(@maven_switches, @maven_arguments);
+        if ($? != 0)
+        {
+            fail("Build failed:\n\n$build_output\n");
+        }
+    }
+    say_it("Done building");
+
+    show_end_build();
 }
 
 sub check_tools
@@ -81,7 +101,7 @@ sub check_tools
     {
         # Check Java version
         my $java_version = $1;
-        my ($java_major_version) = $java_version =~ /(\d+)\./;
+        my ($java_major_version) = $java_version =~ /(\d+)\.(\d+)/;
         if ($java_major_version < 17)
         {
             fail(qq!
@@ -91,7 +111,8 @@ sub check_tools
         }
         else
         {
-            say("\nJava $java_version");
+            say_it("");
+            say_it("                 Tools: Java $java_version");
         }
     }
     else
@@ -105,19 +126,42 @@ sub check_tools
     {
         # Check Git version
         my $git_version = $1;
-        my ($git_major_version, $git_minor_version) = $git_version =~ /(\d+)\.(\d+)/;
-        if ($git_major_version < 2 || $git_minor_version < 30)
+        my ($git_major_version, $git_minor_version, $git_dot_version) = $git_version =~ /(\d+)\.(\d+)\.(\d+)/;
+        my $ordinal = $git_major_version * 10000 + $git_minor_version * 100 + $git_dot_version;
+        if ($ordinal < 23000)
         {
             fail("Telenav Open Source projects require Git version 2.30 or higher");
         }
         else
         {
-            say("Git $git_version\n");
+            say_it("                        Git $git_version");
         }
     }
     else
     {
         fail("Couldn't find Git version in:\n$git_output");
+    }
+
+    # Parse Maven version from output like: Apache Maven 3.8.5
+    my $maven_output = `mvn -version`;
+    if ($maven_output =~ /(\d+\.\d+\.\d+)/)
+    {
+        # Check Git version
+        my $maven_version = $1;
+        my ($maven_major_version, $maven_minor_version, $maven_dot_version) = $maven_version =~ /(\d+)\.(\d+)\.(\d+)/;
+        my $ordinal = $maven_major_version * 10000 + $maven_minor_version * 100 + $maven_dot_version;
+        if ($ordinal < 30805)
+        {
+            fail("Telenav Open Source projects require Maven version 3.8.5 or higher");
+        }
+        else
+        {
+            say_it("                        Maven $maven_version");
+        }
+    }
+    else
+    {
+        fail("Couldn't find maven version in:\n$maven_output");
     }
 }
 
@@ -279,6 +323,21 @@ sub parse_arguments
     }
 }
 
+sub kivakit_folders
+{
+    ("$workspace/kivakit", "$workspace/kivakit-extensions", "$workspace/kivakit-stuff", "$workspace/kivakit-examples")
+}
+
+sub mesakit_folders
+{
+    ("$workspace/mesakit", "$workspace/mesakit-extensions", "$workspace/mesakit-stuff", "$workspace/mesakit-examples")
+}
+
+sub lexakai_folders
+{
+    ("$workspace/lexakai");
+}
+
 sub resolve_build_folders
 {
     foreach my $scope (@build_scopes)
@@ -287,15 +346,15 @@ sub resolve_build_folders
         {
             when ("all")
             {
-                @build_folders = ("$workspace/telenav-superpom", "$workspace/kivakit", "$workspace/lexakai", "$workspace/mesakit");
+                push(@build_folders, kivakit_folders(), mesakit_folders(), lexakai_folders());
             }
             when ("this")
             {
-                @build_folders = ("$workspace/telenav-superpom", ".");
+                push(@build_folders, ".");
             }
             default
             {
-                @build_folders = ("$workspace/telenav-superpom", "$workspace/${scope}");
+                push(@build_folders, eval("${scope}_folders()"));
             }
         }
     }
@@ -304,6 +363,7 @@ sub resolve_build_folders
 sub parse_build_scopes
 {
     resolve_scope_switches(join(",", @build_scopes));
+    resolve_build_folders();
 }
 
 sub resolve_scope_switches
@@ -359,7 +419,60 @@ sub resolve_scope
     }
 }
 
-sub say
+sub maven
+{
+    my @arguments = @_;
+
+    my $log_level = $ENV{"MAVEN_LOG_LEVEL"};
+    if (!defined $log_level)
+    {
+        $log_level = "info";
+    }
+
+    my $temporary_folder = $ENV{"TMPDIR"};
+    if (!defined $temporary_folder)
+    {
+        $temporary_folder = "/tmp";
+    }
+    $temporary_folder =~ s/\/$//;
+
+    my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime();
+    my @weekdays = ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun");
+    my $weekday = $weekdays[$wday];
+    $year += 1900;
+    my $log_file = sprintf("${temporary_folder}/maven-$weekday-$year.%02d.%02d-$hour.%02d-%s.log", $mon, $mday, $min, basename($0));
+
+    my $command = "mvn -Dorg.slf4j.simpleLogger.logFile=\"${log_file}\" -Dorg.slf4j.simpleLogger.defaultLogLevel=\"${log_level}\" -Dorg.slf4j.simpleLogger.cacheOutputStream=false @arguments 2>&1";
+    if ($build_dry_run eq 0)
+    {
+        system($command);
+    }
+    else
+    {
+        say_it("Execute: $command");
+    }
+
+    my $exit_code = $?;
+
+    my $last_log_link = "$temporary_folder/maven-last.log";
+    `rm -f "$last_log_link"`;
+    `ln -s "$log_file" "$last_log_link"`;
+
+    if ($exit_code ne 0)
+    {
+        print qq!
+mvn @arguments
+
+Maven execution failed with exit code ${exit_code}
+A complete log is in ${log_file}
+The last maven log is always $temporary_folder/maven-last.log
+!;
+    }
+
+    return $exit_code;
+}
+
+sub say_it
 {
     my ($text) = @_;
     println("┋ $text");
@@ -381,13 +494,13 @@ sub fail
 sub require_variable
 {
     my ($variable, $help) = @_;
-    if (! defined $ENV{$variable})
+    if (!defined $ENV{$variable})
     {
         usage($help);
     }
 }
 
-sub say_block
+sub say_it_block
 {
     my ($text) = @_;
     print "\n$text\n\n";
@@ -396,9 +509,9 @@ sub say_block
 sub usage
 {
     my ($problem) = @_;
-    if ($problem ne "")
+    if (defined $problem && $problem ne "")
     {
-        say_block($problem);
+        say_it_block($problem);
     }
 
     print q#
@@ -441,14 +554,17 @@ Usage: telenav-build [build-scope|build-type|build-modifiers]*
                    tests - run all tests
 
 #;
-    die;
+    exit 0;
 }
 
-sub start_build
+sub show_start_build
 {
-    my $folders = join("\n┋              -", @build_folders);
+    my $folders = join("\n┋                         ", @build_folders);
+    my @arguments = (@maven_scope_switches, @maven_switches, @maven_arguments);
+    my $command = join("\n┋                             ", @arguments);
 
     print <<~EOF;
+
     ┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Building
     ┋
     ┋           Build Scopes: @build_scopes
@@ -463,16 +579,16 @@ sub start_build
     ┋
     ┋              Workspace: $workspace
     ┋
-    ┋     mvn @maven_scope_switches @maven_switches @maven_arguments
-    ┋
+    ┋                Command: mvn $command
     EOF
 }
 
-sub end_build
+sub show_end_build
 {
     print <<~EOF;
     ┋
-    ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Built
+    ┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Done Building
+
     EOF
 }
 
@@ -483,7 +599,6 @@ sub end_build
 require_variable("M2_HOME", "Must set M2_HOME");
 require_variable("JAVA_HOME", "Must set JAVA_HOME");
 require_variable("TELENAV_WORKSPACE", "Must set TELENAV_WORKSPACE");
-check_tools();
 
 #
 # Parse arguments in four phases:
@@ -493,7 +608,7 @@ check_tools();
 #   3. For each build modifier, translate it into maven arguments and switches
 #
 
-parse_arguments(@_);
+parse_arguments(@ARGV);
 parse_build_types();
 parse_build_modifiers();
 parse_build_scopes();
