@@ -33,7 +33,7 @@ read -r -p "Body? "
 body=$REPLY
 
 cactus_all git-pull-request \
-    -Dcactus.authentication-token="$CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN" \
+    "-Dcactus.authentication-token=\"$CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN\"" \
     "-Dcactus.title=\"$title\"" \
     "-Dcactus.to-branch=develop" \
     "-Dcactus.from-branch=\"${branch_name}\"" \
