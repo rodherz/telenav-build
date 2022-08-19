@@ -30,7 +30,7 @@ fi
 read -r -p "Body? "
 body=$REPLY
 
-cactus_all git-pull-request \
-    -Dcactus.authentication-token="$CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN" \
-    -Dcactus.branch-to-approve="$branch_name" \
-    -Dcactus.body="$body" || exit 1
+cactus_all git-approve-pull-request \
+    -Dcactus.authentication-token=\""$CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN"\" \
+    -Dcactus.pr.branch-to-approve=\""$branch_name"\" \
+    -Dcactus.pr.body=\""$body"\" || exit 1
