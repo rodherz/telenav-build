@@ -276,6 +276,9 @@ cactus_all()
 
     cd_workspace
     # shellcheck disable=SC2086
+    echo maven -Dcactus.scope=all \
+        ${*} \
+        com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":"${command}" validate || exit 1
     maven -Dcactus.scope=all \
         ${*} \
         com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":"${command}" validate || exit 1

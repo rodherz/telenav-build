@@ -11,7 +11,7 @@ source telenav-library-functions
 
 if [[ -z "$CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN" ]]; then
 
-    echo "Must set CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN environment variable to create pull requests"
+    echo "Must set CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN environment variable to approve pull requests"
     exit 1
 
 fi
@@ -27,15 +27,10 @@ else
 
 fi
 
-read -r -p "Title? "
-title=$REPLY
 read -r -p "Body? "
 body=$REPLY
 
-cactus_all git-pull-request \
-    -Dcactus.authentication-token="$CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN" \
-    -Dcactus.title=\""$title"\" \
-    -Dcactus.to-branch=develop \
-    -Dcactus.from-branch=\""${branch_name}"\" \
-    -Dcactus.body=\""${body}"\" \
-    -Dcactus.reviewers="rodherz,sunshine-syz,timboudreau,wenjuanj,jonathanl-telenav,haifeng-z" || exit 1
+cactus_all git-approve-pull-request \
+    -Dcactus.authentication-token=\""$CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN"\" \
+    -Dcactus.pr.branch-to-approve=\""$branch_name"\" \
+    -Dcactus.pr.body=\""$body"\" || exit 1
