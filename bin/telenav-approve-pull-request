@@ -11,25 +11,26 @@ source telenav-library-functions
 
 if [[ -z "$GITHUB_PERSONAL_ACCESS_TOKEN" ]]; then
 
-    echo "Must set GITHUB_PERSONAL_ACCESS_TOKEN environment variable to merge pull requests"
+    echo "Must set GITHUB_PERSONAL_ACCESS_TOKEN environment variable to approve pull requests"
     exit 1
 
 fi
 
-if [[ "$#" -eq 0 ]]; then
-
-    branch_name=$(branch_name "$TELENAV_WORKSPACE/kivakit")
-
-elif [[ "$#" -eq 1 ]]; then
+if [[ "$#" -eq 1 ]]; then
 
     branch_name=$1
 
 else
 
-    usage "[branch_name]?"
+    read -r -p "Branch name? "
+    branch_name=$REPLY
 
 fi
 
-cactus_all git-merge-pull-request \
-    -Dcactus.authentication-token="$GITHUB_PERSONAL_ACCESS_TOKEN" \
-    -Dcactus.branch-name="$branch_name" || exit 1
+read -r -p "Body? "
+body=$REPLY
+
+cactus_all git-approve-pull-request \
+    -Dcactus.authentication-token=\""$GITHUB_PERSONAL_ACCESS_TOKEN"\" \
+    -Dcactus.pr.branch-to-approve=\""$branch_name"\" \
+    -Dcactus.pr.body=\""$body"\" || exit 1
