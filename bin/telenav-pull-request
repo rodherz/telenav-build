@@ -33,9 +33,9 @@ read -r -p "Body? "
 body=$REPLY
 
 cactus_all git-pull-request \
-    -Dcactus.authentication-token="$CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN" \
-    -Dcactus.title=\""$title"\" \
-    -Dcactus.to-branch=develop \
-    -Dcactus.from-branch=\""${branch_name}"\" \
-    -Dcactus.body=\""${body}"\" \
+    "-Dcactus.authentication-token=\"$CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN\"" \
+    "-Dcactus.title=\"$title\"" \
+    "-Dcactus.to-branch=develop" \
+    "-Dcactus.from-branch=\"${branch_name}\"" \
+    "-Dcactus.body=\"${body}\"" \
     -Dcactus.reviewers="rodherz,sunshine-syz,timboudreau,wenjuanj,jonathanl-telenav,haifeng-z" || exit 1

@@ -31,5 +31,5 @@ else
 fi
 
 cactus_all git-merge-pull-request \
-    -Dcactus.authentication-token="$CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN" \
+    -Dcactus.github-personal-access-token="$CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN" \
     -Dcactus.branch-name="$branch_name" || exit 1
