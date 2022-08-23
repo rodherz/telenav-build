@@ -253,8 +253,8 @@ git_branch_name()
 cactus_version()
 {
     # shellcheck disable=SC2002
-    #cat "${TELENAV_WORKSPACE}"/cactus/pom.xml | grep -Eow "<cactus\.previous\.version>(.*?)</cactus\.previous\.version>" | sed -E 's/.*>(.*)<.*/\1/'
-    echo "1.5.24"
+    cat "${TELENAV_WORKSPACE}"/cactus/pom.xml | grep -Eow "<cactus\.previous\.version>(.*?)</cactus\.previous\.version>" | sed -E 's/.*>(.*)<.*/\1/'
+    # echo "1.5.24"
 }
 
 cactus_check_branch()
