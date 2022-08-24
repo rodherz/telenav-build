@@ -142,7 +142,7 @@ sub fail
 
 sub fail_with_usage
 {
-    my $help = $1;
+    my $help = shift @_;
 
     fail("Usage: $FindBin::Script $help");
 }
@@ -174,22 +174,19 @@ sub get_argument
 {
     my $prompt = shift @_;
 
-    my $argument;
-    if (@_ eq 0)
+    if (@ARGV == 0)
     {
-        say($prompt);
-        $argument = <STDIN>;
+        print($prompt);
+        return <STDIN>;
     }
-    elsif (@_ eq 1)
+    elsif (@ARGV == 1)
     {
-        $argument = $1;
+        return shift @ARGV;
     }
     else
     {
-        undef $argument;
+        return undef;
     }
-
-    return $argument;
 }
 
 1;
