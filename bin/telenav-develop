@@ -14,6 +14,9 @@ use warnings;
 require "$ENV{'TELENAV_WORKSPACE'}/bin/telenav-functions.pl";
 
 cactus("checkout",
+      "-Dcactus.fetch-first=true",
+      "-Dcactus.push=false",
       "-Dcactus.target-branch=develop",
       "-Dcactus.update-root=true",
-      "-Dcactus.include-root=true");
+      "-Dcactus.include-root=true",
+      "-Dcactus.permit-local-changes=true");
