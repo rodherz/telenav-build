@@ -161,8 +161,9 @@ sub say_it_block
 sub console_input
 {
     my $prompt = shift @_;
-    say($prompt);
+    print($prompt);
     my $input = <STDIN>;
+    chomp $input;
     return $input;
 }
 
@@ -172,8 +173,7 @@ sub get_argument
 
     if (@ARGV == 0)
     {
-        print($prompt);
-        return <STDIN>;
+        return console_input($prompt);
     }
     elsif (@ARGV == 1)
     {
