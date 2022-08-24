@@ -31,4 +31,4 @@ cactus("checkout",
     "-Dcactus.push=false",
     "-Dcactus.permit-local-changes=true");
 
-printf("Checked out branch ${branch_name}");
+println("Checked out branch ${branch_name}");

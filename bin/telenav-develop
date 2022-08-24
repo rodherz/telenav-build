@@ -20,3 +20,5 @@ cactus("checkout",
       "-Dcactus.update-root=true",
       "-Dcactus.include-root=true",
       "-Dcactus.permit-local-changes=true");
+
+println("Switched to branch: develop");

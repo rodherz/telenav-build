@@ -30,3 +30,5 @@ cactus("git-pull-request",
     "-Dcactus.from-branch=\"${branch_name}\"",
     "-Dcactus.body=\"${body}\"",
     "-Dcactus.reviewers=\"rodherz,sunshine-syz,timboudreau,wenjuanj,jonathanl-telenav,haifeng-z\"");
+
+println("Pull request created for ${branch_name}");
