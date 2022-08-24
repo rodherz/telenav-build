@@ -14,11 +14,14 @@ use File::Basename;
 use feature qw(switch);
 no warnings qw(experimental::smartmatch);
 
+our $workspace = $ENV{'TELENAV_WORKSPACE'};
+
+require "$workspace/bin/telenav-functions.pl";
+
 #
 # Retrieve environment variables
 #
 
-our $workspace = $ENV{'TELENAV_WORKSPACE'};
 our $kivakit_debug = $ENV{'KIVAKIT_DEBUG'};
 if (!defined $kivakit_debug)
 {
@@ -35,7 +38,6 @@ our @build_modifiers = ("quiet");
 our @build_folders = ();
 our $build_threads = 12;
 our $build_javadoc = 0;
-our $build_dry_run = 0;
 our $build_clean_script = "";
 
 our $resolved_scope = "";
@@ -61,7 +63,7 @@ sub build
     if ($build_clean_script ne "")
     {
         say_it("Cleaning with $build_clean_script");
-        if ($build_dry_run == 0)
+        if (!is_dry_run())
         {
             system($build_clean_script);
         }
@@ -195,7 +197,7 @@ sub parse_build_modifiers
             when ("documentation")
             { push(@maven_switches, "-P", "release") }
             when ("dry-run")
-            { $build_dry_run = 1 }
+            { build_dry_run() }
             when ("javadoc")
             { $build_javadoc = 1 }
             when ("lexakai-documentation")
@@ -417,93 +419,6 @@ sub resolve_scope
             }
         }
     }
-}
-
-sub maven
-{
-    my @arguments = @_;
-
-    my $log_level = $ENV{"MAVEN_LOG_LEVEL"};
-    if (!defined $log_level)
-    {
-        $log_level = "info";
-    }
-
-    my $temporary_folder = $ENV{"TMPDIR"};
-    if (!defined $temporary_folder)
-    {
-        $temporary_folder = "/tmp";
-    }
-    $temporary_folder =~ s/\/$//;
-
-    my ($sec, $min, $hour, $mday, $mon, $year, $wday, $yday, $isdst) = localtime();
-    my @weekdays = ("Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun");
-    my $weekday = $weekdays[$wday];
-    $year += 1900;
-    my $log_file = sprintf("${temporary_folder}/maven-$weekday-$year.%02d.%02d-$hour.%02d-%s.log", $mon, $mday, $min, basename($0));
-
-    my $command = "mvn -Dorg.slf4j.simpleLogger.logFile=\"${log_file}\" -Dorg.slf4j.simpleLogger.defaultLogLevel=\"${log_level}\" -Dorg.slf4j.simpleLogger.cacheOutputStream=false @arguments 2>&1";
-    if ($build_dry_run eq 0)
-    {
-        system($command);
-    }
-    else
-    {
-        say_it("Execute: $command");
-    }
-
-    my $exit_code = $?;
-
-    my $last_log_link = "$temporary_folder/maven-last.log";
-    `rm -f "$last_log_link"`;
-    `ln -s "$log_file" "$last_log_link"`;
-
-    if ($exit_code ne 0)
-    {
-        print qq!
-mvn @arguments
-
-Maven execution failed with exit code ${exit_code}
-A complete log is in ${log_file}
-The last maven log is always $temporary_folder/maven-last.log
-!;
-    }
-
-    return $exit_code;
-}
-
-sub say_it
-{
-    my ($text) = @_;
-    println("┋ $text");
-}
-
-sub println
-{
-    my ($text) = @_;
-    print "$text\n";
-}
-
-sub fail
-{
-    my ($text) = @_;
-    print $text;
-    exit 1;
-}
-
-sub require_variable
-{
-    my ($variable, $help) = @_;
-    if (!defined $ENV{$variable})
-    {
-        usage($help);
-    }
-}
-
-sub say_it_block
-{
-    my ($text) = @_;
-    print "\n$text\n\n";
 }
 
 sub usage

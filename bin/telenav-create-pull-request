@@ -15,14 +15,18 @@ require "$ENV{'TELENAV_WORKSPACE'}/bin/telenav-functions.pl";
 
 if (!defined $ENV{"CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN"})
 {
-    fail("Must set CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN environment variable to merge pull requests");
+    fail("Must set CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN environment variable to create pull requests");
 }
 
 my $branch_name = get_argument("Branch name? ");
 
-cactus("git-merge-pull-request",
+my $title = console_input("Title? ");
+my $body = console_input("Body? ");
+
+cactus("git-pull-request",
     "-Dcactus.authentication-token=\"$ENV{CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN}\"",
-    "-Dcactus.pr.squash=true",
-    "-Dcactus.pr.delete-branch=true",
-    "-Dcactus.pr.auto=true",
-    "-Dcactus.target-branch=\"$branch_name\"");
+    "-Dcactus.title=\"$title\"",
+    "-Dcactus.to-branch=develop",
+    "-Dcactus.from-branch=\"${branch_name}\"",
+    "-Dcactus.body=\"${body}\"",
+    "-Dcactus.reviewers=\"rodherz,sunshine-syz,timboudreau,wenjuanj,jonathanl-telenav,haifeng-z\"");

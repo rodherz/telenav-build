@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env perl
 
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #
@@ -7,30 +7,21 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-source telenav-library-functions
+use 5.018;
+use strict;
+use warnings;
 
-if [[ -z "$CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN" ]]; then
+require "$ENV{'TELENAV_WORKSPACE'}/bin/telenav-functions.pl";
 
-    echo "Must set CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN environment variable to approve pull requests"
-    exit 1
+if (!defined $ENV{"CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN"})
+{
+    fail("Must set CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN environment variable to approve pull requests");
+}
 
-fi
+my $branch_name = get_argument("Branch name? ");
+my $body = console_input("Approval body? ");
 
-if [[ "$#" -eq 1 ]]; then
-
-    branch_name=$1
-
-else
-
-    read -r -p "Branch name? "
-    branch_name=$REPLY
-
-fi
-
-read -r -p "Body? "
-body=$REPLY
-
-cactus_all git-approve-pull-request \
-    -Dcactus.authentication-token=\""$CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN"\" \
-    -Dcactus.pr.branch-to-approve=\""$branch_name"\" \
-    -Dcactus.pr.body=\""$body"\" || exit 1
+cactus("git-approve-pull-request",
+    "-Dcactus.authentication-token=\"$ENV{CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN}\"",
+    "-Dcactus.pr.branch-to-approve=\"$branch_name\"",
+    ""-Dcactus.pr.body=\"$body\"");

@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env perl
 
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #
@@ -7,20 +7,17 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-source telenav-library-functions
+use 5.018;
+use strict;
+use warnings;
 
-branch_type=bugfix
-branch_name=$(get_optional_argument "Branch name? " "$@")
+require "$ENV{'TELENAV_WORKSPACE'}/bin/telenav-functions.pl";
 
-if [[ -z "$branch_name" ]]; then
-    usage "[branch_name]"
-else
-    cactus_all checkout \
-        -Dcactus.fetch-first=true \
-        -Dcactus.base-branch=develop \
-        -Dcactus.create-branches=true \
-        -Dcactus.create-local-branches=true \
-        -Dcactus.target-branch="$branch_type/$branch_name" \
-        -Dcactus.update-root=true \
-        -Dcactus.include-root=true || exit 1
-fi
+my $branch_name = get_argument("Branch name? ");
+
+if (!defined $branch_name)
+{
+    fail_with_usage("[branch-name]");
+}
+
+system("telenav-checkout bugfix/$branch_name");
