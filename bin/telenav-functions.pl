@@ -115,10 +115,6 @@ failed with exit code ${exit_code}. A complete log is in ${log_file}.
 The last maven log is always $temporary_folder/maven-last.log
 !);
     }
-    else
-    {
-        println("Succeeded");
-    }
 }
 
 sub say_it
