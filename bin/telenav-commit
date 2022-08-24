@@ -17,7 +17,7 @@ my $message = get_argument("Commit message? ");
 
 if (!defined $message)
 {
-    fail_with_usage("message");
+    fail_with_usage("[message]");
 }
 
 cactus("commit",
