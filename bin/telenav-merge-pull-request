@@ -26,3 +26,5 @@ cactus("git-merge-pull-request",
     "-Dcactus.pr.delete-branch=true",
     "-Dcactus.pr.auto=true",
     "-Dcactus.target-branch=\"$branch_name\"");
+
+println("Merged pull request for ${branch_name}");

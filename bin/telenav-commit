@@ -21,5 +21,7 @@ if (!defined $message)
 }
 
 cactus("commit",
-    "-Dcactus.commit-message=\"$message\"",
-    "-Dcactus.update-root=true");
+       "-Dcactus.commit-message=\"$message\"",
+       "-Dcactus.update-root=true");
+
+println("Changes committed");

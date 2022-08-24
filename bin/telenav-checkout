@@ -30,3 +30,5 @@ cactus("checkout",
     "-Dcactus.create-local-branches=true",
     "-Dcactus.push=false",
     "-Dcactus.permit-local-changes=true");
+
+println("Checked out branch ${branch_name}");
