@@ -115,10 +115,6 @@ failed with exit code ${exit_code}. A complete log is in ${log_file}.
 The last maven log is always $temporary_folder/maven-last.log
 !);
     }
-    else
-    {
-        println("Succeeded");
-    }
 }
 
 sub say_it
@@ -142,7 +138,7 @@ sub fail
 
 sub fail_with_usage
 {
-    my $help = $1;
+    my $help = shift @_;
 
     fail("Usage: $FindBin::Script $help");
 }
@@ -165,8 +161,9 @@ sub say_it_block
 sub console_input
 {
     my $prompt = shift @_;
-    say($prompt);
+    print($prompt);
     my $input = <STDIN>;
+    chomp $input;
     return $input;
 }
 
@@ -174,22 +171,18 @@ sub get_argument
 {
     my $prompt = shift @_;
 
-    my $argument;
-    if (@_ eq 0)
+    if (@ARGV == 0)
     {
-        say($prompt);
-        $argument = <STDIN>;
+        return console_input($prompt);
     }
-    elsif (@_ eq 1)
+    elsif (@ARGV == 1)
     {
-        $argument = $1;
+        return shift @ARGV;
     }
     else
     {
-        undef $argument;
+        return undef;
     }
-
-    return $argument;
 }
 
 1;
