@@ -262,9 +262,11 @@ Here, `branch-type` must be one of:
 
 To add a submodule to a workspace:
 
+```
 git submodule add -b [branch-name] [repository-name]  
 git submodule init  
 git submodule update
+```
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
 
