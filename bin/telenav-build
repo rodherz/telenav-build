@@ -85,7 +85,7 @@ sub build
         my $project = basename("$folder");
         say_it("Building project $project");
         my @maven_parameters=(@maven_switches, @maven_arguments);
-        my $build_output = maven(\@maven_parameters);
+        my $build_output = maven_array(\@maven_parameters);
         if ($? != 0)
         {
             fail("Build failed:\n\n$build_output\n");
