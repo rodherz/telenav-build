@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+
+#///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#
+#  © 2011-2021 Telenav, Inc.
+#  Licensed under Apache License, Version 2.0
+#
+#///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+use 5.018;
+use strict;
+use warnings;
+
+require "$ENV{'TELENAV_WORKSPACE'}/bin/telenav-functions.pl";
+
+if (!defined $ENV{"CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN"})
+{
+    fail("Must set CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN environment variable to create pull requests");
+}
+
+my $branch_name = get_argument("Branch name? ");
+
+cactus("show-prs",
+    "-Dcactus.target-branch=\"$branch_name\"",
+    "-Dcactus.include-root=true",
+    "-Dcactus.scope=all",
+    "-Dcactus.authentication-token=\"$ENV{CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN}\"");

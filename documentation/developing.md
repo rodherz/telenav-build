@@ -4,8 +4,26 @@
 
 If you are helping to develop Telenav Open Source projects this page will help you get going. 
 
+### Index
+
+ - [**Setup**](#setup)
+ - [**Development Practices**](#development-practices)
+ - [**Convenient Scripts for Developers**](#scripts-for-developers)
+ - [**Feature Development Workflow**](#workflow-for-developing-a-feature)
+ - [**Workspace Information**](#workspace-information)
+ - [**Building**](#building)
+ - [**Build Examples**](#build-examples)
+ - [**Build Scopes**](#build-scopes)
+ - [**Build Types**](#build-types)
+ - [**Build Modifiers**](#build-modifiers)
+ - [**Source Control**](#source-control)
+ - [**Git Flow**](#git-flow)
+ - [**Git Operations**](#git-operations)
+ - [**Adding a Submodule**](#adding-a-submodule)
+
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
 
+<a name = "setup"></a>
 ## Setup
 
 1. Follow the [Initial Setup Instructions](initial-setup-instructions.md).
@@ -16,6 +34,7 @@ If you are helping to develop Telenav Open Source projects this page will help y
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
+<a name = "development-practices"></a>
 ## Our Development Practices
 
 Once you're ready to go, these articles can help you to understand our development practices:
@@ -28,6 +47,7 @@ Once you're ready to go, these articles can help you to understand our developme
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
+<a name = "scripts-for-developers"></a>
 ## Convenient Scripts for Developers
 
 The `telenav-build/bin` folder contains a set of bash scripts, all prefixed with `telenav-`.
@@ -40,6 +60,7 @@ they are *not required*, merely convenient.
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
+<a name = "feature-development"></a>
 ## Workflow for Developing a Feature
 
 1. `telenav-develop`--switch all projects to the `develop` branch
@@ -53,6 +74,7 @@ they are *not required*, merely convenient.
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
+<a name = "workspace-information"></a>
 ## Workspace Information
 
 To get the versions of tools, and repository families in the Telenav workspace, run `telenav-version`:
@@ -109,20 +131,21 @@ To get information about the projects in the Telenav workspace, run `telenav-wor
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
-## Building &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/command-line-24.png" srcset="https://telenav.github.io/telenav-assets/images/icons/command-line-24-2x.png 2x"/>
-
+<a name = "building"></a>
+## Building &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/command-line-24.png" srcset="https://telenav.github.io/telenav-assets/images/icons/command-line-24-2x.png 2x"/> 
 The `telenav-build` script helps to compose Maven commands. It takes an optional `build-scope`,
 zero or more `build-modifiers`, and a `build-type`:
 
 `telenav-build` `[build-scope]`**?** `[build-modifier]`**&ast;** `[build-type]`
 
-### Examples &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/books-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/books-32-2x.png 2x"/>
+<a name = "build-examples"></a>
+### Build Examples &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/books-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/books-32-2x.png 2x"/>
 
 For example, `telenav-build kivakit release` builds a release of the KivaKit project family and uploads
 it to OSSRH (Maven Central staging). Some more examples:
 
-| Example Command                          | Purpose                                                                                            |
-|------------------------------------------|----------------------------------------------------------------------------------------------------|
+| Example Command                       | Purpose                                                                                            |
+|---------------------------------------|----------------------------------------------------------------------------------------------------|
 | `telenav-build`                       | Build all projects and run tests                                                                   |
 | `telenav-build help`                  | Show script help                                                                                   |
 | `telenav-build kivakit release`       | Build a release for the kivakit project family and upload it to OSSRH (Maven Central staging)      |
@@ -134,6 +157,7 @@ it to OSSRH (Maven Central staging). Some more examples:
 | `telenav-build javadoc lexakai`       | Build javadoc and lexakai documentation for all project families                                   |
 | `telenav-build single-threaded`       | Build all projects with only one thread (12 is the default)                                        |
 
+<a name = "build-scopes"></a>
 ### Build Scopes
 
 The `telenav-build` workspace can contain any set of Telenav Open Source projects.
@@ -145,6 +169,7 @@ project `build-scope` specifier is accepted, which must be one of:
 | `all-project-families`  **[default]** | All repositories belonging to any project family                                                    |
 | `[project-family]`                    | All repositories belonging to a project family, such as `kivakit`, `mesakit`, `cactus` or `lexakai` |
 
+<a name = "build-types"></a>
 ### Build Types &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/set-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/set-32-2x.png 2x"/>
 
 The `build-type` parameter to `telenav-build` specifies the goal of the build.
@@ -159,6 +184,7 @@ The `build-type` parameter to `telenav-build` specifies the goal of the build.
 | `release-local`         | Builds a release                                                     |
 | `release`               | Builds a release and uploads it to OSSRH (staging for Maven Central) |
 
+<a name = "build-modifiers"></a>
 ### Build Modifiers &nbsp; <img src="https://telenav.github.io/telenav-assets/images/icons/stars-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/stars-32-2x.png 2x"/>
 
 The `build-modifier` parameter(s) adds or removes switches from those specified by `build-type`.
@@ -185,10 +211,12 @@ They effectively *modify* the kind of build.
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-128-2x.png 2x"/>
 
+<a name = "source-control"></a>
 ## Source Control <img src="https://telenav.github.io/telenav-assets/images/icons/branch-32.png" srcset="https://telenav.github.io/telenav-assets/images/icons/branch-32-2x.png 2x"/>
 
 Telenav Open Source projects are published on [Github](https://www.github.com/) and use Git for source control. 
 
+&nbsp; <a name = "git-flow"></a>
 ### The Git Flow Branching Model
 
 Although Telenav Open Source projects do not use git flow, they adhere to the [Git Flow](https://www.atlassian.com/git/tutorials/comparing-workflows/gitflow-workflow) branching model.
@@ -203,6 +231,7 @@ This model specifies the following branch naming convention:
 | `feature/*`         | Feature branches      |
 | `hotfix/*`          | Hot fix branches      |
 
+<a name = "git-operations"></a>
 ### Git Operations
 
 After following the [Initial Setup Instructions](initial-setup-instructions.md), the scripts below will be available.
@@ -227,6 +256,17 @@ Here, `branch-type` must be one of:
  - `bugfix`
  - `feature`
  - `hotfix`
+
+<a name = "adding-a-submodule"></a>
+### Adding a Submodule
+
+To add a submodule to a workspace:
+
+```
+git submodule add -b [branch-name] [repository-name]  
+git submodule init  
+git submodule update
+```
 
 <img src="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512.png" srcset="https://telenav.github.io/telenav-assets/images/separators/horizontal-line-512-2x.png 2x"/>
 

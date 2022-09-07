@@ -20,14 +20,15 @@ our $build_dry_run;
 sub cactus
 {
     my $command = shift @_;
+    my @arguments = (@_);
+
+    my @defaults = (); # ("--quiet");
+    push @arguments, @defaults;
+    push @arguments, "-Dcactus.scope=all com.telenav.cactus:cactus-maven-plugin:${\(cactus_version())}:${command}";
+    push @arguments, "validate";
 
     cd_workspace();
-    my @defaults = (); # ("--quiet");
-    my @arguments = @_;
-    push(@arguments, @defaults);
-    push(@arguments, "-Dcactus.scope=all com.telenav.cactus:cactus-maven-plugin:${\(cactus_version())}:${command}");
-    push(@arguments, "validate");
-    maven(\@arguments);
+    maven_array(\@arguments);
 }
 
 sub dry_run
@@ -52,7 +53,8 @@ sub workspace
 
 sub cactus_version
 {
-    my $version = `cat ${\(workspace())}/cactus/pom.xml | grep -Eow '<cactus\.previous\.version>(.*?)</cactus\.previous\.version>' | sed -E 's/.*>(.*)<.*/\\1/'`;
+    # my $version = `cat ${\(workspace())}/cactus/pom.xml | grep -Eow '<cactus\.previous\.version>(.*?)</cactus\.previous\.version>' | sed -E 's/.*>(.*)<.*/\\1/'`;
+    my $version = `cat ${\(workspace())}/cactus/pom.xml | grep -Eow '<cactus\.version>(.*?)</cactus\.version>' | sed -E 's/.*>(.*)<.*/\\1/'`;
     chomp $version;
     return $version;
 }
@@ -63,6 +65,11 @@ sub cd_workspace
 }
 
 sub maven
+{
+    maven_array(\@_);
+}
+
+sub maven_array
 {
     my @arguments = @{$_[0]};
 
@@ -109,7 +116,7 @@ sub maven
         fail(qq!
 The Maven command
 
-    mvn $command
+    $command
 
 failed with exit code ${exit_code}. A complete log is in ${log_file}.
 The last maven log is always $temporary_folder/maven-last.log
