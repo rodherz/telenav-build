@@ -143,13 +143,15 @@ MINOR_REVISION_FAMILIES=`echo $MINOR_REVISION_FAMILIES | tr ' ' ,`
 DOT_REVISION_FAMILIES=`echo $DOT_REVISION_FAMILIES | tr ' ' ,`
 NONE_REVISION_FAMILIES=`echo $NONE_REVISION_FAMILIES | tr ' ' ,`
 
-echo Releasing families: $PROJECT_FAMILIES
-echo "Changing MAJOR revision for [ $MAJOR_REVISION_FAMILIES ]"
-echo "Changing MINOR revision for [ $MINOR_REVISION_FAMILIES ]"
-echo "Changing MAJOR revision for [ $DOT_REVISION_FAMILIES ]"
-echo "Using current version (less any -SNAPSHOT suffix) for [ $NONE_REVISION_FAMILIES ]"
+echo "┋"
+echo "┋ Releasing families: $PROJECT_FAMILIES"
+echo "┋ Changing MAJOR revision for [ $MAJOR_REVISION_FAMILIES ]"
+echo "┋ Changing MINOR revision for [ $MINOR_REVISION_FAMILIES ]"
+echo "┋ Changing MAJOR revision for [ $DOT_REVISION_FAMILIES ]"
+echo "┋ Using current version (less any -SNAPSHOT suffix) for [ $NONE_REVISION_FAMILIES ]"
+echo "┋"
 
-read -r -p "┋ Does this look correct (yes/no)? [no]"
+read -r -p "┋ Does that look correct (yes/no)? [no]"
 if [[ "${REPLY}" != "yes" ]]; then
     echo Aborting.
     exit 1
