@@ -13,7 +13,8 @@ export RELEASE_BRANCH_PREFIX=release
 # Project families that can be released
 export VALID_PROJECT_FAMILIES=(kivakit lexakai mesakit)
 
-
+# We do not release cactus through this script, and its tests take a long time
+export CACTUS_TESTS_SKIP=true
 
 ##############################################################################
 # Check for any arguments (publish, quiet)
@@ -248,7 +249,7 @@ echo "┋ Maven repository: ${MAVEN_REPOSITORY}"
 # lets us create test release branches without stepping the real release.
 ##############################################################################
 
-export MAVEN_OPTS="-XX:+UseG1GC \
+export MAVEN_OPTS="-B -ntp -XX:+UseG1GC \
     -Dcactus.debug=false \
     -DreleasePush=${PUBLISH_RELEASE} \
     -Dmaven.repo.local=${MAVEN_REPOSITORY} \
@@ -334,13 +335,16 @@ echo "┋ Installing superpoms"
 maven $QUIET $FAST \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -f telenav-superpom/pom.xml \
-        clean install \
-        || exit 1
+        clean install || exit 1
+
 
 echo "┋ Ensuring versions are consistent"
-mvn -Dcactus.commit-changes=true -Dcactus.superpom.bump.policy=BUMP_WITHOUT_CHANGING_FLAVOR \
-    -Dcactus.scope=all-project-families -Dcactus.include-root=true \
-    -Dcactus.scope=family com.telenav.cactus:cactus-maven-plugin:${CACTUS_PLUGIN_VERSION}:homogenize-versions
+# shellcheck disable=SC2086
+mvn -Dcactus.commit-changes=true \
+    -Dcactus.scope=all-project-families \
+    -Dcactus.include-root=true \
+    -Dcactus.scope=family \
+    com.telenav.cactus:cactus-maven-plugin:${CACTUS_PLUGIN_VERSION}:homogenize-versions
 
 
 echo "┋ Reinstalling superpoms in case anything was inconsistent"
@@ -349,16 +353,15 @@ echo "┋ Reinstalling superpoms in case anything was inconsistent"
 maven $QUIET $FAST \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -f telenav-superpom/pom.xml \
-        clean install \
-        || exit 1
+        clean install || exit 1
 
 echo "┋ Checking build (tests enabled)"
 
 # shellcheck disable=SC2086
 maven $QUIET $FAST \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
-        clean install \
-        || exit 1
+        clean install || exit 1
+
 
 echo "┋━━━━━━━ PHASE 1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
