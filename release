@@ -307,12 +307,22 @@ echo "┋ "
 echo "┋━━━━━━━ PHASE 1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┋ Updating versions and branch references"
 
+echo "┋ Changing MAJOR revision for [ $MAJOR_REVISION_FAMILIES ]"
+echo "┋ Changing MINOR revision for [ $MINOR_REVISION_FAMILIES ]"
+echo "┋ Changing MAJOR revision for [ $DOT_REVISION_FAMILIES ]"
+echo "┋ Using current version (less any -SNAPSHOT suffix) for [ $NONE_REVISION_FAMILIES ]"
+
+# Deleteme:  temporary debug stuff
+echo Phase 1 Maven Cmdline:
+echo mvn $QUIET $FAST -Dcactus.verbose=true -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" -P release-phase-1 -Denforcer.skip=true -Dcactus.scope=family -Dcactus.expected.branch=develop -Dcactus.major.bump.families=\""${MAJOR_REVISION_FAMILIES[*]}"\" -Dcactus.minor.bump.families=\""${MINOR_REVISION_FAMILIES[*]}"\" -Dcactus.dot.bump.families=\""${DOT_REVISION_FAMILIES[*]}"\" -Dcactus.no.bump.families=\""${NONE_REVISION_FAMILIES[*]}"\" -Dcactus.families="${PROJECT_FAMILIES}" -Dcactus.version.flavor.change=to-release -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" -Dmaven.test.skip=true clean validate
+
 # shellcheck disable=SC2086
 maven $QUIET $FAST \
     -Dcactus.verbose=true \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -P release-phase-1 \
     -Denforcer.skip=true \
+    -Dcactus.scope=family \
     -Dcactus.expected.branch=develop \
     -Dcactus.major.bump.families=\""${MAJOR_REVISION_FAMILIES[*]}"\" \
     -Dcactus.minor.bump.families=\""${MINOR_REVISION_FAMILIES[*]}"\" \
