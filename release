@@ -103,7 +103,7 @@ for family in ${PROJECT_FAMILIES//,/ }
 do
     # shellcheck disable=SC2076
     if [[ " ${VALID_PROJECT_FAMILIES[*]} " =~ " ${family} " ]]; then
-        read -r -p "┋    - $family release should be the next (major, minor, dot) version or the current version [current]? "
+        read -r -p "┋    - $family release should be the next (major, minor, dot, none) version or the current version [current]? "
         if [[ -z "${REPLY}" ]]; then
             release_type="none"
         else
@@ -111,19 +111,19 @@ do
         fi
         case $release_type in
         major)
-            MAJOR_REVISION_FAMILIES+=("$family")
+            MAJOR_REVISION_FAMILIES=("$MAJOR_REVISION_FAMILIES $family")
             ;;
         minor)
-            MINOR_REVISION_FAMILIES+=("$family")
+            MINOR_REVISION_FAMILIES=("$MINOR_REVISION_FAMILIES $family")
             ;;
         dot)
-            DOT_REVISION_FAMILIES+=("$family")
+            DOT_REVISION_FAMILIES=("$DOT_REVISION_FAMILIES $family")
             ;;
         none)
-            NONE_REVISION_FAMILIES+=("$family")
+            NONE_REVISION_FAMILIES=("$NONE_REVISION_FAMILIES $family")
             ;;
         current)
-            NONE_REVISION_FAMILIES+=("$family")
+            NONE_REVISION_FAMILIES=("$NONE_REVISION_FAMILIES $family")
             ;;
         *)
             echo "$release_type is not a valid release type"
@@ -135,6 +135,25 @@ do
     fi
 done
 
+# We need these values to be comma-delimited or we wind up in
+# shell-quoting hell constructing maven arguments.
+
+MAJOR_REVISION_FAMILIES=`echo $MAJOR_REVISION_FAMILIES | tr ' ' ,`
+MINOR_REVISION_FAMILIES=`echo $MINOR_REVISION_FAMILIES | tr ' ' ,`
+DOT_REVISION_FAMILIES=`echo $DOT_REVISION_FAMILIES | tr ' ' ,`
+NONE_REVISION_FAMILIES=`echo $NONE_REVISION_FAMILIES | tr ' ' ,`
+
+echo Releasing families: $PROJECT_FAMILIES
+echo "Changing MAJOR revision for [ $MAJOR_REVISION_FAMILIES ]"
+echo "Changing MINOR revision for [ $MINOR_REVISION_FAMILIES ]"
+echo "Changing MAJOR revision for [ $DOT_REVISION_FAMILIES ]"
+echo "Using current version (less any -SNAPSHOT suffix) for [ $NONE_REVISION_FAMILIES ]"
+
+read -r -p "┋ Does this look correct (yes/no)? [no]"
+if [[ "${REPLY}" != "yes" ]]; then
+    echo Aborting.
+    exit 1
+fi
 
 
 ##############################################################################
