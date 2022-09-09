@@ -324,12 +324,26 @@ maven $QUIET $FAST \
         clean validate \
         || exit 1
 
-
 ##############################################################################
 # Rebuild everything with tests now that some things have new versions
 ##############################################################################
 
 echo "┋ Installing superpoms"
+
+# shellcheck disable=SC2086
+maven $QUIET $FAST \
+    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
+    -f telenav-superpom/pom.xml \
+        clean install \
+        || exit 1
+
+echo "┋ Ensuring versions are consistent"
+mvn -Dcactus.commit-changes=true -Dcactus.superpom.bump.policy=BUMP_WITHOUT_CHANGING_FLAVOR \
+    -Dcactus.scope=all-project-families -Dcactus.include-root=true \
+    -Dcactus.scope=family com.telenav.cactus:cactus-maven-plugin:${CACTUS_PLUGIN_VERSION}:homogenize-versions
+
+
+echo "┋ Reinstalling superpoms in case anything was inconsistent"
 
 # shellcheck disable=SC2086
 maven $QUIET $FAST \
