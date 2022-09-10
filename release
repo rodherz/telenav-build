@@ -456,7 +456,7 @@ echo "┋ Publishing release..."
 # shellcheck disable=SC2086
 maven $QUIET --no-transfer-progress --batch-mode \
     -P release-phase-3 \
-    -Dcactus.verb=Publishing
+    -Dcactus.verb=Publishing \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -P ${GPG_PROFILE} \
     -Dcactus.families="${PROJECT_FAMILIES}" \
