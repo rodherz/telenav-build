@@ -264,14 +264,6 @@ export MAVEN_OPTS="-XX:+UseG1GC \
 # from Maven's two versions of its artifact API in Lexakai mojo.
 # Just gets it installed ahead of anything trying to use it.
 
-# shellcheck disable=SC2086
-echo "┋ Installing lexakai 1.0.11"
-
-maven $QUIET $FAST --no-transfer-progress --batch-mode \
-    org.apache.maven.plugins:maven-dependency-plugin:3.3.0:get \
-    -Dartifact=com.telenav.lexakai:lexakai:1.0.11:jar:app
-
-
 ##############################################################################
 # Check installed tools and clean out project caches
 ##############################################################################
@@ -296,6 +288,14 @@ maven $QUIET $FAST --no-transfer-progress --batch-mode \
     -f telenav-superpom/pom.xml \
         clean install \
         || exit 1
+
+echo "┋ Installing lexakai 1.0.11"
+
+# shellcheck disable=SC2086
+maven $QUIET $FAST --no-transfer-progress --batch-mode \
+    org.apache.maven.plugins:maven-dependency-plugin:3.3.0:get \
+    -Dartifact=com.telenav.lexakai:lexakai:1.0.11:jar:app
+
 
 echo '┋ Checking build (no tests)'
 
