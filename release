@@ -322,26 +322,25 @@ echo "┋ Changing MAJOR revision for [ $DOT_REVISION_FAMILIES ]"
 echo "┋ Using current version (less any -SNAPSHOT suffix) for [ $NONE_REVISION_FAMILIES ]"
 
 # Deleteme:  temporary debug stuff
-echo Phase 1 Maven Cmdline:
-echo mvn $QUIET $FAST -Dcactus.verbose=true -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" -P release-phase-1 -Denforcer.skip=true -Dcactus.scope=family -Dcactus.expected.branch=develop -Dcactus.major.bump.families=\""${MAJOR_REVISION_FAMILIES[*]}"\" -Dcactus.minor.bump.families=\""${MINOR_REVISION_FAMILIES[*]}"\" -Dcactus.dot.bump.families=\""${DOT_REVISION_FAMILIES[*]}"\" -Dcactus.no.bump.families=\""${NONE_REVISION_FAMILIES[*]}"\" -Dcactus.families="${PROJECT_FAMILIES}" -Dcactus.version.flavor.change=to-release -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" -Dmaven.test.skip=true clean validate
+echo "Phase 1 Maven Command-line:"
+echo "mvn $QUIET $FAST -Dcactus.verbose=true -Dcactus.maven.plugin.version=${CACTUS_PLUGIN_VERSION} -P release-phase-1 -Denforcer.skip=true -Dcactus.scope=family -Dcactus.expected.branch=develop -Dcactus.major.bump.families=${MAJOR_REVISION_FAMILIES[*]} -Dcactus.minor.bump.families=${MINOR_REVISION_FAMILIES[*]} -Dcactus.dot.bump.families=${DOT_REVISION_FAMILIES[*]} -Dcactus.no.bump.families=${NONE_REVISION_FAMILIES[*]} -Dcactus.families=${PROJECT_FAMILIES} -Dcactus.version.flavor.change=to-release -Dcactus.release.branch.prefix=${RELEASE_BRANCH_PREFIX} -Dmaven.test.skip=true clean validate"
 
 # shellcheck disable=SC2086
 maven $QUIET $FAST --no-transfer-progress --batch-mode \
     -Dcactus.verbose=true \
-    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
+    -Dcactus.maven.plugin.version=${CACTUS_PLUGIN_VERSION} \
     -P release-phase-1 \
     -Denforcer.skip=true \
     -Dcactus.scope=family \
     -Dcactus.expected.branch=develop \
-    -Dcactus.major.bump.families=\""${MAJOR_REVISION_FAMILIES[*]}"\" \
-    -Dcactus.minor.bump.families=\""${MINOR_REVISION_FAMILIES[*]}"\" \
-    -Dcactus.dot.bump.families=\""${DOT_REVISION_FAMILIES[*]}"\" \
-    -Dcactus.no.bump.families=\""${NONE_REVISION_FAMILIES[*]}"\" \
-    -Dcactus.families="${PROJECT_FAMILIES}" \
+    -Dcactus.major.bump.families=${MAJOR_REVISION_FAMILIES} \
+    -Dcactus.minor.bump.families=${MINOR_REVISION_FAMILIES} \
+    -Dcactus.dot.bump.families=${DOT_REVISION_FAMILIES} \
+    -Dcactus.no.bump.families=${NONE_REVISION_FAMILIES} \
+    -Dcactus.families=${PROJECT_FAMILIES} \
     -Dcactus.version.flavor.change=to-release \
-    -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
-    -Dmaven.test.skip=true \
-        clean validate || exit 4
+    -Dcactus.release.branch.prefix=${RELEASE_BRANCH_PREFIX} \
+    -Dmaven.test.skip=true clean validate || exit 4
         
 
 ##############################################################################
@@ -352,7 +351,7 @@ echo "┋ Installing superpoms"
 
 # shellcheck disable=SC2086
 maven $QUIET $FAST --no-transfer-progress --batch-mode \
-    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
+    -Dcactus.maven.plugin.version=${CACTUS_PLUGIN_VERSION} \
     -f telenav-superpom/pom.xml \
         clean install || exit 5
 
@@ -372,7 +371,7 @@ echo "┋ Reinstalling superpoms in case anything was inconsistent"
 
 # shellcheck disable=SC2086
 maven $QUIET $FAST --no-transfer-progress --batch-mode \
-    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
+    -Dcactus.maven.plugin.version=${CACTUS_PLUGIN_VERSION} \
     -f telenav-superpom/pom.xml \
         clean install || exit 7
 
@@ -380,7 +379,7 @@ echo "┋ Checking build (tests enabled)"
 
 # shellcheck disable=SC2086
 maven $QUIET $FAST --no-transfer-progress --batch-mode \
-    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
+    -Dcactus.maven.plugin.version=${CACTUS_PLUGIN_VERSION} \
         clean install || exit 8
 
 
@@ -399,9 +398,9 @@ echo "┋ Building documentation"
 # shellcheck disable=SC2086
 maven $QUIET $FAST --no-transfer-progress --batch-mode \
     -P release-phase-2 \
-    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
-    -Dcactus.families="${PROJECT_FAMILIES}" \
-    -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
+    -Dcactus.maven.plugin.version=${CACTUS_PLUGIN_VERSION} \
+    -Dcactus.families=${PROJECT_FAMILIES} \
+    -Dcactus.release.branch.prefix=${RELEASE_BRANCH_PREFIX} \
     -Dmaven.test.skip=true \
     -DreleasePush=$PUBLISH_RELEASE \
     -Dcactus.push=$PUBLISH_RELEASE \
