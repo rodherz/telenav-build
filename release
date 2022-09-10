@@ -39,9 +39,6 @@ do
     if [ "$argument" == "skip-review" ]; then
         export SKIP_REVIEW=true
     fi
-    if [ "$argument" == "fast" ]; then
-        export FAST="--threads 12"
-    fi
     if [ "$argument" == "help" ]; then
         echo " "
         echo "release [publish|skip-review|quiet|fast|help]*"
@@ -187,7 +184,7 @@ echo "┋ Installing superpoms"
 cd "${ORIGINAL_WORKSPACE}" || exit 1
 
 # shellcheck disable=SC2086
-maven $QUIET $FAST --no-transfer-progress --batch-mode \
+maven $QUIET --no-transfer-progress --batch-mode \
     -Dcactus.version="${CACTUS_PLUGIN_VERSION}" \
     -f telenav-superpom/pom.xml \
         clean install \
@@ -279,7 +276,7 @@ cd "${TEMPORARY_WORKSPACE}" || exit 1
 echo '┋ Installing superpoms'
 
 # shellcheck disable=SC2086
-maven $QUIET $FAST --no-transfer-progress --batch-mode \
+maven $QUIET --no-transfer-progress --batch-mode \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -f telenav-superpom/pom.xml \
         clean install || exit 1
@@ -290,7 +287,7 @@ maven $QUIET $FAST --no-transfer-progress --batch-mode \
 echo "┋ Installing lexakai 1.0.11"
 
 # shellcheck disable=SC2086
-maven $QUIET $FAST --no-transfer-progress --batch-mode \
+maven $QUIET --no-transfer-progress --batch-mode \
     org.apache.maven.plugins:maven-dependency-plugin:3.3.0:get \
     -Dartifact=com.telenav.lexakai:lexakai:1.0.11:jar:app || exit 2
 
@@ -298,7 +295,7 @@ maven $QUIET $FAST --no-transfer-progress --batch-mode \
 echo '┋ Checking build (no tests)'
 
 # shellcheck disable=SC2086
-maven $QUIET $FAST --no-transfer-progress --batch-mode \
+maven $QUIET --no-transfer-progress --batch-mode \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -Dmaven.test.skip=true \
         clean install || exit 3 \
@@ -323,10 +320,10 @@ echo "┋ Using current version (less any -SNAPSHOT suffix) for [ $NONE_REVISION
 
 # Deleteme:  temporary debug stuff
 echo "Phase 1 Maven Command-line:"
-echo "mvn $QUIET $FAST -Dcactus.verbose=true -Dcactus.maven.plugin.version=${CACTUS_PLUGIN_VERSION} -P release-phase-1 -Denforcer.skip=true -Dcactus.scope=family -Dcactus.expected.branch=develop -Dcactus.major.bump.families=${MAJOR_REVISION_FAMILIES[*]} -Dcactus.minor.bump.families=${MINOR_REVISION_FAMILIES[*]} -Dcactus.dot.bump.families=${DOT_REVISION_FAMILIES[*]} -Dcactus.no.bump.families=${NONE_REVISION_FAMILIES[*]} -Dcactus.families=${PROJECT_FAMILIES} -Dcactus.version.flavor.change=to-release -Dcactus.release.branch.prefix=${RELEASE_BRANCH_PREFIX} -Dmaven.test.skip=true clean validate"
+echo "mvn $QUIET -Dcactus.verbose=true -Dcactus.maven.plugin.version=${CACTUS_PLUGIN_VERSION} -P release-phase-1 -Denforcer.skip=true -Dcactus.scope=family -Dcactus.expected.branch=develop -Dcactus.major.bump.families=${MAJOR_REVISION_FAMILIES[*]} -Dcactus.minor.bump.families=${MINOR_REVISION_FAMILIES[*]} -Dcactus.dot.bump.families=${DOT_REVISION_FAMILIES[*]} -Dcactus.no.bump.families=${NONE_REVISION_FAMILIES[*]} -Dcactus.families=${PROJECT_FAMILIES} -Dcactus.version.flavor.change=to-release -Dcactus.release.branch.prefix=${RELEASE_BRANCH_PREFIX} -Dmaven.test.skip=true clean validate"
 
 # shellcheck disable=SC2086
-maven $QUIET $FAST --no-transfer-progress --batch-mode \
+maven $QUIET --no-transfer-progress --batch-mode \
     -Dcactus.verbose=true \
     -Dcactus.maven.plugin.version=${CACTUS_PLUGIN_VERSION} \
     -P release-phase-1 \
@@ -352,7 +349,7 @@ maven $QUIET $FAST --no-transfer-progress --batch-mode \
 echo "┋ Installing superpoms"
 
 # shellcheck disable=SC2086
-maven $QUIET $FAST --no-transfer-progress --batch-mode \
+maven $QUIET --no-transfer-progress --batch-mode \
     -Dcactus.maven.plugin.version=${CACTUS_PLUGIN_VERSION} \
     -f telenav-superpom/pom.xml \
         clean install || exit 5
@@ -360,7 +357,7 @@ maven $QUIET $FAST --no-transfer-progress --batch-mode \
 
 echo "┋ Ensuring versions are consistent"
 # shellcheck disable=SC2086
-maven $QUIET $FAST --no-transfer-progress --batch-mode \
+maven $QUIET --no-transfer-progress --batch-mode \
     -Dcactus.commit-changes=true \
     --no-transfer-progress --batch-mode \
     -Dcactus.scope=all-project-families \
@@ -372,7 +369,7 @@ maven $QUIET $FAST --no-transfer-progress --batch-mode \
 echo "┋ Reinstalling superpoms in case anything was inconsistent"
 
 # shellcheck disable=SC2086
-maven $QUIET $FAST --no-transfer-progress --batch-mode \
+maven $QUIET --no-transfer-progress --batch-mode \
     -Dcactus.maven.plugin.version=${CACTUS_PLUGIN_VERSION} \
     -f telenav-superpom/pom.xml \
         clean install || exit 7
@@ -380,7 +377,7 @@ maven $QUIET $FAST --no-transfer-progress --batch-mode \
 echo "┋ Checking build (tests enabled)"
 
 # shellcheck disable=SC2086
-maven $QUIET $FAST --no-transfer-progress --batch-mode \
+maven $QUIET --no-transfer-progress --batch-mode \
     -Dcactus.maven.plugin.version=${CACTUS_PLUGIN_VERSION} \
         clean install || exit 8
 
@@ -398,7 +395,7 @@ echo "┋━━━━━━━ PHASE 2 ━━━━━━━━━━━━━�
 echo "┋ Building documentation"
 
 # shellcheck disable=SC2086
-maven $QUIET $FAST --no-transfer-progress --batch-mode \
+maven $QUIET --no-transfer-progress --batch-mode \
     -P release-phase-2 \
     -Dcactus.maven.plugin.version=${CACTUS_PLUGIN_VERSION} \
     -Dcactus.families=${PROJECT_FAMILIES} \
@@ -457,7 +454,7 @@ echo "┏━━━━━━━ PHASE 3 ━━━━━━━━━━━━━�
 echo "┋ Publishing release..."
 
 # shellcheck disable=SC2086
-maven $QUIET $FAST --no-transfer-progress --batch-mode \
+maven $QUIET --no-transfer-progress --batch-mode \
     -P release-phase-3 \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -P ${GPG_PROFILE} \
@@ -483,7 +480,7 @@ echo "┏━━━━━━━ PHASE 4 ━━━━━━━━━━━━━�
 echo "┋ Merging release and updating to next snapshot version..."
 
 # shellcheck disable=SC2086
-maven $QUIET $FAST --no-transfer-progress --batch-mode \
+maven $QUIET --no-transfer-progress --batch-mode \
     -P release-phase-4 \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -Dcactus.families="${PROJECT_FAMILIES}" \
@@ -492,6 +489,20 @@ maven $QUIET $FAST --no-transfer-progress --batch-mode \
 
 echo "┗━━━━━━━ PHASE 4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
+
+# Now pull the changes from all the submodules back into
+# the originating checkout, and lastly (so the refs exist),
+# those from the submodule root, so the operator does not
+# need to get them from the remote.
+
+echo "┏━━━━━━━ PHASE 5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
+echo "┋ Updating local checkout from release checkout "
+
+cd ${ORIGINAL_WORKSPACE}
+git submodule foreach --recursive git pull ${TEMPORARY_WORKSPACE}/${name}
+git pull ${TEMPORARY_WORKSPACE}
+
+echo "┗━━━━━━━ PHASE 5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
 
 ##############################################################################
