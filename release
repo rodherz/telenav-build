@@ -187,7 +187,7 @@ echo "┋ Installing superpoms"
 cd "${ORIGINAL_WORKSPACE}" || exit 1
 
 # shellcheck disable=SC2086
-maven $QUIET $FAST \
+maven $QUIET $FAST --no-transfer-progress --batch-mode \
     -Dcactus.version="${CACTUS_PLUGIN_VERSION}" \
     -f telenav-superpom/pom.xml \
         clean install \
@@ -259,6 +259,17 @@ export MAVEN_OPTS="-XX:+UseG1GC \
     --add-opens=java.desktop/java.awt.font=ALL-UNNAMED \
     -Dcactus.release.branch.prefix=${RELEASE_BRANCH_PREFIX}"
 
+
+# Temporary hack until we untangle warring DefaultArtifact classes
+# from Maven's two versions of its artifact API in Lexakai mojo.
+# Just gets it installed ahead of anything trying to use it.
+
+# shellcheck disable=SC2086
+echo "┋ Installing lexakai 1.0.11"
+
+maven $QUIET $FAST --no-transfer-progress --batch-mode \
+    org.apache.maven.plugins:maven-dependency-plugin:3.3.0:get \
+    -Dartifact=com.telenav.lexakai:lexakai:1.0.11:jar:app
 
 
 ##############################################################################
