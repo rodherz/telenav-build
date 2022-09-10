@@ -332,6 +332,8 @@ maven $QUIET $FAST --no-transfer-progress --batch-mode \
     -P release-phase-1 \
     -Denforcer.skip=true \
     -Dcactus.scope=family \
+    -Dcactus.bump-published=true \
+    -Dcactus.create.release.branch=true \
     -Dcactus.expected.branch=develop \
     -Dcactus.major.bump.families=${MAJOR_REVISION_FAMILIES} \
     -Dcactus.minor.bump.families=${MINOR_REVISION_FAMILIES} \
@@ -340,7 +342,7 @@ maven $QUIET $FAST --no-transfer-progress --batch-mode \
     -Dcactus.families=${PROJECT_FAMILIES} \
     -Dcactus.version.flavor.change=to-release \
     -Dcactus.release.branch.prefix=${RELEASE_BRANCH_PREFIX} \
-    -Dmaven.test.skip=true clean validate || exit 4
+    -Dmaven.test.skip=true com.telenav.cactus:cactus-maven-plugin:${CACTUS_PLUGIN_VERSION}:bump-version || exit 4
         
 
 ##############################################################################
