@@ -1,0 +1,465 @@
+#!/bin/bash
+
+#///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#
+#  © 2011-2021 Telenav, Inc.
+#  Licensed under Apache License, Version 2.0
+#
+#///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+################ VARIABLES ################################################################################################
+
+export NORMAL='\033[0m'
+export ATTENTION='\033[1;32m'
+
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    export HISTCONTROL=ignoreboth:erasedups
+fi
+
+################ WORKSPACE ################################################################################################
+
+function cd_workspace()
+{
+    if [[ "$TELENAV_WORKSPACE" == "" ]]; then
+        echo "TELENAV_WORKSPACE must be defined"
+        exit 1
+    fi
+
+    cd "$TELENAV_WORKSPACE" || exit 1
+}
+
+function show_workspace()
+{
+    echo " "
+    echo "┏━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┫ Telenav Workspace ┣━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
+    echo "┋"
+    echo "┋        TELENAV_WORKSPACE: $TELENAV_WORKSPACE"
+
+    if [[ -d "$KIVAKIT_HOME" ]]; then
+
+        echo "┋"
+        echo "┋             KIVAKIT_HOME: $KIVAKIT_HOME"
+        echo "┋          KIVAKIT_VERSION: $KIVAKIT_VERSION"
+        echo "┋       KIVAKIT_CACHE_HOME: $KIVAKIT_CACHE_HOME"
+        echo "┋      KIVAKIT_ASSETS_HOME: $KIVAKIT_ASSETS_HOME"
+        echo "┋     KIVAKIT_JAVA_OPTIONS: $KIVAKIT_JAVA_OPTIONS"
+
+    fi
+
+    if [[ -d "$MESAKIT_HOME" ]]; then
+
+        echo "┋"
+        echo "┋             MESAKIT_HOME: $MESAKIT_HOME"
+        echo "┋          MESAKIT_VERSION: $MESAKIT_VERSION"
+        echo "┋       MESAKIT_CACHE_HOME: $MESAKIT_CACHE_HOME"
+        echo "┋      MESAKIT_ASSETS_HOME: $MESAKIT_ASSETS_HOME"
+        echo "┋     MESAKIT_JAVA_OPTIONS: $MESAKIT_JAVA_OPTIONS"
+
+    fi
+
+    echo "┋"
+    echo "┋                JAVA_HOME: $JAVA_HOME"
+    echo "┋"
+    echo "┋                  M2_HOME: $M2_HOME"
+    echo "┋"
+    perl -e 'print "┋                     PATH: " . join("\n┋                           ", split(":", $ENV{"PATH"})) . "\n"'
+    echo "┋"
+    echo "┗━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
+    echo " "
+}
+
+################ PROJECTS ############################################################################################
+
+project_version()
+{
+    project_home=$1
+
+    pushd "$project_home" 1>/dev/null || exit 1
+    maven --quiet -DforceStdout -Dexpression=project.version org.apache.maven.plugins:maven-help-plugin:3.2.0:evaluate validate || exit 1
+    popd 1>/dev/null || exit 1
+}
+
+project_name()
+{
+    project_home=$1
+
+    # shellcheck disable=SC2046
+    # shellcheck disable=SC2005
+    echo $(basename -- "$project_home")
+}
+
+project_build()
+{
+    project_home=$1
+
+    build_properties="$KIVAKIT_HOME/kivakit-core/target/classes/build.properties"
+
+    if [ -e "$build_properties" ]; then
+
+        build_name=$(property_value "$build_properties" build-name)
+        build_number=$(property_value "$build_properties" build-number)
+        build_date=$(property_value "$build_properties" build-date)
+
+        branch_name=$(git_branch_name "$project_home")
+
+        echo "$branch_name build #$build_number [$build_name] on $build_date"
+
+    fi
+}
+
+################ SCOPES ################################################################################################
+
+resolved_scope=""
+resolved_scope_switches=()
+resolved_families=()
+
+export resolved_scope
+export resolved_families
+export resolved_scope_switches
+
+resolve_scope_switches()
+{
+    scope=$1
+
+    resolve_scope "$scope"
+
+    families=$(join_by , "${resolved_families[@]}")
+
+    if [[ ${#resolved_families[@]} == 1 ]]; then
+
+        resolved_scope_switches=(-Dcactus.scope="$resolved_scope" -Dcactus.family="$families")
+
+    else
+
+        resolved_scope_switches=(-Dcactus.scope="$resolved_scope" -Dcactus.families="$families")
+
+    fi
+
+}
+
+resolve_scope()
+{
+    scope=$1
+
+    resolved_families=()
+
+    case "${scope}" in
+
+    "all")
+        resolved_scope="all"
+        ;;
+
+    "all-project-families")
+        resolved_scope="all-project-families"
+        ;;
+
+    "this")
+        resolved_scope="just-this"
+        ;;
+
+    "just-this")
+        resolved_scope="just-this"
+        ;;
+
+    *)
+        if [[ "${scope}" == "" ]]; then
+
+            if [[ "${TELENAV_SCOPE}" == "" ]]; then
+
+                resolved_scope="all-project-families"
+
+            else
+
+                resolved_scope="$TELENAV_SCOPE"
+                resolved_families=("$TELENAV_FAMILY")
+
+            fi
+
+        else
+
+            resolved_scope="family"
+
+            IFS=',' read -ra ARRAY <<< "$scope"
+            for family in "${ARRAY[@]}"; do
+                resolved_families+=("$family")
+            done
+
+        fi
+        ;;
+
+    esac
+}
+
+################ TOOLS ################################################################################################
+
+check_tools()
+{
+    caller=$1
+
+    if [[ ! "$caller" == "ci-build" ]]; then
+        require_variable M2_HOME "Must set M2_HOME"
+        require_variable JAVA_HOME "Must set JAVA_HOME"
+    fi
+
+    #
+    # Check tools
+    #
+
+    # 1) Parse Java version from output like: openjdk version "17.0.3" 2022-04-19 LTS
+    java_version=$(java -version 2>&1 | awk -F '"' '/version/ {print $2}')
+
+    # 2) Parse Git version from output like: git version 2.36.1
+    git_version=$(git --version 2>&1 | awk -F' ' '{print $3}')
+
+    # Check Java version
+    if [[ ! "$java_version" == "17."* ]]; then
+        echo "Telenav Open Source projects require Java 17"
+        echo "To install: https://jdk.java.net/archive/"
+        exit 1
+    else
+        echo "┋ Java $java_version"
+    fi
+
+    # Check Git version
+    if [[ ! $git_version =~ 2\.3[0-9]\. ]]; then
+        echo "Telenav Open Source projects require Git version 2.30 or higher"
+        exit 1
+    else
+        echo "┋ Git $git_version"
+    fi
+}
+
+################ GIT ################################################################################################
+
+git_repository_initialize()
+{
+    echo "Git pull fast-forward"
+    git config pull.ff false || exit 1
+    # shellcheck disable=SC2016
+    git submodule foreach 'git config pull.ff false && echo "Configuring $name"' || exit 1
+}
+
+git_branch_name()
+{
+    project_home=$1
+
+    cd "$project_home" || exit
+    branch_name=$(git rev-parse --abbrev-ref HEAD)
+    echo "$branch_name"
+}
+
+################ CACTUS ##############################################################################################
+
+cactus_version()
+{
+    # shellcheck disable=SC2002
+    cat "${TELENAV_WORKSPACE}"/cactus/pom.xml | grep -Eow "<cactus\.previous\.version>(.*?)</cactus\.previous\.version>" | sed -E 's/.*>(.*)<.*/\1/'
+    # echo "1.5.24"
+}
+
+cactus_check_branch()
+{
+    scope=$1
+    branch=$2
+
+    resolve_scope_switches "$scope"
+
+    cd_workspace
+    maven "${resolved_scope_switches[@]}" \
+        -Dcactus.expected.branch="$branch" \
+        com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":check validate || exit 1
+}
+
+cactus()
+{
+    command=$1
+    shift
+
+    cd_workspace
+    arguments=("${arguments[@]}" -Dcactus.scope=all com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":"${command}" validate)
+    maven "${arguments[@]}" || exit 1
+}
+
+################ MAVEN ###############################################################################################
+
+maven()
+{
+    local arguments=("$@")
+
+    local log_file
+    local log_level
+    local temporary_folder
+    local exit_code
+    local last_log_link
+
+    log_level="${MAVEN_LOG_LEVEL:-info}"
+    temporary_folder="${TMPDIR:-/tmp/}"
+    log_file=${temporary_folder}maven-$(date '+%s')-$(script).log
+    echo "mvn ${arguments[*]} || exit 1 2>&1" > "$log_file"
+
+    arguments=("-Dorg.slf4j.simpleLogger.logFile=${log_file}" "-Dorg.slf4j.simpleLogger.defaultLogLevel=\"${log_level}\"" "-Dorg.slf4j.simpleLogger.cacheOutputStream=false" "${arguments[@]}")
+    # shellcheck disable=SC2086
+    mvn ${arguments[*]} 2>&1
+    exit_code=$?
+
+    last_log_link=$temporary_folder/maven-last.log
+
+    rm -f "$last_log_link"
+    ln -s "$log_file" "$last_log_link"
+
+    if [ $exit_code -ne 0 ]; then
+        echo " " 1>&2
+        echo "mvn ${arguments[*]}" 1>&2
+        echo " " 1>&2
+        echo "Maven execution failed with exit code ${exit_code}" 1>&2
+        echo "A complete log is in ${log_file}" 1>&2
+        echo "The last maven log is always linked as maven-last.log in the system temp folder $temporary_folder" 1>&2
+        return $exit_code
+    fi
+
+    return $exit_code
+}
+
+################ ARGUMENTS ################################################################################################
+
+function script()
+{
+    # shellcheck disable=SC2046
+    # shellcheck disable=SC2005
+    echo $(basename -- "$0")
+}
+
+function get_optional_argument()
+{
+    prompt=$1
+    shift
+
+    if [[ "$#" -eq 0 ]]; then
+        read -r -p "$prompt"
+        argument=$REPLY
+    elif [[ "$#" -eq 1 ]]; then
+        argument=$1
+    else
+        argument=""
+    fi
+    echo "$argument"
+}
+
+function get_required_argument()
+{
+    prompt=$0
+    shift
+    help=$1
+    shift
+
+    argument=$(get_optional_argument "$@")
+
+    if [[ -z "$argument" ]]; then
+        usage "$help"
+    fi
+}
+
+usage()
+{
+    argument_help=$1
+
+    echo "Usage: $(script) $argument_help"
+    exit 1
+}
+
+################ REQUIRE ################################################################################################
+
+require_variable()
+{
+    variable=$1
+    argument_help=$2
+
+    if [[ -z "${!variable}" ]]; then
+
+        if [[ "$argument_help" == *"["* ]]; then
+            usage "$argument_help"
+        else
+            echo "$argument_help"
+        fi
+
+        exit 1
+
+    fi
+}
+
+require_folder()
+{
+    variable=$1
+    argument_help=$2
+
+    if [[ ! -e "${!variable}" ]]; then
+
+        echo "Folder '${!variable}' does not exist"
+        exit 1
+
+    fi
+}
+
+################ PATH ################################################################################################
+
+append_path()
+{
+    export PATH="$PATH:$1"
+}
+
+prepend_path()
+{
+    export PATH="$1:$PATH"
+}
+
+################ UTILITY ################################################################################################
+
+function join_by()
+{
+    local d=${1-} f=${2-}
+    if shift 2; then
+        printf %s "$f" "${@/#/$d}"
+    fi
+}
+
+is_mac()
+{
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        true
+    else
+        false
+    fi
+}
+
+property_value()
+{
+    file=$1
+    key=$2
+
+    # shellcheck disable=SC2002
+    cat "$file" | grep "$key" | cut -d'=' -f2 | xargs echo
+}
+
+yes_no()
+{
+    if [ -z "${NO_PROMPT}" ]; then
+
+        prompt=$1
+
+        read -p "$prompt (y/n)? " -n 1 -r
+        printf "\n"
+
+        if [[ $REPLY =~ ^[Yy]$ ]]; then
+            true
+        else
+            false
+        fi
+
+    else
+
+        true
+
+    fi
+}
+
+#####################################################################################################################

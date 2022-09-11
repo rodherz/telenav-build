@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env perl
 
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #
@@ -7,12 +7,10 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-source telenav-library-functions.sh
+use 5.018;
+use strict;
+use warnings;
 
-scope=""
-get_scope_argument "$@"
+require "$ENV{'TELENAV_WORKSPACE'}/bin/telenav-functions.pl";
 
-cd_workspace
-mvn --quiet \
-    "$(resolve_scope_switches "$scope")" \
-    com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":push || exit 1
+cactus("is-dirty");

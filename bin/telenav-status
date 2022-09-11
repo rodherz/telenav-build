@@ -7,14 +7,10 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-source "telenav-library-functions.sh"
+source telenav-library-functions
 
-clean_caches
-
-if [[ ! "$1" == "sparkling" ]]; then
-
-    clean_maven_repository_telenav
-
-fi
-
-clean_temporary_files "$TELENAV_WORKSPACE"
+echo " "
+cd_workspace
+git status --short || exit 1
+git submodule --quiet foreach "git status --short" || exit 1
+echo " "

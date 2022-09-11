@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+
+#///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#
+#  © 2011-2021 Telenav, Inc.
+#  Licensed under Apache License, Version 2.0
+#
+#///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+use 5.018;
+use strict;
+use warnings;
+
+require "$ENV{'TELENAV_WORKSPACE'}/bin/telenav-functions.pl";
+
+my $message = get_argument("Commit message? ");
+
+if (!defined $message)
+{
+    fail_with_usage("[message]");
+}
+
+cactus("commit",
+       "-Dcactus.commit-message=\"$message\"",
+       "-Dcactus.update-root=true");
+
+println("Changes committed");

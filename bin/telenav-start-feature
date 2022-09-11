@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env perl
 
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 #
@@ -7,17 +7,17 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-scope=""
-branch=""
-type="hotfix"
+use 5.018;
+use strict;
+use warnings;
 
-source telenav-library-functions.sh
+require "$ENV{'TELENAV_WORKSPACE'}/bin/telenav-functions.pl";
 
-get_scope_and_branch_arguments "$@"
+my $branch_name = get_argument("Branch name? ");
 
-if [[ ! $(git_check_branch_name "$scope" develop)  ]]; then
-    echo "Must be on 'develop' branch to start a $type"
-    exit 1
-fi
+if (!defined $branch_name)
+{
+    fail_with_usage("[branch-name]");
+}
 
-git_checkout_branch "$scope" "$type/$branch" true || exit 1
+system("telenav-checkout feature/$branch_name");

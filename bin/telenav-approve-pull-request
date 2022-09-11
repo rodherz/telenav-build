@@ -1,0 +1,27 @@
+#!/usr/bin/env perl
+
+#///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#
+#  © 2011-2021 Telenav, Inc.
+#  Licensed under Apache License, Version 2.0
+#
+#///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+use 5.018;
+use strict;
+use warnings;
+
+require "$ENV{'TELENAV_WORKSPACE'}/bin/telenav-functions.pl";
+
+if (!defined $ENV{"CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN"})
+{
+    fail("Must set CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN environment variable to approve pull requests");
+}
+
+my $branch_name = get_argument("Branch name? ");
+my $body = console_input("Approval body? ");
+
+cactus("git-approve-pull-request",
+    "-Dcactus.authentication-token=\"$ENV{CACTUS_GITHUB_PERSONAL_ACCESS_TOKEN}\"",
+    "-Dcactus.pr.branch-to-approve=\"$branch_name\"",
+    ""-Dcactus.pr.body=\"$body\"");

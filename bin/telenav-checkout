@@ -1,0 +1,33 @@
+#!/usr/bin/env perl
+
+#///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+#
+#  © 2011-2021 Telenav, Inc.
+#  Licensed under Apache License, Version 2.0
+#
+#///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+use 5.018;
+use strict;
+use warnings;
+
+require "$ENV{'TELENAV_WORKSPACE'}/bin/telenav-functions.pl";
+
+my $branch_name = get_argument("Branch name? ");
+
+if (!defined $branch_name)
+{
+    fail_with_usage("[branch-name]");
+}
+
+cactus("checkout",
+    "-Dcactus.fetch-first=true",
+    "-Dcactus.base-branch=develop",
+    "-Dcactus.target-branch=\"${branch_name}\"",
+    "-Dcactus.include-root=true",
+    "-Dcactus.create-branches=true",
+    "-Dcactus.create-local-branches=true",
+    "-Dcactus.push=false",
+    "-Dcactus.permit-local-changes=true");
+
+println("Checked out branch ${branch_name}");

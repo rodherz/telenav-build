@@ -7,12 +7,8 @@
 #
 #///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-source telenav-library-functions.sh
+source "${TELENAV_WORKSPACE}/bin/telenav-build-library-functions"
 
-scope=""
-get_scope_argument "$@"
-
-cd_workspace
-mvn --quiet \
-    "$(resolve_scope_switches "$scope")" \
-    com.telenav.cactus:cactus-maven-plugin:"$(cactus_version)":is-dirty || exit 1
+telenav_clean_caches_forced
+telenav_clean_maven_repository_forced
+telenav_clean_temporary_files_forced "$TELENAV_WORKSPACE"
