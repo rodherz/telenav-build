@@ -13,7 +13,8 @@ export RELEASE_BRANCH_PREFIX=release
 # Project families that can be released
 export VALID_PROJECT_FAMILIES=(kivakit lexakai mesakit)
 
-
+# We do not release cactus through this script, and its tests take a long time
+export CACTUS_TESTS_SKIP=true
 
 ##############################################################################
 # Check for any arguments (publish, quiet)
@@ -37,9 +38,6 @@ do
     fi
     if [ "$argument" == "skip-review" ]; then
         export SKIP_REVIEW=true
-    fi
-    if [ "$argument" == "fast" ]; then
-        export FAST="--threads 12"
     fi
     if [ "$argument" == "help" ]; then
         echo " "
@@ -103,7 +101,7 @@ for family in ${PROJECT_FAMILIES//,/ }
 do
     # shellcheck disable=SC2076
     if [[ " ${VALID_PROJECT_FAMILIES[*]} " =~ " ${family} " ]]; then
-        read -r -p "┋    - $family release should be the next (major, minor, dot) version or the current version [current]? "
+        read -r -p "┋    - $family release should be the next (major, minor, dot, none) version or the current version [current]? "
         if [[ -z "${REPLY}" ]]; then
             release_type="none"
         else
@@ -111,19 +109,19 @@ do
         fi
         case $release_type in
         major)
-            MAJOR_REVISION_FAMILIES+=("$family")
+            MAJOR_REVISION_FAMILIES=("$MAJOR_REVISION_FAMILIES $family")
             ;;
         minor)
-            MINOR_REVISION_FAMILIES+=("$family")
+            MINOR_REVISION_FAMILIES=("$MINOR_REVISION_FAMILIES $family")
             ;;
         dot)
-            DOT_REVISION_FAMILIES+=("$family")
+            DOT_REVISION_FAMILIES=("$DOT_REVISION_FAMILIES $family")
             ;;
         none)
-            NONE_REVISION_FAMILIES+=("$family")
+            NONE_REVISION_FAMILIES=("$NONE_REVISION_FAMILIES $family")
             ;;
         current)
-            NONE_REVISION_FAMILIES+=("$family")
+            NONE_REVISION_FAMILIES=("$NONE_REVISION_FAMILIES $family")
             ;;
         *)
             echo "$release_type is not a valid release type"
@@ -135,6 +133,27 @@ do
     fi
 done
 
+# We need these values to be comma-delimited or we wind up in
+# shell-quoting hell constructing maven arguments.
+
+MAJOR_REVISION_FAMILIES=`echo $MAJOR_REVISION_FAMILIES | tr ' ' ,`
+MINOR_REVISION_FAMILIES=`echo $MINOR_REVISION_FAMILIES | tr ' ' ,`
+DOT_REVISION_FAMILIES=`echo $DOT_REVISION_FAMILIES | tr ' ' ,`
+NONE_REVISION_FAMILIES=`echo $NONE_REVISION_FAMILIES | tr ' ' ,`
+
+echo "┋"
+echo "┋ Releasing families: $PROJECT_FAMILIES"
+echo "┋ Changing MAJOR revision for [ $MAJOR_REVISION_FAMILIES ]"
+echo "┋ Changing MINOR revision for [ $MINOR_REVISION_FAMILIES ]"
+echo "┋ Changing MAJOR revision for [ $DOT_REVISION_FAMILIES ]"
+echo "┋ Using current version (less any -SNAPSHOT suffix) for [ $NONE_REVISION_FAMILIES ]"
+echo "┋"
+
+read -r -p "┋ Does that look correct (yes/no)? [no] "
+if [[ "${REPLY}" != "yes" ]]; then
+    echo Aborting.
+    exit 1
+fi
 
 
 ##############################################################################
@@ -165,7 +184,7 @@ echo "┋ Installing superpoms"
 cd "${ORIGINAL_WORKSPACE}" || exit 1
 
 # shellcheck disable=SC2086
-maven $QUIET $FAST \
+maven $QUIET --no-transfer-progress --batch-mode \
     -Dcactus.version="${CACTUS_PLUGIN_VERSION}" \
     -f telenav-superpom/pom.xml \
         clean install \
@@ -235,8 +254,7 @@ export MAVEN_OPTS="-XX:+UseG1GC \
     --add-opens=java.base/java.lang.reflect=ALL-UNNAMED \
     --add-opens=java.base/java.text=ALL-UNNAMED \
     --add-opens=java.desktop/java.awt.font=ALL-UNNAMED \
-    -Dcactus.release.branch.prefix=${RELEASE_BRANCH_PREFIX}"
-
+    -Dcactus.release.branch.prefix=${RELEASE_BRANCH_PREFIX} ${MAVEN_OPTS}"
 
 
 ##############################################################################
@@ -258,20 +276,30 @@ cd "${TEMPORARY_WORKSPACE}" || exit 1
 echo '┋ Installing superpoms'
 
 # shellcheck disable=SC2086
-maven $QUIET $FAST \
+maven $QUIET --no-transfer-progress --batch-mode \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -f telenav-superpom/pom.xml \
-        clean install \
-        || exit 1
+        clean install || exit 1
+        
+# Temporary hack until we untangle warring DefaultArtifact classes
+# from Maven's two versions of its artifact API in Lexakai mojo.
+# Just gets it installed ahead of anything trying to use it.
+echo "┋ Installing lexakai 1.0.11"
+
+# shellcheck disable=SC2086
+maven $QUIET --no-transfer-progress --batch-mode \
+    org.apache.maven.plugins:maven-dependency-plugin:3.3.0:get \
+    -Dartifact=com.telenav.lexakai:lexakai:1.0.11:jar:app || exit 2
+
 
 echo '┋ Checking build (no tests)'
 
 # shellcheck disable=SC2086
-maven $QUIET $FAST \
+maven $QUIET --no-transfer-progress --batch-mode \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -Dmaven.test.skip=true \
-        clean install \
-        || exit 1
+        clean install || exit 3 \
+
 
 echo "┋━━━━━━━ PHASE 0 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
@@ -285,24 +313,34 @@ echo "┋ "
 echo "┋━━━━━━━ PHASE 1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┋ Updating versions and branch references"
 
+echo "┋ Changing MAJOR revision for [ $MAJOR_REVISION_FAMILIES ]"
+echo "┋ Changing MINOR revision for [ $MINOR_REVISION_FAMILIES ]"
+echo "┋ Changing MAJOR revision for [ $DOT_REVISION_FAMILIES ]"
+echo "┋ Using current version (less any -SNAPSHOT suffix) for [ $NONE_REVISION_FAMILIES ]"
+
+# Deleteme:  temporary debug stuff
+echo "Phase 1 Maven Command-line:"
+echo "mvn $QUIET -Dcactus.verbose=true -Dcactus.maven.plugin.version=${CACTUS_PLUGIN_VERSION} -P release-phase-1 -Denforcer.skip=true -Dcactus.scope=family -Dcactus.expected.branch=develop -Dcactus.major.bump.families=${MAJOR_REVISION_FAMILIES[*]} -Dcactus.minor.bump.families=${MINOR_REVISION_FAMILIES[*]} -Dcactus.dot.bump.families=${DOT_REVISION_FAMILIES[*]} -Dcactus.no.bump.families=${NONE_REVISION_FAMILIES[*]} -Dcactus.families=${PROJECT_FAMILIES} -Dcactus.version.flavor.change=to-release -Dcactus.release.branch.prefix=${RELEASE_BRANCH_PREFIX} -Dmaven.test.skip=true clean validate"
+
 # shellcheck disable=SC2086
-maven $QUIET $FAST \
+maven $QUIET --no-transfer-progress --batch-mode \
     -Dcactus.verbose=true \
-    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
+    -Dcactus.maven.plugin.version=${CACTUS_PLUGIN_VERSION} \
     -P release-phase-1 \
     -Denforcer.skip=true \
+    -Dcactus.scope=family \
+    -Dcactus.bump-published=true \
+    -Dcactus.create.release.branch=true \
     -Dcactus.expected.branch=develop \
-    -Dcactus.major.bump.families=\""${MAJOR_REVISION_FAMILIES[*]}"\" \
-    -Dcactus.minor.bump.families=\""${MINOR_REVISION_FAMILIES[*]}"\" \
-    -Dcactus.dot.bump.families=\""${DOT_REVISION_FAMILIES[*]}"\" \
-    -Dcactus.no.bump.families=\""${NONE_REVISION_FAMILIES[*]}"\" \
-    -Dcactus.families="${PROJECT_FAMILIES}" \
+    -Dcactus.major.bump.families=${MAJOR_REVISION_FAMILIES} \
+    -Dcactus.minor.bump.families=${MINOR_REVISION_FAMILIES} \
+    -Dcactus.dot.bump.families=${DOT_REVISION_FAMILIES} \
+    -Dcactus.no.bump.families=${NONE_REVISION_FAMILIES} \
+    -Dcactus.families=${PROJECT_FAMILIES} \
     -Dcactus.version.flavor.change=to-release \
-    -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
-    -Dmaven.test.skip=true \
-        clean validate \
-        || exit 1
-
+    -Dcactus.release.branch.prefix=${RELEASE_BRANCH_PREFIX} \
+    -Dmaven.test.skip=true com.telenav.cactus:cactus-maven-plugin:${CACTUS_PLUGIN_VERSION}:bump-version || exit 4
+        
 
 ##############################################################################
 # Rebuild everything with tests now that some things have new versions
@@ -311,19 +349,38 @@ maven $QUIET $FAST \
 echo "┋ Installing superpoms"
 
 # shellcheck disable=SC2086
-maven $QUIET $FAST \
-    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
+maven $QUIET --no-transfer-progress --batch-mode \
+    -Dcactus.maven.plugin.version=${CACTUS_PLUGIN_VERSION} \
     -f telenav-superpom/pom.xml \
-        clean install \
-        || exit 1
+        clean install || exit 5
+
+
+echo "┋ Ensuring versions are consistent"
+# shellcheck disable=SC2086
+maven $QUIET --no-transfer-progress --batch-mode \
+    -Dcactus.commit-changes=true \
+    --no-transfer-progress --batch-mode \
+    -Dcactus.scope=all-project-families \
+    -Dcactus.include-root=true \
+    -Dcactus.scope=family \
+    com.telenav.cactus:cactus-maven-plugin:${CACTUS_PLUGIN_VERSION}:homogenize-versions || exit 6
+
+
+echo "┋ Reinstalling superpoms in case anything was inconsistent"
+
+# shellcheck disable=SC2086
+maven $QUIET --no-transfer-progress --batch-mode \
+    -Dcactus.maven.plugin.version=${CACTUS_PLUGIN_VERSION} \
+    -f telenav-superpom/pom.xml \
+        clean install || exit 7
 
 echo "┋ Checking build (tests enabled)"
 
 # shellcheck disable=SC2086
-maven $QUIET $FAST \
-    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
-        clean install \
-        || exit 1
+maven $QUIET --no-transfer-progress --batch-mode \
+    -Dcactus.maven.plugin.version=${CACTUS_PLUGIN_VERSION} \
+        clean install || exit 8
+
 
 echo "┋━━━━━━━ PHASE 1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
@@ -338,11 +395,11 @@ echo "┋━━━━━━━ PHASE 2 ━━━━━━━━━━━━━�
 echo "┋ Building documentation"
 
 # shellcheck disable=SC2086
-maven $QUIET $FAST \
+maven $QUIET --no-transfer-progress --batch-mode \
     -P release-phase-2 \
-    -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
-    -Dcactus.families="${PROJECT_FAMILIES}" \
-    -Dcactus.release.branch.prefix="${RELEASE_BRANCH_PREFIX}" \
+    -Dcactus.maven.plugin.version=${CACTUS_PLUGIN_VERSION} \
+    -Dcactus.families=${PROJECT_FAMILIES} \
+    -Dcactus.release.branch.prefix=${RELEASE_BRANCH_PREFIX} \
     -Dmaven.test.skip=true \
     -DreleasePush=$PUBLISH_RELEASE \
     -Dcactus.push=$PUBLISH_RELEASE \
@@ -353,8 +410,7 @@ maven $QUIET $FAST \
         javadoc:jar \
         gpg:sign \
         org.apache.maven.plugins:maven-site-plugin:4.0.0-M1:site \
-        verify \
-        || exit 1
+        verify || exit 9
 
 echo "┗━━━━━━━ PHASE 2 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
@@ -398,8 +454,9 @@ echo "┏━━━━━━━ PHASE 3 ━━━━━━━━━━━━━�
 echo "┋ Publishing release..."
 
 # shellcheck disable=SC2086
-maven $QUIET $FAST \
+maven $QUIET --no-transfer-progress --batch-mode \
     -P release-phase-3 \
+    -Dcactus.verb=Publishing \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -P ${GPG_PROFILE} \
     -Dcactus.families="${PROJECT_FAMILIES}" \
@@ -408,8 +465,8 @@ maven $QUIET $FAST \
         install \
         verify \
         gpg:sign \
-        deploy \
-        || exit 1
+        deploy || exit 10
+        
 
 echo "┗━━━━━━━ PHASE 3 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
@@ -424,16 +481,29 @@ echo "┏━━━━━━━ PHASE 4 ━━━━━━━━━━━━━�
 echo "┋ Merging release and updating to next snapshot version..."
 
 # shellcheck disable=SC2086
-maven $QUIET $FAST \
+maven $QUIET --no-transfer-progress --batch-mode \
     -P release-phase-4 \
     -Dcactus.maven.plugin.version="${CACTUS_PLUGIN_VERSION}" \
     -Dcactus.families="${PROJECT_FAMILIES}" \
     -Dmaven.test.skip=true \
-        clean generate-resources \
-        || exit 1
+        clean generate-resources || exit 11
 
 echo "┗━━━━━━━ PHASE 4 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
+
+# Now pull the changes from all the submodules back into
+# the originating checkout, and lastly (so the refs exist),
+# those from the submodule root, so the operator does not
+# need to get them from the remote.
+
+echo "┏━━━━━━━ PHASE 5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
+echo "┋ Updating local checkout from release checkout "
+
+cd ${ORIGINAL_WORKSPACE}
+git submodule foreach --recursive git pull ${TEMPORARY_WORKSPACE}/${name}
+git pull ${TEMPORARY_WORKSPACE}
+
+echo "┗━━━━━━━ PHASE 5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
 
 ##############################################################################
