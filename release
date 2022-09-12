@@ -25,7 +25,6 @@ export PUBLISH_RELEASE=false
 export RELEASE_BRANCH_PREFIX=$(date '+%s')-test-release
 unset QUIET
 unset SKIP_REVIEW
-unset FAST
 
 for argument in "$@"
 do
@@ -41,7 +40,7 @@ do
     fi
     if [ "$argument" == "help" ]; then
         echo " "
-        echo "release [publish|skip-review|quiet|fast|help]*"
+        echo "release [publish|skip-review|quiet|help]*"
         echo " "
         exit 0
     fi
@@ -109,18 +108,23 @@ do
         fi
         case $release_type in
         major)
+            # shellcheck disable=SC2128
             MAJOR_REVISION_FAMILIES=("$MAJOR_REVISION_FAMILIES $family")
             ;;
         minor)
+            # shellcheck disable=SC2128
             MINOR_REVISION_FAMILIES=("$MINOR_REVISION_FAMILIES $family")
             ;;
         dot)
+            # shellcheck disable=SC2128
             DOT_REVISION_FAMILIES=("$DOT_REVISION_FAMILIES $family")
             ;;
         none)
+            # shellcheck disable=SC2128
             NONE_REVISION_FAMILIES=("$NONE_REVISION_FAMILIES $family")
             ;;
         current)
+            # shellcheck disable=SC2128
             NONE_REVISION_FAMILIES=("$NONE_REVISION_FAMILIES $family")
             ;;
         *)
@@ -136,17 +140,17 @@ done
 # We need these values to be comma-delimited or we wind up in
 # shell-quoting hell constructing maven arguments.
 
-MAJOR_REVISION_FAMILIES=`echo $MAJOR_REVISION_FAMILIES | tr ' ' ,`
-MINOR_REVISION_FAMILIES=`echo $MINOR_REVISION_FAMILIES | tr ' ' ,`
-DOT_REVISION_FAMILIES=`echo $DOT_REVISION_FAMILIES | tr ' ' ,`
-NONE_REVISION_FAMILIES=`echo $NONE_REVISION_FAMILIES | tr ' ' ,`
+COMMA_SEPARATED_MAJOR_REVISION_FAMILIES=$(echo "${MAJOR_REVISION_FAMILIES[*]}" | tr ' ' ,)
+COMMA_SEPARATED_MINOR_REVISION_FAMILIES=$(echo "${MINOR_REVISION_FAMILIES[*]}" | tr ' ' ,)
+COMMA_SEPARATED_DOT_REVISION_FAMILIES=$(echo "${DOT_REVISION_FAMILIES[*]}" | tr ' ' ,)
+COMMA_SEPARATED_NONE_REVISION_FAMILIES=$(echo "${NONE_REVISION_FAMILIES[*]}" | tr ' ' ,)
 
 echo "┋"
 echo "┋ Releasing families: $PROJECT_FAMILIES"
-echo "┋ Changing MAJOR revision for [ $MAJOR_REVISION_FAMILIES ]"
-echo "┋ Changing MINOR revision for [ $MINOR_REVISION_FAMILIES ]"
-echo "┋ Changing MAJOR revision for [ $DOT_REVISION_FAMILIES ]"
-echo "┋ Using current version (less any -SNAPSHOT suffix) for [ $NONE_REVISION_FAMILIES ]"
+echo "┋ Changing MAJOR revision for [ $COMMA_SEPARATED_MAJOR_REVISION_FAMILIES ]"
+echo "┋ Changing MINOR revision for [ $COMMA_SEPARATED_MINOR_REVISION_FAMILIES ]"
+echo "┋ Changing MAJOR revision for [ $COMMA_SEPARATED_DOT_REVISION_FAMILIES ]"
+echo "┋ Using current version (less any -SNAPSHOT suffix) for [ $COMMA_SEPARATED_NONE_REVISION_FAMILIES ]"
 echo "┋"
 
 read -r -p "┋ Does that look correct (yes/no)? [no] "
@@ -313,10 +317,10 @@ echo "┋ "
 echo "┋━━━━━━━ PHASE 1 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┋ Updating versions and branch references"
 
-echo "┋ Changing MAJOR revision for [ $MAJOR_REVISION_FAMILIES ]"
-echo "┋ Changing MINOR revision for [ $MINOR_REVISION_FAMILIES ]"
-echo "┋ Changing MAJOR revision for [ $DOT_REVISION_FAMILIES ]"
-echo "┋ Using current version (less any -SNAPSHOT suffix) for [ $NONE_REVISION_FAMILIES ]"
+echo "┋ Changing MAJOR revision for [ $COMMA_SEPARATED_MAJOR_REVISION_FAMILIES ]"
+echo "┋ Changing MINOR revision for [ $COMMA_SEPARATED_MINOR_REVISION_FAMILIES ]"
+echo "┋ Changing MAJOR revision for [ $COMMA_SEPARATED_DOT_REVISION_FAMILIES ]"
+echo "┋ Using current version (less any -SNAPSHOT suffix) for [ $COMMA_SEPARATED_NONE_REVISION_FAMILIES ]"
 
 # Deleteme:  temporary debug stuff
 echo "Phase 1 Maven Command-line:"
@@ -332,10 +336,10 @@ maven $QUIET --no-transfer-progress --batch-mode \
     -Dcactus.bump-published=true \
     -Dcactus.create.release.branch=true \
     -Dcactus.expected.branch=develop \
-    -Dcactus.major.bump.families=${MAJOR_REVISION_FAMILIES} \
-    -Dcactus.minor.bump.families=${MINOR_REVISION_FAMILIES} \
-    -Dcactus.dot.bump.families=${DOT_REVISION_FAMILIES} \
-    -Dcactus.no.bump.families=${NONE_REVISION_FAMILIES} \
+    -Dcactus.major.bump.families=${COMMA_SEPARATED_MAJOR_REVISION_FAMILIES} \
+    -Dcactus.minor.bump.families=${COMMA_SEPARATED_MINOR_REVISION_FAMILIES} \
+    -Dcactus.dot.bump.families=${COMMA_SEPARATED_DOT_REVISION_FAMILIES} \
+    -Dcactus.no.bump.families=${COMMA_SEPARATED_NONE_REVISION_FAMILIES} \
     -Dcactus.families=${PROJECT_FAMILIES} \
     -Dcactus.version.flavor.change=to-release \
     -Dcactus.release.branch.prefix=${RELEASE_BRANCH_PREFIX} \
@@ -499,9 +503,10 @@ echo "┗━━━━━━━ PHASE 4 ━━━━━━━━━━━━━�
 echo "┏━━━━━━━ PHASE 5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┓"
 echo "┋ Updating local checkout from release checkout "
 
-cd ${ORIGINAL_WORKSPACE}
-git submodule foreach --recursive git pull ${TEMPORARY_WORKSPACE}/${name}
-git pull ${TEMPORARY_WORKSPACE}
+cd "${ORIGINAL_WORKSPACE}" || exit
+# shellcheck disable=SC2154
+git submodule foreach --recursive git pull "${TEMPORARY_WORKSPACE}"/"${name}"
+git pull "${TEMPORARY_WORKSPACE}"
 
 echo "┗━━━━━━━ PHASE 5 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━┛"
 
