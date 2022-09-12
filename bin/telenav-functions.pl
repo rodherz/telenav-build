@@ -53,8 +53,15 @@ sub workspace
 
 sub cactus_version
 {
-    # my $version = `cat ${\(workspace())}/cactus/pom.xml | grep -Eow '<cactus\.previous\.version>(.*?)</cactus\.previous\.version>' | sed -E 's/.*>(.*)<.*/\\1/'`;
-    my $version = `cat ${\(workspace())}/cactus/pom.xml | grep -Eow '<cactus\.version>(.*?)</cactus\.version>' | sed -E 's/.*>(.*)<.*/\\1/'`;
+    my $version;
+    if ($ENV{'KIVAKIT_DEBUG'})
+    {
+        $version = `cat ${\(workspace())}/cactus/pom.xml | grep -Eow '<cactus\.version>(.*?)</cactus\.version>' | sed -E 's/.*>(.*)<.*/\\1/'`;
+    }
+    else
+    {
+        $version = `cat ${\(workspace())}/cactus/pom.xml | grep -Eow '<cactus\.previous\.version>(.*?)</cactus\.previous\.version>' | sed -E 's/.*>(.*)<.*/\\1/'`;
+    }
     chomp $version;
     return $version;
 }
