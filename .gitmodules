@@ -1,39 +1,39 @@
 [submodule "lexakai-annotations"]
 	path = lexakai-annotations
 	url = https://github.com/Telenav/lexakai-annotations.git
-	branch = develop
+	branch = feature/core-evaluation
 [submodule "kivakit"]
 	path = kivakit
 	url = https://github.com/Telenav/kivakit.git
-	branch = develop
+	branch = feature/core-evaluation
 [submodule "kivakit-extensions"]
 	path = kivakit-extensions
 	url = https://github.com/Telenav/kivakit-extensions.git
-	branch = develop
+	branch = feature/core-evaluation
 [submodule "kivakit-stuff"]
 	path = kivakit-stuff
 	url = https://github.com/Telenav/kivakit-stuff.git
-	branch = develop
+	branch = feature/core-evaluation
 [submodule "kivakit-examples"]
 	path = kivakit-examples
 	url = https://github.com/Telenav/kivakit-examples.git
-	branch = develop
+	branch = feature/core-evaluation
 [submodule "lexakai"]
 	path = lexakai
 	url = https://github.com/Telenav/lexakai.git
-	branch = develop
+	branch = feature/core-evaluation
 [submodule "mesakit"]
 	path = mesakit
 	url = https://github.com/Telenav/mesakit.git
-	branch = develop
+	branch = feature/core-evaluation
 [submodule "mesakit-extensions"]
 	path = mesakit-extensions
 	url = https://github.com/Telenav/mesakit-extensions.git
-	branch = develop
+	branch = feature/core-evaluation
 [submodule "mesakit-examples"]
 	path = mesakit-examples
 	url = https://github.com/Telenav/mesakit-examples.git
-	branch = develop
+	branch = feature/core-evaluation
 [submodule "cactus"]
 	path = cactus
 	url = https://github.com/Telenav/cactus.git
@@ -41,7 +41,7 @@
 [submodule "telenav-superpom"]
 	path = telenav-superpom
 	url = https://github.com/Telenav/telenav-superpom.git
-	branch = develop
+	branch = feature/core-evaluation
 [submodule "mesakit-assets"]
 	path = mesakit-assets
 	url = https://github.com/Telenav/mesakit-assets.git
