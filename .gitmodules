@@ -37,7 +37,7 @@
 [submodule "cactus"]
 	path = cactus
 	url = https://github.com/Telenav/cactus.git
-	branch = develop
+	branch = feature/core-evaluation
 [submodule "telenav-superpom"]
 	path = telenav-superpom
 	url = https://github.com/Telenav/telenav-superpom.git
