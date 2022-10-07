@@ -41,7 +41,6 @@
 
         <module>telenav-superpom</module>
         <module>kivakit</module>
-        <module>cactus</module>
         <module>lexakai-annotations</module>
         <module>kivakit-extensions</module>
         <module>kivakit-examples</module>
