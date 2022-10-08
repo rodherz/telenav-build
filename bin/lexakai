@@ -9,8 +9,8 @@
 
 source telenav-library-functions
 
-lexakai_download_version="1.0.7"
-lexakai_download_name="lexakai-${lexakai_download_version}.jar"
+lexakai_download_version="1.0.13"
+lexakai_download_name="lexakai-${lexakai_download_version}-app.jar"
 
 lexakai_downloads="$HOME/.lexakai/downloads"
 
@@ -22,8 +22,8 @@ if [[ "$lexakai_download_version" == *"SNAPSHOT"* ]]; then
 
 else
 
-    lexakai_url="https://repo1.maven.org/maven2/com/telenav/lexakai/lexakai/${lexakai_download_version}/lexakai-${lexakai_download_version}.jar"
-    lexakai_jar="${lexakai_downloads}/lexakai-${lexakai_download_version}.jar"
+    lexakai_url="https://repo1.maven.org/maven2/com/telenav/lexakai/lexakai/${lexakai_download_version}/lexakai-${lexakai_download_version}-app.jar"
+    lexakai_jar="${lexakai_downloads}/lexakai-${lexakai_download_version}-app.jar"
 
 fi
 
