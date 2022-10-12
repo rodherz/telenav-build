@@ -1,7 +1,7 @@
 # This workflow will build a Java project with Maven, and cache/restore any dependencies to improve the workflow execution time
 # For more information see: https://help.github.com/actions/language-and-framework-guides/building-and-testing-java-with-maven
 
-name: Java CI with Maven
+name: Build telenav-build
 
 on:
   workflow_dispatch:
@@ -26,10 +26,19 @@ jobs:
         java-version: '17'
         distribution: 'temurin'
         cache: maven
-    - name: Install telenav-superpom
+        
+    - name: Configure Git
       run: |
-        mvn -f telenav-superpom/pom.xml clean install
-        mvn -f cactus/pom.xml -Dmaven.test.skip.exec=true clean install
-        mvn clean install
+        git config --global user.email "nobody@nowhere.com"
+        git config --global user.name "Nobody"
+        
+    - name: Install telenav-superpom
+      run: mvn -f telenav-superpom/pom.xml clean install
+    
+    - name: Install cactus
+      run: mvn -f cactus/pom.xml -Dmaven.test.skip.exec=true clean install
+      
+    - name: Build
+      run: mvn clean install
         
         
